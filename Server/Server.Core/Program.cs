@@ -2,7 +2,6 @@
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Net.Sockets.TcpClient;
 using System.Text;
 
 namespace Server.Core
@@ -16,7 +15,7 @@ namespace Server.Core
             StringBuilder str = new StringBuilder();
             foreach (string file in files)
             {
-                str.Append("<br><a href=http://localhost:32000/" + file.Replace('\\', '/')+">" + file + "</a>");
+                str.Append("<br><a href=http://localhost:32000/" + file.Replace('\\', '/')+ " download>" + file + "</a>");
             }
             
             string strOutput = str.ToString();
@@ -44,10 +43,23 @@ namespace Server.Core
                     {
                         Console.WriteLine(requestInformation);
                         Console.WriteLine("Read Data");
-                        handler.Send(Encoding.ASCII.GetBytes("HTTP/1.1 400 Bad Request\r\n"));
+                        handler.Send(Encoding.ASCII.GetBytes("HTTP/1.1 404 Bad Request\r\n"));
                         Console.WriteLine("Write One");
                         handler.Send(Encoding.ASCII.GetBytes("Content-Length: " + 0 + "\r\n\r\n"));
                         Console.WriteLine("Write Two");
+                    }
+                    else if(requestInformation.Contains("/C:/ShanwDocs/Apprenticeships/week5/Task.txt"))
+                    {
+                        Console.WriteLine(requestInformation);
+                        Console.WriteLine("Read Data");
+                        handler.Send(Encoding.ASCII.GetBytes("HTTP/1.1 200 OK\r\n"));
+                        Console.WriteLine("Write One");
+                        handler.Send(Encoding.ASCII.GetBytes("Content-Type: application/download\r\n"));
+                        Console.WriteLine("Write Two");
+                        handler.Send(Encoding.ASCII.GetBytes("Content-Length: " + System.IO.File.ReadAllBytes("C:/ShanwDocs/Apprenticeships/week5/Task.txt").Length + "\r\n\r\n"));
+                        Console.WriteLine("Write Three");
+                        handler.SendFile("C:/ShanwDocs/Apprenticeships/week5/Task.txt");
+                        Console.WriteLine("Write Four");
                     }
                     else
                     {
@@ -69,28 +81,3 @@ namespace Server.Core
         }
     }
 }
-
-/*
-                Console.WriteLine("Waiting for a connection...");
-                // Program is suspended while waiting for an incoming connection.
-                Socket handler = listener.Accept();
-                byte[] readData = new byte[1024];
-                Console.WriteLine("Hit");
-                handler.Send(Encoding.ASCII.GetBytes(strOutput));
-                Console.WriteLine(handler.Receive(readData));
-                handler.Shutdown(SocketShutdown.Both);
-                handler.Close();
-
-                handler = listener.Accept();
-                handler.Send(Encoding.ASCII.GetBytes("HTTP/1.1 200 OK\r\n"));
-                Console.WriteLine(handler.Receive(readData));
-                handler.Shutdown(SocketShutdown.Both);
-                handler.Close();
-
-                handler = listener.Accept();
-                handler.Send(Encoding.ASCII.GetBytes("Connection: close\r\n\r\n"));
-                //handler.SendFile("C:\\ShanwDocs\\Apprenticeships\\week5\\webData\\HelloWorld.html");
-                //handler.Send(System.IO.File.ReadAllBytes("C:\\ShanwDocs\\Apprenticeships\\week5\\webData\\HelloWorld.html"));
-                handler.Shutdown(SocketShutdown.Both);
-                handler.Close();
-                */
