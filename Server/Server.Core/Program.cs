@@ -1,9 +1,14 @@
-﻿namespace Server.Core
+﻿using System.Net;
+
+namespace Server.Core
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
+            var runningServer = new MainServer(new DataManager(new SocketProxy(), new IPEndPoint((IPAddress.Loopback), 32000)), new WebPageMaker());
+            while(true)
+                runningServer.run();
         }
     }
 }
