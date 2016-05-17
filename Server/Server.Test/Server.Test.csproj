@@ -64,7 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataManagerTest.cs" />
-    <Compile Include="MainServerTest.cs" />
+    <Compile Include="HelloWorldServerTest.cs" />
     <Compile Include="MockDataManager.cs" />
     <Compile Include="MockSocketProxy.cs" />
     <Compile Include="ProgramTest.cs" />

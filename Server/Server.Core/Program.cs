@@ -12,7 +12,7 @@ namespace Server.Core
                 runningServer.run();
         }
 
-        public static MainServer makeServer(string[] args)
+        public static IMainServer makeServer(string[] args)
         {
             if (args.Length > 1)
             {
@@ -21,7 +21,7 @@ namespace Server.Core
                 {
                     var endPoint = new IPEndPoint((IPAddress.Loopback), port);
                     var manager = new DataManager(new SocketProxy(), endPoint);
-                    return new MainServer(manager, new WebPageMaker());
+                    return new HelloWorldServer(manager, new WebPageMaker());
                 }
                 else
                     return null;
