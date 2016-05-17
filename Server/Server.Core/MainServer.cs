@@ -53,8 +53,8 @@ namespace Server.Core
                 handler.send("HTTP/1.1 200 OK\r\n");
                 handler.send("Content-Type: text/html\r\n");
                 handler.send("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.helloWorld()).Length + "\r\n\r\n");
+                handler.send(webMaker.helloWorld());
             }
-            handler.send(webMaker.helloWorld());
             handler.close();
         }
     }
