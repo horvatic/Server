@@ -9,7 +9,12 @@ namespace Server.Test
     class MockSocketProxy : ISocketProxy
     {
 
+
         private readonly Mock<ISocketProxy> _mock;
+        public MockSocketProxy()
+        {
+            _mock = new Mock<ISocketProxy>();
+        }
         public void Close()
         {
             _mock.Object.Close();
@@ -18,10 +23,6 @@ namespace Server.Test
         public void Shutdown(SocketShutdown how)
         {
             _mock.Object.Shutdown(how);
-        }
-        public MockSocketProxy()
-        {
-            _mock = new Mock<ISocketProxy>();
         }
 
         public ISocketProxy Accept()

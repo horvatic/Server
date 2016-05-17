@@ -48,6 +48,7 @@ namespace Server.Core
             byte[] readData = new byte[8192];
             int lengthRead = socket.Receive(readData);
             return (Encoding.ASCII.GetString(readData).Substring(0, lengthRead));
+
         }
     }
 }

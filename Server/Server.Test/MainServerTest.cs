@@ -14,6 +14,23 @@ namespace Server.Test
         }
 
         [Fact]
+        public void Make_Web_Server_Get_Request_Send_Back_Repsonce()
+        {
+            var dataManager = new MockDataManager()
+                    .stubSentToReturn(10)
+                    .stubReceive("Hello World");
+            dataManager = dataManager.stubAccpetObject(dataManager);
+            var server = new MainServer(dataManager, new WebPageMaker());
+            server.run();
+
+            dataManager.VerifyAccept();
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
+            dataManager.VerifyClose();
+
+        }
+
+        [Fact]
         public void Make_Sure_New_Main_Server_Does_Not_Take_Null_Socket()
         {
             Assert.Throws< SocketCanNotBeNull>( () => ( new MainServer(null, new WebPageMaker())));

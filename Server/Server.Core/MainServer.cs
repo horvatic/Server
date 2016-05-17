@@ -44,6 +44,19 @@ namespace Server.Core
                 this.webMaker = webMaker;
             }
         }
+        public void run()
+        {
+            var handler = socket.accept();
+            var request = handler.receive();
+            if (!(request.Length == 0))
+            {
+                handler.send("HTTP/1.1 200 OK\r\n");
+                handler.send("Content-Type: text/html\r\n");
+                handler.send("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.helloWorld()).Length + "\r\n\r\n");
+            }
+            handler.send(webMaker.helloWorld());
+            handler.close();
+        }
     }
 }
 

@@ -81,5 +81,17 @@ namespace Server.Test
 
             mockSocket.VerifyReceive(byteArray);
         }
+
+        public void Data_Manager_Receive_File_With_Data()
+        {
+            var mockSocket = new MockSocketProxy();
+            var localEndPoint = new IPEndPoint((IPAddress.Loopback), 32000);
+            var manager = new DataManager(mockSocket, localEndPoint);
+            var byteArray = new byte[8192];
+
+            manager.receive();
+
+            mockSocket.VerifyReceive(byteArray);
+        }
     }
 }
