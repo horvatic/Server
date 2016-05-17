@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 
 namespace Server.Core
 {
@@ -6,9 +7,27 @@ namespace Server.Core
     {
         public static void Main(string[] args)
         {
-            var runningServer = new MainServer(new DataManager(new SocketProxy(), new IPEndPoint((IPAddress.Loopback), 32000)), new WebPageMaker());
-            while(true)
+            var runningServer = makeServer(args); 
+            while (true && runningServer != null)
                 runningServer.run();
+        }
+
+        public static IMainServer makeServer(string[] args)
+        {
+            if (args.Length > 1)
+            {
+                int port;
+                if (Int32.TryParse(args[1], out port))
+                {
+                    var endPoint = new IPEndPoint((IPAddress.Loopback), port);
+                    var manager = new DataManager(new SocketProxy(), endPoint);
+                    return new HelloWorldServer(manager, new WebPageMaker());
+                }
+                else
+                    return null;
+            }
+            else
+                return null;
         }
     }
 }

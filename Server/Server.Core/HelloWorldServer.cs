@@ -24,11 +24,11 @@ namespace Server.Core
 
 
 
-    public class MainServer
+    public class HelloWorldServer : IMainServer
     {
         IDataManager socket;
         IWebPageMaker webMaker;
-        public MainServer(IDataManager socket, IWebPageMaker webMaker)
+        public HelloWorldServer(IDataManager socket, IWebPageMaker webMaker)
         {
             if (socket == null)
             {
@@ -50,11 +50,21 @@ namespace Server.Core
             var request = handler.receive();
             if (!(request.Length == 0))
             {
-                handler.send("HTTP/1.1 200 OK\r\n");
-                handler.send("Content-Type: text/html\r\n");
-                handler.send("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.helloWorld()).Length + "\r\n\r\n");
+                if (request.Contains("GET / HTTP/1.1"))
+                { 
+                    handler.send("HTTP/1.1 200 OK\r\n");
+                    handler.send("Content-Type: text/html\r\n");
+                    handler.send("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.helloWorld()).Length + "\r\n\r\n");
+                    handler.send(webMaker.helloWorld());
+                }
+                else
+                {
+                    handler.send("HTTP/1.1 404 Not Found\r\n");
+                    handler.send("Content-Type: text/html\r\n");
+                    handler.send("Content-Length: " + Encoding.ASCII.GetBytes("404").Length + "\r\n\r\n");
+                    handler.send("404");
+                }
             }
-            handler.send(webMaker.helloWorld());
             handler.close();
         }
     }
