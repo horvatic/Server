@@ -6,43 +6,14 @@ using System.Text;
 
 namespace Server.Core
 {
-    public class SocketCanNotBeNull : Exception
-    {
-        public SocketCanNotBeNull()
-        {
-
-        }
-    }
-
-    public class WebPageMakerCanNotBeNull : Exception
-    {
-        public WebPageMakerCanNotBeNull()
-        {
-
-        }
-    }
-
-
-
     public class HelloWorldServer : IMainServer
     {
         IDataManager socket;
         IWebPageMaker webMaker;
         public HelloWorldServer(IDataManager socket, IWebPageMaker webMaker)
         {
-            if (socket == null)
-            {
-                throw new SocketCanNotBeNull();
-            }
-            else if(webMaker == null)
-            {
-                throw new WebPageMakerCanNotBeNull();
-            }
-            else
-            {
-                this.socket = socket;
-                this.webMaker = webMaker;
-            }
+            this.socket = socket;
+            this.webMaker = webMaker;
         }
         public void run()
         {

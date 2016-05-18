@@ -44,7 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataManager.cs" />
+    <Compile Include="DirectoryProxy.cs" />
+    <Compile Include="DirectoryServer.cs" />
     <Compile Include="IDataManager.cs" />
+    <Compile Include="IDirectoryProxy.cs" />
     <Compile Include="IMainServer.cs" />
     <Compile Include="ISocketProxy.cs" />
     <Compile Include="IWebPageMaker.cs" />
