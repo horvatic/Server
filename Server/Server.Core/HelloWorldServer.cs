@@ -67,6 +67,11 @@ namespace Server.Core
             }
             handler.close();
         }
+
+        public bool stillAlive()
+        {
+            return true;
+        }
     }
 }
 

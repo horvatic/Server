@@ -26,5 +26,21 @@ namespace Server.Test
             var serverMade = Program.makeServer(args);
             Assert.Null(serverMade);
         }
+
+        [Fact]
+        public void Main_Starting_Program()
+        {
+            string[] args = { };
+            Assert.Equal(0, Program.Main(args));
+        }
+
+        [Fact]
+        public void Test_Running_Of_Server()
+        {
+            var mockServer = new MockMainServer();
+            Program.runServer(mockServer);
+            mockServer.VerifyRun();
+            mockServer.stillAlive();
+        }
     }
 }
