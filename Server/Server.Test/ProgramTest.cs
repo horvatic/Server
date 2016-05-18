@@ -13,11 +13,43 @@ namespace Server.Test
         }
 
         [Fact]
-        public void Make_Dirctory_Server_Correct_Inccorect_Arg_BAckwords()
+        public void Make_Dirctory_Server_Correct_Arg_Backwords()
         {
-            string[] args = { "-d", "C:\\", "-p", "8080" };
+            string[] args = { "-d", "C:\\", "-p", "2020" };
             var serverMade = Program.makeServer(args);
             Assert.NotNull(serverMade);
+        }
+
+        [Fact]
+        public void Make_Dirctory_Server_Inncorect_Correct_Not_Dir()
+        {
+            string[] args = { "-d", "Hello", "-p", "1111" };
+            var serverMade = Program.makeServer(args);
+            Assert.Null(serverMade);
+        }
+
+        [Fact]
+        public void Make_Dirctory_Server_Inncorect_Correct_Not_Port()
+        {
+            string[] args = { "-d", "C:\\", "-p", "hello" };
+            var serverMade = Program.makeServer(args);
+            Assert.Null(serverMade);
+        }
+
+        [Fact]
+        public void Make_Dirctory_Server_Inncorect_Correct_Not_Dir_Option()
+        {
+            string[] args = { "-s", "C:\\", "-p", "hello" };
+            var serverMade = Program.makeServer(args);
+            Assert.Null(serverMade);
+        }
+
+        [Fact]
+        public void Make_Dirctory_Server_Inncorect_Correct_Not_Port_Option()
+        {
+            string[] args = { "-d", "C:\\", "-s", "hello" };
+            var serverMade = Program.makeServer(args);
+            Assert.Null(serverMade);
         }
 
         [Fact]

@@ -53,6 +53,18 @@ namespace Server.Core
                 else
                     return null;
             }
+            else if (args[2] == "-p" && args[0] == "-d")
+            {
+                homeDirectory = args[1];
+                if (Int32.TryParse(args[3], out port) && Directory.Exists(homeDirectory))
+                {
+                    var endPoint = new IPEndPoint((IPAddress.Loopback), port);
+                    var manager = new DataManager(new SocketProxy(), endPoint);
+                    return new DirectoryServer(manager, new WebPageMaker(new DirectoryProxy(), port), homeDirectory);
+                }
+                else
+                    return null;
+            }
             else
                 return null;
         }
