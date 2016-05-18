@@ -26,7 +26,7 @@ namespace Server.Test
         {
             _mock.Verify(m => m.stillAlive(), Times.Once);
         }
-        public IMainServer stubAccpetObject(IMainServer returnObject)
+        public MockMainServer stubStillAlive()
         {
             _mock.Setup(m => m.stillAlive()).Returns(false);
             return this;

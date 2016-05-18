@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Server.Core
 {
-    class SocketProxy : ISocketProxy
+    public class SocketProxy : ISocketProxy
     {
         Socket tcpSocket;
         public SocketProxy()

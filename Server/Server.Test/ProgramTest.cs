@@ -37,10 +37,10 @@ namespace Server.Test
         [Fact]
         public void Test_Running_Of_Server()
         {
-            var mockServer = new MockMainServer();
+            var mockServer = new MockMainServer().stubStillAlive();
             Program.runServer(mockServer);
             mockServer.VerifyRun();
-            mockServer.stillAlive();
+            mockServer.VerifyStillAlive();
         }
     }
 }

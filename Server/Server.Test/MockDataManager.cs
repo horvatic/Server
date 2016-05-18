@@ -40,6 +40,10 @@ namespace Server.Test
         {
             _mock.Verify(m => m.send(message), Times.AtLeastOnce);
         }
+        public void VerifySendFile(string message)
+        {
+            _mock.Verify(m => m.sendFile(message), Times.AtLeastOnce);
+        }
         public void VerifyAccept()
         {
             _mock.Verify(m => m.accept(), Times.Once);

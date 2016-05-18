@@ -82,6 +82,7 @@ namespace Server.Test
             mockSocket.VerifyReceive(byteArray);
         }
 
+        [Fact]
         public void Data_Manager_Receive_File_With_Data()
         {
             var mockSocket = new MockSocketProxy();
