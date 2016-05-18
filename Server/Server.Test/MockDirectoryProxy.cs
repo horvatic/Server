@@ -11,7 +11,10 @@ namespace Server.Test
         {
             _mock = new Mock<IDirectoryProxy>();
         }
-
+        public bool Exists(string path)
+        {
+            return _mock.Object.Exists(path);
+        }
         public string[] GetDirectories(string path)
         {
             return _mock.Object.GetDirectories(path);
@@ -34,6 +37,16 @@ namespace Server.Test
             return this;
         }
 
+        public MockDirectoryProxy StubExists(bool isDir)
+        {
+            _mock.Setup(m => m.Exists(It.IsAny<string>())).Returns(isDir);
+            return this;
+        }
+
+        public void VerifyExists(string path)
+        {
+            _mock.Verify(m => m.Exists(path), Times.AtLeastOnce);
+        }
         public void VerifyGetFiles(string path)
         {
             _mock.Verify(m => m.GetFiles(path), Times.AtLeastOnce);
@@ -43,6 +56,5 @@ namespace Server.Test
         {
             _mock.Verify(m => m.GetDirectories(path), Times.AtLeastOnce);
         }
-
     }
 }

@@ -48,7 +48,7 @@ namespace Server.Core
                 {
                     var endPoint = new IPEndPoint((IPAddress.Loopback), port);
                     var manager = new DataManager(new SocketProxy(), endPoint);
-                    return new DirectoryServer(manager, new WebPageMaker(new DirectoryProxy(), port), homeDirectory);
+                    return new DirectoryServer(manager, new WebPageMaker(port), homeDirectory, new DirectoryProxy(), new FileProxy());
                 }
                 else
                     return null;
@@ -60,7 +60,7 @@ namespace Server.Core
                 {
                     var endPoint = new IPEndPoint((IPAddress.Loopback), port);
                     var manager = new DataManager(new SocketProxy(), endPoint);
-                    return new DirectoryServer(manager, new WebPageMaker(new DirectoryProxy(), port), homeDirectory);
+                    return new DirectoryServer(manager, new WebPageMaker(port), homeDirectory, new DirectoryProxy(), new FileProxy());
                 }
                 else
                     return null;

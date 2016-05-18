@@ -68,6 +68,7 @@
     <Compile Include="HelloWorldServerTest.cs" />
     <Compile Include="MockDataManager.cs" />
     <Compile Include="MockDirectoryProxy.cs" />
+    <Compile Include="MockFileProxy.cs" />
     <Compile Include="MockMainServer.cs" />
     <Compile Include="MockSocketProxy.cs" />
     <Compile Include="ProgramTest.cs" />

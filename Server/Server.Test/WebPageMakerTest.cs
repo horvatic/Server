@@ -25,8 +25,8 @@ namespace Server.Test
             correctOutput.Append("<br><a href=http://localhost:8080/file3 download>file3</a>");
             correctOutput.Append("<br><a href=http://localhost:8080/dir1 >dir1</a>");
             correctOutput.Append("<br><a href=http://localhost:8080/dir2 >dir2</a>");
-            WebPageMaker maker = new WebPageMaker(mockRead, 8080);
-            Assert.Equal(correctOutput.ToString(), maker.directoryContents(@"Hello/World"));
+            WebPageMaker maker = new WebPageMaker(8080);
+            Assert.Equal(correctOutput.ToString(), maker.directoryContents(@"Hello/World", mockRead));
             mockRead.VerifyGetDirectories(@"Hello/World");
             mockRead.VerifyGetFiles(@"Hello/World");
         }
@@ -43,8 +43,8 @@ namespace Server.Test
             correctOutput.Append("<br><a href=http://localhost:8080/dir0/file3 download>dir0/file3</a>");
             correctOutput.Append("<br><a href=http://localhost:8080/dir0/dir1 >dir0/dir1</a>");
             correctOutput.Append("<br><a href=http://localhost:8080/dir0/dir2 >dir0/dir2</a>");
-            WebPageMaker maker = new WebPageMaker(mockRead, 8080);
-            Assert.Equal(correctOutput.ToString(), maker.directoryContents(@"Hello/World"));
+            WebPageMaker maker = new WebPageMaker(8080);
+            Assert.Equal(correctOutput.ToString(), maker.directoryContents(@"Hello/World", mockRead));
             mockRead.VerifyGetDirectories(@"Hello/World");
             mockRead.VerifyGetFiles(@"Hello/World");
         }

@@ -3,6 +3,6 @@
     public interface IWebPageMaker
     {
         string helloWorld();
-        string directoryContents(string dir);
+        string directoryContents(string dir, IDirectoryProxy reader);
     }
 }

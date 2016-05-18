@@ -20,12 +20,12 @@ namespace Server.Test
             var mockRead = new MockDirectoryProxy()
                 .StubGetDirectories(new[] { "dir1", "dir2" })
                 .StubGetFiles(new[] { "file1", "file2", "file3" });
-            var webMaker = new WebPageMaker(mockRead, 8080);
+            var webMaker = new WebPageMaker();
             var dataManager = new MockDataManager()
                     .stubSentToReturn(10)
                     .stubReceive("GET / HTTP/1.1");
             dataManager = dataManager.stubAccpetObject(dataManager);
-            var server = new HelloWorldServer(dataManager, new WebPageMaker());
+            var server = new HelloWorldServer(dataManager, webMaker);
             server.run();
 
             dataManager.VerifyAccept();

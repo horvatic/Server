@@ -8,27 +8,24 @@ namespace Server.Core
 {
     public class WebPageMaker : IWebPageMaker
     {
-        private readonly IDirectoryProxy _reader;
         private readonly int _port;
         public WebPageMaker()
         {
-            _reader = null;
             _port = 0;
         }
-        public WebPageMaker(IDirectoryProxy reader, int port)
+        public WebPageMaker(int port)
         {
-            _reader = reader;
             _port = port;
         }
-        public string directoryContents(string dir)
+        public string directoryContents(string dir, IDirectoryProxy reader)
         {
             StringBuilder directoryContents = new StringBuilder();
-            var files = _reader.GetFiles(dir);
+            var files = reader.GetFiles(dir);
             foreach (string file in files)
             {
                 directoryContents.Append("<br><a href=http://localhost:"+_port+"/" + file.Replace('\\', '/') + " download>" + file.Replace('\\', '/') + "</a>");
             }
-            var subDirs = _reader.GetDirectories(dir);
+            var subDirs = reader.GetDirectories(dir);
             foreach (string subDir in subDirs)
             {
                 directoryContents.Append("<br><a href=http://localhost:" + _port + "/" + subDir.Replace('\\', '/') + " >" + subDir.Replace('\\', '/') + "</a>");
