@@ -5,11 +5,21 @@ namespace Server.Core
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
-            var runningServer = makeServer(args); 
-            while (true && runningServer != null)
-                runningServer.run();
+            runServer(makeServer(args));
+            return 0;
+        }
+
+        public static void runServer(IMainServer runningServer)
+        {
+            if (runningServer != null)
+            {
+                do
+                {
+                    runningServer.run();
+                } while (runningServer.stillAlive());
+            }
         }
 
         public static IMainServer makeServer(string[] args)

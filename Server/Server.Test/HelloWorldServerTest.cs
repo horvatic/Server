@@ -57,5 +57,16 @@ namespace Server.Test
         {
             Assert.Throws<WebPageMakerCanNotBeNull>(() => (new HelloWorldServer(new MockDataManager(), null)));
         }
+        [Fact]
+        public void Make_Sure_Server_Is_Always_Alive()
+        {
+            var dataManager = new MockDataManager()
+                    .stubSentToReturn(10)
+                    .stubReceive("/Hello");
+            dataManager = dataManager.stubAccpetObject(dataManager);
+            var server = new HelloWorldServer(dataManager, new WebPageMaker());
+
+            Assert.Equal(true, server.stillAlive());
+        }
     }
 }
