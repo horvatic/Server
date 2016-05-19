@@ -65,8 +65,8 @@ namespace Server.Core
         {
             handler.send("HTTP/1.1 404 Not Found\r\n");
             handler.send("Content-Type: text/html\r\n");
-            handler.send("Content-Length: " + Encoding.ASCII.GetBytes("404").Length + "\r\n\r\n");
-            handler.send("404");
+            handler.send("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.error404Page()).Length + "\r\n\r\n");
+            handler.send(webMaker.error404Page());
         }
 
         public bool stillAlive()

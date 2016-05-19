@@ -17,9 +17,6 @@ namespace Server.Test
         [Fact]
         public void Make_Web_Server_Get_Request_Send_Back_Repsonce()
         {
-            var mockRead = new MockDirectoryProxy()
-                .StubGetDirectories(new[] { "dir1", "dir2" })
-                .StubGetFiles(new[] { "file1", "file2", "file3" });
             var webMaker = new WebPageMaker();
             var dataManager = new MockDataManager()
                     .stubSentToReturn(10)
@@ -45,6 +42,7 @@ namespace Server.Test
                     .stubSentToReturn(10)
                     .stubReceive("/Hello");
             dataManager = dataManager.stubAccpetObject(dataManager);
+            var webMaker = new WebPageMaker();
             var server = new HelloWorldServer(dataManager, new WebPageMaker());
             server.run();
 
@@ -52,8 +50,8 @@ namespace Server.Test
             dataManager.VerifyReceive();
             dataManager.VerifySend("HTTP/1.1 404 Not Found\r\n");
             dataManager.VerifySend("Content-Type: text/html\r\n");
-            dataManager.VerifySend("Content-Length: " + Encoding.ASCII.GetBytes("404").Length + "\r\n\r\n");
-            dataManager.VerifySend("404");
+            dataManager.VerifySend("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.error404Page()).Length + "\r\n\r\n");
+            dataManager.VerifySend(webMaker.error404Page());
             dataManager.VerifyClose();
 
         }
