@@ -31,20 +31,18 @@ namespace Server.Core
             }
             else if(args.Length == 4)
             {
-                return directoryServerServer(args);
+                return directoryServer(args);
             }
             else
                 return null;
         }
 
-        public static IMainServer directoryServerServer(string[] args)
+        public static IMainServer makedirectoryServer(string chosenPort, string homeDirectory)
         {
             int port;
-            string homeDirectory;
-            if (args[0] == "-p" && args[2] == "-d")
+            if (Int32.TryParse(chosenPort, out port) && Directory.Exists(homeDirectory))
             {
-                homeDirectory = args[3];
-                if (Int32.TryParse(args[1], out port) && Directory.Exists(homeDirectory))
+                if (port > 1999 && port < 65001)
                 {
                     var endPoint = new IPEndPoint((IPAddress.Loopback), port);
                     var manager = new DataManager(new SocketProxy(), endPoint);
@@ -53,17 +51,21 @@ namespace Server.Core
                 else
                     return null;
             }
+            else
+            {
+                return null;
+            }
+        }
+
+        public static IMainServer directoryServer(string[] args)
+        {
+            if (args[0] == "-p" && args[2] == "-d")
+            {
+                return makedirectoryServer(args[1], args[3]);
+            }
             else if (args[2] == "-p" && args[0] == "-d")
             {
-                homeDirectory = args[1];
-                if (Int32.TryParse(args[3], out port) && Directory.Exists(homeDirectory))
-                {
-                    var endPoint = new IPEndPoint((IPAddress.Loopback), port);
-                    var manager = new DataManager(new SocketProxy(), endPoint);
-                    return new DirectoryServer(manager, new WebPageMaker(port), homeDirectory, new DirectoryProxy(), new FileProxy());
-                }
-                else
-                    return null;
+                return makedirectoryServer(args[3], args[1]);
             }
             else
                 return null;

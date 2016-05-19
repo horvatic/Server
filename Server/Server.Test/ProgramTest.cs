@@ -4,6 +4,23 @@ namespace Server.Test
 {
     public class ProgramTest
     {
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        [InlineData(1000)]
+        [InlineData(1999)]
+        [InlineData(65001)]
+        [InlineData(9999999)]
+        public void Out_Of_Range_Ports(int invaildPorts)
+        {
+            string[] args = { "-p", invaildPorts.ToString(), "-d", "C:\\" };
+            var serverMade = Program.makeServer(args);
+            Assert.Null(serverMade);
+
+            string[] argsSwaped = { "-d", "C:\\", "-p", invaildPorts.ToString() };
+            var serverMadeSwaped = Program.makeServer(argsSwaped);
+            Assert.Null(serverMadeSwaped);
+        }
         [Fact]
         public void Make_Dirctory_Server_Correct()
         {
