@@ -41,11 +41,22 @@ namespace Server.Core
                     {
                         pushFile(requestItem, handler);
                     }
+                    else if(dirReader.Exists(requestItem))
+                    {
+                        pushDir(requestItem, handler);
+                    }
                     else
                         error404(handler);
                 }
             }
             handler.close();
+        }
+        private void pushDir(string path, IDataManager handler)
+        {
+            handler.send("HTTP/1.1 200 OK\r\n");
+            handler.send("Content-Type: text/html\r\n");
+            handler.send("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.directoryContents(path, dirReader)).Length + "\r\n\r\n");
+            handler.send(webMaker.directoryContents(path, dirReader));
         }
         private void pushFile(string path, IDataManager handler)
         {

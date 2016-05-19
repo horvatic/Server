@@ -20,9 +20,9 @@ namespace Server.Test
                 .StubGetDirectories(new []{ "dir1", "dir2"})
                 .StubGetFiles(new[] { "file1", "file2", "file3" });
             var correctOutput = new StringBuilder();
-            correctOutput.Append("<br><a href=http://localhost:8080/file1 download>file1</a>");
-            correctOutput.Append("<br><a href=http://localhost:8080/file2 download>file2</a>");
-            correctOutput.Append("<br><a href=http://localhost:8080/file3 download>file3</a>");
+            correctOutput.Append("<br><a href=http://localhost:8080/file1 >file1</a>");
+            correctOutput.Append("<br><a href=http://localhost:8080/file2 >file2</a>");
+            correctOutput.Append("<br><a href=http://localhost:8080/file3 >file3</a>");
             correctOutput.Append("<br><a href=http://localhost:8080/dir1 >dir1</a>");
             correctOutput.Append("<br><a href=http://localhost:8080/dir2 >dir2</a>");
             WebPageMaker maker = new WebPageMaker(8080);
@@ -38,9 +38,9 @@ namespace Server.Test
                 .StubGetDirectories(new[] { "dir0\\dir1", "dir0\\dir2" })
                 .StubGetFiles(new[] { "dir0\\file1", "dir0\\file2", "dir0\\file3" });
             var correctOutput = new StringBuilder();
-            correctOutput.Append("<br><a href=http://localhost:8080/dir0/file1 download>dir0/file1</a>");
-            correctOutput.Append("<br><a href=http://localhost:8080/dir0/file2 download>dir0/file2</a>");
-            correctOutput.Append("<br><a href=http://localhost:8080/dir0/file3 download>dir0/file3</a>");
+            correctOutput.Append("<br><a href=http://localhost:8080/dir0/file1 >dir0/file1</a>");
+            correctOutput.Append("<br><a href=http://localhost:8080/dir0/file2 >dir0/file2</a>");
+            correctOutput.Append("<br><a href=http://localhost:8080/dir0/file3 >dir0/file3</a>");
             correctOutput.Append("<br><a href=http://localhost:8080/dir0/dir1 >dir0/dir1</a>");
             correctOutput.Append("<br><a href=http://localhost:8080/dir0/dir2 >dir0/dir2</a>");
             WebPageMaker maker = new WebPageMaker(8080);

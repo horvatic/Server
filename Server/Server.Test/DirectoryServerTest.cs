@@ -72,6 +72,31 @@ namespace Server.Test
         }
 
         [Fact]
+        public void Make_Web_Server_Get_Request_Send_Back_Repsonce_Not_Home_Dir_Output()
+        {
+            var mockRead = new MockDirectoryProxy()
+                .StubGetDirectories(new[] { "dir1", "dir2" })
+                .StubGetFiles(new[] { "file1", "file2", "file3" })
+                .StubExists(true);
+            var webMaker = new WebPageMaker(8080);
+            var mockFileReader = new MockFileProxy().StubExists(false).StubReadAllBytes(new byte[] { 1, 2 });
+            var dataManager = new MockDataManager()
+                    .stubSentToReturn(10)
+                    .stubReceive("GET /DirNotHome HTTP/1.1");
+            dataManager = dataManager.stubAccpetObject(dataManager);
+            var server = new DirectoryServer(dataManager, webMaker, @"Home", mockRead, mockFileReader);
+            server.run();
+
+            dataManager.VerifyAccept();
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
+            dataManager.VerifySend("Content-Type: text/html\r\n");
+            dataManager.VerifySend("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.directoryContents(@"DirNotHome", mockRead)).Length + "\r\n\r\n");
+            dataManager.VerifySend(webMaker.directoryContents(@"DirNotHome", mockRead));
+            dataManager.VerifyClose();
+        }
+
+        [Fact]
         public void Make_Web_Server_Get_Bad_Request_Send_Back_Repsonce()
         {
             var mockRead = new MockDirectoryProxy()
