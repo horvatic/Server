@@ -23,7 +23,7 @@ namespace Server.Core
             var request = handler.receive();
             if (!(request.Length == 0))
             {
-                string requestItem = request.Substring(request.IndexOf("GET /") + 5, request.IndexOf(" HTTP/1.1")-5);
+                string requestItem = request.Substring(request.IndexOf("GET /") + 5, request.IndexOf(" HTTP/1.1")-5).Replace("%20", " ");
                 if (request.Contains("GET / HTTP/1.1"))
                 {
                     handler.send("HTTP/1.1 200 OK\r\n");

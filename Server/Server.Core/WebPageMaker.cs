@@ -19,12 +19,12 @@ namespace Server.Core
             var files = reader.GetFiles(dir);
             foreach (string file in files)
             {
-                directoryContents.Append("<br><a href=http://localhost:"+_port+"/" + file.Replace('\\', '/') + " >" + file.Replace('\\', '/') + "</a>");
+                directoryContents.Append(@"<br><a href=""http://localhost:"+_port+"/" + file.Replace('\\', '/') + @""" >" + file.Replace('\\', '/') + "</a>");
             }
             var subDirs = reader.GetDirectories(dir);
             foreach (string subDir in subDirs)
             {
-                directoryContents.Append("<br><a href=http://localhost:" + _port + "/" + subDir.Replace('\\', '/') + " >" + subDir.Replace('\\', '/') + "</a>");
+                directoryContents.Append(@"<br><a href=""http://localhost:" + _port + "/" + subDir.Replace('\\', '/') + @""" >" + subDir.Replace('\\', '/') + "</a>");
             }
 
             return directoryContents.ToString();
