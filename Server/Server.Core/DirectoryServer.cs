@@ -57,7 +57,8 @@ namespace Server.Core
         private void pushFile(string path, IDataManager handler)
         {
             handler.send("HTTP/1.1 200 OK\r\n");
-            handler.send("Content-Type: /application/download\r\n");
+            handler.send("Content-Type: application/text\r\n");
+            handler.send("Content-Disposition: attachment; filename = "+ path+ "\r\n");
             handler.send("Content-Length: " + fileReader.ReadAllBytes(path).Length + "\r\n\r\n");
             handler.sendFile(path);
         }

@@ -65,7 +65,8 @@ namespace Server.Test
             dataManager.VerifyAccept();
             dataManager.VerifyReceive();
             dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
-            dataManager.VerifySend("Content-Type: /application/download\r\n");
+            dataManager.VerifySend("Content-Type: application/text\r\n");
+            dataManager.VerifySend("Content-Disposition: attachment; filename = NotHome.txt\r\n");
             dataManager.VerifySend("Content-Length: " + mockFileReader.ReadAllBytes("NotHome.txt").Length + "\r\n\r\n");
             dataManager.VerifySendFile("NotHome.txt");
             dataManager.VerifyClose();
