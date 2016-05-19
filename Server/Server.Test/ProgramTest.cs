@@ -1,4 +1,6 @@
 ﻿using Server.Core;
+using System.IO;
+using System.Text;
 using Xunit;
 namespace Server.Test
 {
@@ -13,6 +15,10 @@ namespace Server.Test
         [InlineData(9999999)]
         public void Out_Of_Range_Ports(int invaildPorts)
         {
+            string[] argsHelloWorld = { "-p", invaildPorts.ToString()};
+            var serverMadeHelloWorld = Program.makeServer(argsHelloWorld);
+            Assert.Null(serverMadeHelloWorld);
+
             string[] args = { "-p", invaildPorts.ToString(), "-d", "C:\\" };
             var serverMade = Program.makeServer(args);
             Assert.Null(serverMade);
@@ -126,6 +132,8 @@ namespace Server.Test
         [Fact]
         public void Main_Starting_Program()
         {
+            var output = new StringWriter();
+            System.Console.SetOut(output);
             string[] args = { };
             Assert.Equal(0, Program.Main(args));
         }
@@ -133,10 +141,31 @@ namespace Server.Test
         [Fact]
         public void Test_Running_Of_Server()
         {
+            var output = new StringWriter();
+            System.Console.SetOut(output);
             var mockServer = new MockMainServer().stubStillAlive();
             Program.runServer(mockServer);
             mockServer.VerifyRun();
             mockServer.VerifyStillAlive();
+            Assert.Equal("Server Running...\r\n", output.ToString());
+        }
+
+        [Fact]
+        public void Test_User_Inputs_Invaild_Settings_Dump_Error()
+        {
+            var output = new StringWriter();
+            System.Console.SetOut(output);
+            var correctOutput = new StringBuilder();
+            correctOutput.Append("Invaild Input Detected.\n");
+            correctOutput.Append("must be Server.Core.exe -p PORT -d directory\n");
+            correctOutput.Append("Vaild Ports 2000 - 65000\n");
+            correctOutput.Append("Examples:\n");
+            correctOutput.Append("Server.Core.exe -p 8080 -d C:/\n");
+            correctOutput.Append("Server.Core.exe -d C:/HelloWorld -p 5555\n");
+            correctOutput.Append("Server.Core.exe -p 9999\n\r\n");
+
+            Program.runServer(null);
+            Assert.Equal(correctOutput.ToString(), output.ToString());
         }
     }
 }

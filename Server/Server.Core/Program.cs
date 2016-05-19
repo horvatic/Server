@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Text;
 
 namespace Server.Core
 {
@@ -16,13 +17,28 @@ namespace Server.Core
         {
             if (runningServer != null)
             {
+                Console.WriteLine("Server Running...");
                 do
                 {
                     runningServer.run();
                 } while (runningServer.stillAlive());
             }
+            else
+                Console.WriteLine(getError());
         }
 
+        public static string getError()
+        {
+            var error = new StringBuilder();
+            error.Append("Invaild Input Detected.\n");
+            error.Append("must be Server.Core.exe -p PORT -d directory\n");
+            error.Append("Vaild Ports 2000 - 65000\n");
+            error.Append("Examples:\n");
+            error.Append("Server.Core.exe -p 8080 -d C:/\n");
+            error.Append("Server.Core.exe -d C:/HelloWorld -p 5555\n");
+            error.Append("Server.Core.exe -p 9999\n");
+            return error.ToString();
+        }
         public static IMainServer makeServer(string[] args)
         {
             if (args.Length == 2)
@@ -78,9 +94,14 @@ namespace Server.Core
             {
                 if (Int32.TryParse(args[1], out port))
                 {
-                    var endPoint = new IPEndPoint((IPAddress.Loopback), port);
-                    var manager = new DataManager(new SocketProxy(), endPoint);
-                    return new HelloWorldServer(manager, new WebPageMaker());
+                    if (port > 1999 && port < 65001)
+                    {
+                        var endPoint = new IPEndPoint((IPAddress.Loopback), port);
+                        var manager = new DataManager(new SocketProxy(), endPoint);
+                        return new HelloWorldServer(manager, new WebPageMaker());
+                    }
+                    else
+                        return null;
                 }
                 else
                     return null;
