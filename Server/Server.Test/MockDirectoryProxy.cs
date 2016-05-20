@@ -1,5 +1,4 @@
-﻿using System;
-using Moq;
+﻿using Moq;
 using Server.Core;
 
 namespace Server.Test
@@ -7,14 +6,17 @@ namespace Server.Test
     public class MockDirectoryProxy : IDirectoryProxy
     {
         private readonly Mock<IDirectoryProxy> _mock;
+
         public MockDirectoryProxy()
         {
             _mock = new Mock<IDirectoryProxy>();
         }
+
         public bool Exists(string path)
         {
             return _mock.Object.Exists(path);
         }
+
         public string[] GetDirectories(string path)
         {
             return _mock.Object.GetDirectories(path);
@@ -47,6 +49,7 @@ namespace Server.Test
         {
             _mock.Verify(m => m.Exists(path), Times.AtLeastOnce);
         }
+
         public void VerifyGetFiles(string path)
         {
             _mock.Verify(m => m.GetFiles(path), Times.AtLeastOnce);

@@ -2,8 +2,8 @@
 {
     public interface IWebPageMaker
     {
-        string error404Page();
-        string helloWorld();
-        string directoryContents(string dir, IDirectoryProxy reader);
+        string Error404Page();
+        string HelloWorld();
+        string DirectoryContents(string dir, IDirectoryProxy reader);
     }
 }

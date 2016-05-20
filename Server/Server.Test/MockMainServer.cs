@@ -1,40 +1,43 @@
-﻿using System;
+﻿using Moq;
 using Server.Core;
-using Moq;
+
 namespace Server.Test
 {
-    class MockMainServer : IMainServer
+    internal class MockMainServer : IMainServer
     {
         private readonly Mock<IMainServer> _mock;
+
         public MockMainServer()
         {
-            this._mock = new Mock<IMainServer>();
-        }
-        public bool stillAlive()
-        {
-            return _mock.Object.stillAlive();
-        }
-        void IMainServer.runningProcess(IDataManager handler)
-        {
-            _mock.Object.runningProcess(handler);
-        }
-        public void run()
-        {
-            _mock.Object.run();
-        }
-        public void VerifyRun()
-        {
-            _mock.Verify(m => m.run(), Times.Once);
-        }
-        public void VerifyStillAlive()
-        {
-            _mock.Verify(m => m.stillAlive(), Times.Once);
-        }
-        public MockMainServer stubStillAlive()
-        {
-            _mock.Setup(m => m.stillAlive()).Returns(false);
-            return this;
+            _mock = new Mock<IMainServer>();
         }
 
+        public bool StillAlive => _mock.Object.StillAlive;
+
+        void IMainServer.RunningProcess(IDataManager handler)
+        {
+            _mock.Object.RunningProcess(handler);
+        }
+
+        public void Run()
+        {
+            _mock.Object.Run();
+        }
+
+        public void VerifyRun()
+        {
+            _mock.Verify(m => m.Run(), Times.Once);
+        }
+
+        public void VerifyStillAlive()
+        {
+            _mock.Verify(m => m.StillAlive, Times.Once);
+        }
+
+        public MockMainServer StubStillAlive()
+        {
+            _mock.Setup(m => m.StillAlive).Returns(false);
+            return this;
+        }
     }
 }

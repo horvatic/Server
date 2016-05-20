@@ -2,8 +2,9 @@
 {
     public interface IMainServer
     {
-        void runningProcess(IDataManager handler);
-        bool stillAlive();
-        void run();
+        bool StillAlive { get; }
+        void RunningProcess(IDataManager handler);
+
+        void Run();
     }
 }

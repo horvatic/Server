@@ -1,6 +1,7 @@
-﻿using Server.Core;
-using System.IO;
+﻿using System.IO;
+using Server.Core;
 using Xunit;
+
 namespace Server.Test
 {
     public class FileProxyTest
@@ -23,7 +24,7 @@ namespace Server.Test
         public void File_Not_Read()
         {
             var fileProx = new FileProxy();
-            Assert.Throws<FileNotFoundException>( () => (fileProx.ReadAllBytes("wefefwefwefwefwefwefwef")));
+            Assert.Throws<FileNotFoundException>(() => (fileProx.ReadAllBytes("wefefwefwefwefwefwefwef")));
         }
     }
 }

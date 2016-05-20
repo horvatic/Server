@@ -1,7 +1,6 @@
-﻿using Server.Core;
-using System.IO;
-using System.Net;
+﻿using System.Net;
 using System.Threading;
+using Server.Core;
 using Xunit;
 
 namespace Server.Test
@@ -14,16 +13,12 @@ namespace Server.Test
             var endPoint = new IPEndPoint((IPAddress.Loopback), 4321);
             var manager = new DataManager(new SocketProxy(), endPoint);
             var testingServer = new HelloWorldServer(manager, new WebPageMaker());
-            new Thread(() => runServer(testingServer)).Start();
+            new Thread(() => RunServer(testingServer)).Start();
 
-            string sURL;
-            sURL = "http://localhost:4321";
 
-            WebRequest wrGETURL;
-            wrGETURL = WebRequest.Create(sURL);
+            var wrGeturl = WebRequest.Create("http://localhost:4321");
 
-            wrGETURL.GetResponse();
-
+            wrGeturl.GetResponse();
         }
 
         [Fact]
@@ -31,20 +26,18 @@ namespace Server.Test
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 54321);
             var manager = new DataManager(new SocketProxy(), endPoint);
-            var testingServer = new DirectoryServer(manager, new WebPageMaker(54321), "C:/", new DirectoryProxy(), new FileProxy());
-            new Thread(() => runServer(testingServer)).Start();
-            
-            string rURL = @"http://localhost:54321/C:/Program%20Files%20(x86)/Internet%20Explorer/ie9props.propdesc";
-            WebRequest wrGETURL;
-            wrGETURL = WebRequest.Create(rURL);
+            var testingServer = new DirectoryServer(manager, new WebPageMaker(54321), "C:/", new DirectoryProxy(),
+                new FileProxy());
+            new Thread(() => RunServer(testingServer)).Start();
 
-            wrGETURL.GetResponse();
+            var wrGeturl = WebRequest.Create(@"http://localhost:54321/C:/Program%20Files%20(x86)/Internet%20Explorer/ie9props.propdesc");
 
+            wrGeturl.GetResponse();
         }
 
-        public void runServer(IMainServer server)
+        public void RunServer(IMainServer server)
         {
-            server.run();
+            server.Run();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Server.Core
         int Send(byte[] buffer);
         void SendFile(string fileName);
         int Receive(byte[] buffer);
-        void Bind(EndPoint localEP);
+        void Bind(EndPoint localEp);
         void Listen(int backlog);
         ISocketProxy Accept();
 

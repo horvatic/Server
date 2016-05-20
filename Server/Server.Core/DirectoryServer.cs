@@ -1,95 +1,103 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Threading;
 
 namespace Server.Core
 {
     public class DirectoryServer : IMainServer
     {
-        IFileProxy fileReader;
-        IDataManager socket;
-        IWebPageMaker webMaker;
-        IDirectoryProxy dirReader;
-        string currentDir;
-        public DirectoryServer(IDataManager socket, IWebPageMaker webMaker, string currentDir, IDirectoryProxy dirReader, IFileProxy fileReader)
+        private readonly string _currentDir;
+        private readonly IDirectoryProxy _dirReader;
+        private readonly IFileProxy _fileReader;
+        private readonly IDataManager _socket;
+        private readonly IWebPageMaker _webMaker;
+
+        public DirectoryServer(IDataManager socket, IWebPageMaker webMaker, string currentDir, IDirectoryProxy dirReader,
+            IFileProxy fileReader)
         {
-            this.fileReader = fileReader;
-            this.dirReader = dirReader;
-            this.socket = socket;
-            this.webMaker = webMaker;
-            this.currentDir = currentDir;
+            _fileReader = fileReader;
+            _dirReader = dirReader;
+            _socket = socket;
+            _webMaker = webMaker;
+            _currentDir = currentDir;
         }
-        public void runningProcess(IDataManager handler)
+
+        public bool StillAlive => true;
+
+        public void RunningProcess(IDataManager handler)
         {
             try
             {
-                var request = handler.receive();
-                if (!(request.Length == 0))
+                var request = handler.Receive();
+                if (request.Length == 0) return;
+                var requestItem =
+                    request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
+                        request.IndexOf(" HTTP/1.1", StringComparison.Ordinal) - 5)
+                        .Replace("%20", " ");
+                if (request.Contains("GET / HTTP/1.1"))
                 {
-                    string requestItem = request.Substring(request.IndexOf("GET /") + 5, request.IndexOf(" HTTP/1.1") - 5).Replace("%20", " ");
-                    if (request.Contains("GET / HTTP/1.1"))
+                    handler.Send("HTTP/1.1 200 OK\r\n");
+                    handler.Send("Content-Type: text/html\r\n");
+                    handler.Send("Content-Length: " +
+                                 Encoding.ASCII.GetBytes(_webMaker.DirectoryContents(_currentDir, _dirReader)).Length +
+                                 "\r\n\r\n");
+                    handler.Send(_webMaker.DirectoryContents(_currentDir, _dirReader));
+                }
+                else
+                {
+                    if (_fileReader.Exists(requestItem))
                     {
-                        handler.send("HTTP/1.1 200 OK\r\n");
-                        handler.send("Content-Type: text/html\r\n");
-                        handler.send("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.directoryContents(currentDir, dirReader)).Length + "\r\n\r\n");
-                        handler.send(webMaker.directoryContents(currentDir, dirReader));
+                        PushFile(requestItem, handler);
+                    }
+                    else if (_dirReader.Exists(requestItem))
+                    {
+                        PushDir(requestItem, handler);
                     }
                     else
-                    {
-                        if (fileReader.Exists(requestItem))
-                        {
-                            pushFile(requestItem, handler);
-                        }
-                        else if (dirReader.Exists(requestItem))
-                        {
-                            pushDir(requestItem, handler);
-                        }
-                        else
-                            error404(handler);
-                    }
+                        Error404(handler);
                 }
             }
-            catch (System.Exception e)
+            catch (Exception)
             {
-
+                // ignored
             }
             finally
             {
-                if(handler.connected())
-                    handler.close();
+                if (handler.Connected())
+                    handler.Close();
             }
         }
-        public void run()
-        {
-            var handler = socket.accept();
-            new Thread(() => this.runningProcess(handler)).Start();
 
-        }
-        private void pushDir(string path, IDataManager handler)
+        public void Run()
         {
-            handler.send("HTTP/1.1 200 OK\r\n");
-            handler.send("Content-Type: text/html\r\n");
-            handler.send("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.directoryContents(path, dirReader)).Length + "\r\n\r\n");
-            handler.send(webMaker.directoryContents(path, dirReader));
-        }
-        private void pushFile(string path, IDataManager handler)
-        {
-            handler.send("HTTP/1.1 200 OK\r\n");
-            handler.send("Content-Type: application/octet-stream\r\n");
-            handler.send("Content-Disposition: attachment; filename = "+ path + "\r\n");
-            handler.send("Content-Length: " + fileReader.ReadAllBytes(path).Length + "\r\n\r\n");
-            handler.sendFile(path);
-        }
-        private void error404(IDataManager handler)
-        {
-            handler.send("HTTP/1.1 404 Not Found\r\n");
-            handler.send("Content-Type: text/html\r\n");
-            handler.send("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.error404Page()).Length + "\r\n\r\n");
-            handler.send(webMaker.error404Page());
+            var handler = _socket.Accept();
+            new Thread(() => RunningProcess(handler)).Start();
         }
 
-        public bool stillAlive()
+        public void PushDir(string path, IDataManager handler)
         {
-            return true;
+            handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Content-Type: text/html\r\n");
+            handler.Send("Content-Length: " +
+                         Encoding.ASCII.GetBytes(_webMaker.DirectoryContents(path, _dirReader)).Length + "\r\n\r\n");
+            handler.Send(_webMaker.DirectoryContents(path, _dirReader));
+        }
+
+        private void PushFile(string path, IDataManager handler)
+        {
+            handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Content-Type: application/octet-stream\r\n");
+            handler.Send("Content-Disposition: attachment; filename = " + path + "\r\n");
+            handler.Send("Content-Length: " + _fileReader.ReadAllBytes(path).Length + "\r\n\r\n");
+            handler.SendFile(path);
+        }
+
+        private void Error404(IDataManager handler)
+        {
+            handler.Send("HTTP/1.1 404 Not Found\r\n");
+            handler.Send("Content-Type: text/html\r\n");
+            handler.Send("Content-Length: " + Encoding.ASCII.GetBytes(_webMaker.Error404Page()).Length + "\r\n\r\n");
+            handler.Send(_webMaker.Error404Page());
         }
     }
 }

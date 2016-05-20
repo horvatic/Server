@@ -1,86 +1,93 @@
-﻿using System;
+﻿using Moq;
 using Server.Core;
-using Moq;
 
 namespace Server.Test
 {
     public class MockDataManager : IDataManager
     {
         private readonly Mock<IDataManager> _mock;
+
         public MockDataManager()
         {
             _mock = new Mock<IDataManager>();
         }
-        public bool connected()
+
+        public bool Connected()
         {
-            return _mock.Object.connected();
-        }
-        public IDataManager accept()
-        {
-            return _mock.Object.accept();
+            return _mock.Object.Connected();
         }
 
-        public void close()
+        public IDataManager Accept()
         {
-            _mock.Object.close();
+            return _mock.Object.Accept();
         }
 
-        public string receive()
+        public void Close()
         {
-            return _mock.Object.receive();
+            _mock.Object.Close();
         }
 
-        public int send(string message)
+        public string Receive()
         {
-            return _mock.Object.send(message);
+            return _mock.Object.Receive();
         }
 
-        public void sendFile(string message)
+        public int Send(string message)
         {
-            _mock.Object.sendFile(message);
+            return _mock.Object.Send(message);
+        }
+
+        public void SendFile(string message)
+        {
+            _mock.Object.SendFile(message);
         }
 
         public void VerifySend(string message)
         {
-            _mock.Verify(m => m.send(message), Times.AtLeastOnce);
+            _mock.Verify(m => m.Send(message), Times.AtLeastOnce);
         }
+
         public void VerifySendFile(string message)
         {
-            _mock.Verify(m => m.sendFile(message), Times.AtLeastOnce);
+            _mock.Verify(m => m.SendFile(message), Times.AtLeastOnce);
         }
+
         public void VerifyAccept()
         {
-            _mock.Verify(m => m.accept(), Times.Once);
+            _mock.Verify(m => m.Accept(), Times.Once);
         }
 
         public void VerifyClose()
         {
-            _mock.Verify(m => m.close(), Times.Once);
+            _mock.Verify(m => m.Close(), Times.Once);
         }
+
         public void VerifyReceive()
         {
-            _mock.Verify(m => m.receive(), Times.Once);
+            _mock.Verify(m => m.Receive(), Times.Once);
         }
-        public MockDataManager stubSentToReturn(int value)
+
+        public MockDataManager StubSentToReturn(int value)
         {
-            _mock.Setup(m => m.send(It.IsAny<string>())).Returns(value);
-            return this;
-        }
-        public MockDataManager stubConnect(bool value)
-        {
-            _mock.Setup(m => m.connected()).Returns(value);
+            _mock.Setup(m => m.Send(It.IsAny<string>())).Returns(value);
             return this;
         }
 
-        public MockDataManager stubAccpetObject(IDataManager returnObject)
+        public MockDataManager StubConnect(bool value)
         {
-            _mock.Setup(m => m.accept()).Returns(returnObject);
+            _mock.Setup(m => m.Connected()).Returns(value);
             return this;
         }
 
-        public MockDataManager stubReceive(string message)
+        public MockDataManager StubAccpetObject(IDataManager returnObject)
         {
-            _mock.Setup(m => m.receive()).Returns(message);
+            _mock.Setup(m => m.Accept()).Returns(returnObject);
+            return this;
+        }
+
+        public MockDataManager StubReceive(string message)
+        {
+            _mock.Setup(m => m.Receive()).Returns(message);
             return this;
         }
     }
