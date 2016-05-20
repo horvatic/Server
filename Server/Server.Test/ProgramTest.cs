@@ -94,7 +94,7 @@ namespace Server.Test
         [Fact]
         public void Make_Hello_World_Server_Correct()
         {
-            string[] args = { "-p", "8080"};
+            string[] args = { "-p", "9560"};
             var serverMade = Program.makeServer(args);
             Assert.NotNull(serverMade);
         }
@@ -102,7 +102,7 @@ namespace Server.Test
         [Fact]
         public void Make_Hello_World_Incorrect_Correct()
         {
-            string[] args = { "8080", "-p" };
+            string[] args = { "2750", "-p" };
             var serverMade = Program.makeServer(args);
             Assert.Null(serverMade);
         }
