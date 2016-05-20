@@ -73,6 +73,8 @@ namespace Server.Test
             dataManager = dataManager.stubAccpetObject(dataManager);
             var server = new DirectoryServer(dataManager, webMaker, @"Home", mockRead, mockFileReader);
             server.runningProcess(dataManager);
+            mockFileReader.VerifyExists("NotHome.txt");
+            mockFileReader.VerifyReadAllBytes("NotHome.txt");
             dataManager.VerifyReceive();
             dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
             dataManager.VerifySend("Content-Type: application/octet-stream\r\n");
@@ -100,6 +102,7 @@ namespace Server.Test
             server.runningProcess(dataManager);
 
             dataManager.VerifyReceive();
+            mockRead.VerifyExists("DirNotHome");
             dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
             dataManager.VerifySend("Content-Type: text/html\r\n");
             dataManager.VerifySend("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.directoryContents(@"DirNotHome", mockRead)).Length + "\r\n\r\n");

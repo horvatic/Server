@@ -61,7 +61,7 @@ namespace Server.Core
         public void run()
         {
             var handler = socket.accept();
-            new Thread(() => runningProcess(handler)).Start();
+            new Thread(() => this.runningProcess(handler)).Start();
 
         }
         private void pushDir(string path, IDataManager handler)
