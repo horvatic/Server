@@ -6,49 +6,51 @@ namespace Server.Core
 {
     public class DataManager : IDataManager
     {
-        private ISocketProxy socket;
+        private readonly ISocketProxy _socket;
+
         public DataManager(ISocketProxy socket, IPEndPoint localEndPoint)
         {
-            this.socket = socket;
+            _socket = socket;
             socket.Bind(localEndPoint);
             socket.Listen(10);
         }
-        public bool connected()
-        {
-            return socket.Connected();
-        }
+
         public DataManager(ISocketProxy socket)
         {
-            this.socket = socket;
-        }
-        public IDataManager accept()
-        {
-
-            return new DataManager(socket.Accept());
+            _socket = socket;
         }
 
-        public void close()
+        public bool Connected()
         {
-            socket.Shutdown(SocketShutdown.Both);
-            socket.Close();
+            return _socket.Connected();
         }
 
-        public int send(string message)
+        public IDataManager Accept()
         {
-            return socket.Send(Encoding.ASCII.GetBytes(message));
+            return new DataManager(_socket.Accept());
         }
 
-        public void sendFile(string message)
+        public void Close()
         {
-            socket.SendFile(message);
+            _socket.Shutdown(SocketShutdown.Both);
+            _socket.Close();
         }
 
-        public string receive()
+        public int Send(string message)
         {
-            byte[] readData = new byte[8192];
-            int lengthRead = socket.Receive(readData);
+            return _socket.Send(Encoding.ASCII.GetBytes(message));
+        }
+
+        public void SendFile(string message)
+        {
+            _socket.SendFile(message);
+        }
+
+        public string Receive()
+        {
+            var readData = new byte[8192];
+            var lengthRead = _socket.Receive(readData);
             return (Encoding.ASCII.GetString(readData).Substring(0, lengthRead));
-
         }
     }
 }

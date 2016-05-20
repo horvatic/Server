@@ -1,28 +1,29 @@
-﻿using System;
-using System.Net;
-using Server.Core;
-using Moq;
+﻿using System.Net;
 using System.Net.Sockets;
+using Moq;
+using Server.Core;
 
 namespace Server.Test
 {
-    class MockSocketProxy : ISocketProxy
+    internal class MockSocketProxy : ISocketProxy
     {
-
-
         private readonly Mock<ISocketProxy> _mock;
+
         public MockSocketProxy()
         {
             _mock = new Mock<ISocketProxy>();
         }
+
         public void Close()
         {
             _mock.Object.Close();
         }
+
         public bool Connected()
         {
             return _mock.Object.Connected();
         }
+
         public void Shutdown(SocketShutdown how)
         {
             _mock.Object.Shutdown(how);
@@ -32,9 +33,10 @@ namespace Server.Test
         {
             return _mock.Object.Accept();
         }
-        public void Bind(EndPoint localEP)
+
+        public void Bind(EndPoint localEp)
         {
-            _mock.Object.Bind(localEP);
+            _mock.Object.Bind(localEp);
         }
 
         public void Listen(int backlog)
@@ -57,9 +59,9 @@ namespace Server.Test
             _mock.Object.SendFile(fileName);
         }
 
-        public void VerifyBind(EndPoint localEP)
+        public void VerifyBind(EndPoint localEp)
         {
-            _mock.Verify(m => m.Bind(localEP));
+            _mock.Verify(m => m.Bind(localEp));
         }
 
         public void VerifyListen(int backlog)
@@ -71,6 +73,7 @@ namespace Server.Test
         {
             _mock.Verify(m => m.Send(buffer));
         }
+
         public void VerifyAccept()
         {
             _mock.Verify(m => m.Accept(), Times.Once);

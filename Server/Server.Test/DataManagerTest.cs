@@ -1,8 +1,8 @@
-﻿using Xunit;
-using Server.Core;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Net;
 using System.Text;
+using Server.Core;
+using Xunit;
 
 namespace Server.Test
 {
@@ -13,7 +13,7 @@ namespace Server.Test
         {
             var mockSocket = new MockSocketProxy();
             var localEndPoint = new IPEndPoint((IPAddress.Loopback), 32000);
-            DataManager manager = new DataManager(mockSocket, localEndPoint);
+            var manager = new DataManager(mockSocket, localEndPoint);
             Assert.NotNull(manager);
             mockSocket.VerifyBind(localEndPoint);
             mockSocket.VerifyListen(10);
@@ -24,9 +24,9 @@ namespace Server.Test
         {
             var mockSocket = new MockSocketProxy();
             var localEndPoint = new IPEndPoint((IPAddress.Loopback), 32000);
-            DataManager manager = new DataManager(mockSocket, localEndPoint);
+            var manager = new DataManager(mockSocket, localEndPoint);
 
-            manager.send("Hello");
+            manager.Send("Hello");
             mockSocket.VerifySend(Encoding.ASCII.GetBytes("Hello"));
         }
 
@@ -37,12 +37,10 @@ namespace Server.Test
             var localEndPoint = new IPEndPoint((IPAddress.Loopback), 32000);
             var manager = new DataManager(mockSocket, localEndPoint);
 
-            manager.close();
+            manager.Close();
 
             mockSocket.VerifyClose();
             mockSocket.VerifyShutdown(SocketShutdown.Both);
-
-
         }
 
         [Fact]
@@ -50,9 +48,9 @@ namespace Server.Test
         {
             var mockSocket = new MockSocketProxy();
             var localEndPoint = new IPEndPoint((IPAddress.Loopback), 32000);
-            DataManager manager = new DataManager(mockSocket, localEndPoint);
+            var manager = new DataManager(mockSocket, localEndPoint);
 
-            manager.accept();
+            manager.Accept();
 
             mockSocket.VerifyAccept();
         }
@@ -65,7 +63,7 @@ namespace Server.Test
             var manager = new DataManager(mockSocket, localEndPoint);
             var message = "C:/Shawn/Docs";
 
-            manager.sendFile(message);
+            manager.SendFile(message);
 
             mockSocket.VerifySendFile(message);
         }
@@ -77,7 +75,7 @@ namespace Server.Test
             var localEndPoint = new IPEndPoint((IPAddress.Loopback), 32000);
             var manager = new DataManager(mockSocket, localEndPoint);
             var byteArray = new byte[8192];
-            manager.receive();
+            manager.Receive();
 
             mockSocket.VerifyReceive(byteArray);
         }
@@ -90,7 +88,7 @@ namespace Server.Test
             var manager = new DataManager(mockSocket, localEndPoint);
             var byteArray = new byte[8192];
 
-            manager.receive();
+            manager.Receive();
 
             mockSocket.VerifyReceive(byteArray);
         }

@@ -2,11 +2,11 @@
 {
     public interface IDataManager
     {
-        bool connected();
-        string receive();
-        int send(string message);
-        void sendFile(string message);
-        IDataManager accept();
-        void close();
+        bool Connected();
+        string Receive();
+        int Send(string message);
+        void SendFile(string message);
+        IDataManager Accept();
+        void Close();
     }
 }

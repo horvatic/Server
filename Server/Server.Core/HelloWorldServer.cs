@@ -1,60 +1,60 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Threading;
 
 namespace Server.Core
 {
     public class HelloWorldServer : IMainServer
     {
-        IDataManager socket;
-        IWebPageMaker webMaker;
+        private readonly IDataManager _socket;
+        private readonly IWebPageMaker _webMaker;
+
         public HelloWorldServer(IDataManager socket, IWebPageMaker webMaker)
         {
-            this.socket = socket;
-            this.webMaker = webMaker;
+            _socket = socket;
+            _webMaker = webMaker;
         }
-        public void runningProcess(IDataManager handler)
+
+        public void RunningProcess(IDataManager handler)
         {
             try
             {
-                var request = handler.receive();
-                if (!(request.Length == 0))
+                var request = handler.Receive();
+                if (request.Length == 0) return;
+                if (request.Contains("GET / HTTP/1.1"))
                 {
-                    if (request.Contains("GET / HTTP/1.1"))
-                    {
-                        handler.send("HTTP/1.1 200 OK\r\n");
-                        handler.send("Content-Type: text/html\r\n");
-                        handler.send("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.helloWorld()).Length + "\r\n\r\n");
-                        handler.send(webMaker.helloWorld());
-                    }
-                    else
-                    {
-                        handler.send("HTTP/1.1 404 Not Found\r\n");
-                        handler.send("Content-Type: text/html\r\n");
-                        handler.send("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.error404Page()).Length + "\r\n\r\n");
-                        handler.send(webMaker.error404Page());
-                    }
+                    handler.Send("HTTP/1.1 200 OK\r\n");
+                    handler.Send("Content-Type: text/html\r\n");
+                    handler.Send("Content-Length: " + Encoding.ASCII.GetBytes(_webMaker.HelloWorld()).Length +
+                                 "\r\n\r\n");
+                    handler.Send(_webMaker.HelloWorld());
+                }
+                else
+                {
+                    handler.Send("HTTP/1.1 404 Not Found\r\n");
+                    handler.Send("Content-Type: text/html\r\n");
+                    handler.Send("Content-Length: " + Encoding.ASCII.GetBytes(_webMaker.Error404Page()).Length +
+                                 "\r\n\r\n");
+                    handler.Send(_webMaker.Error404Page());
                 }
             }
-            catch (System.Exception e)
+            catch (Exception)
             {
-
+                // ignored
             }
             finally
             {
-                if(handler.connected())
-                    handler.close();
+                if (handler.Connected())
+                    handler.Close();
             }
         }
-        public void run()
+
+        public void Run()
         {
-            var handler = socket.accept();
-            new Thread(() => this.runningProcess(handler)).Start();
+            var handler = _socket.Accept();
+            new Thread(() => RunningProcess(handler)).Start();
         }
 
-        public bool stillAlive()
-        {
-            return true;
-        }
+        public bool StillAlive => true;
     }
 }
-

@@ -5,39 +5,46 @@ namespace Server.Core
     public class WebPageMaker : IWebPageMaker
     {
         private readonly int _port;
+
         public WebPageMaker()
         {
             _port = 0;
         }
+
         public WebPageMaker(int port)
         {
             _port = port;
         }
-        public string directoryContents(string dir, IDirectoryProxy reader)
+
+        public string DirectoryContents(string dir, IDirectoryProxy reader)
         {
-            StringBuilder directoryContents = new StringBuilder();
+            var directoryContents = new StringBuilder();
             directoryContents.Append(@"<!DOCTYPE html>");
             directoryContents.Append(@"<html>");
             directoryContents.Append(@"<head><title>Vatic File Server</title></head>");
             directoryContents.Append(@"<body>");
             var files = reader.GetFiles(dir);
-            foreach (string file in files)
+            foreach (var file in files)
             {
-                directoryContents.Append(@"<br><a href=""http://localhost:"+_port+"/" + file.Replace('\\', '/').Replace(" ", "%20") + @""" >" + file.Replace('\\', '/') + "</a>");
+                directoryContents.Append(@"<br><a href=""http://localhost:" + _port + "/" +
+                                         file.Replace('\\', '/').Replace(" ", "%20") + @""" >" + file.Replace('\\', '/') +
+                                         "</a>");
             }
             var subDirs = reader.GetDirectories(dir);
-            foreach (string subDir in subDirs)
+            foreach (var subDir in subDirs)
             {
-                directoryContents.Append(@"<br><a href=""http://localhost:" + _port + "/" + subDir.Replace('\\', '/').Replace(" ", "%20") + @""" >" + subDir.Replace('\\', '/') + "</a>");
+                directoryContents.Append(@"<br><a href=""http://localhost:" + _port + "/" +
+                                         subDir.Replace('\\', '/').Replace(" ", "%20") + @""" >" +
+                                         subDir.Replace('\\', '/') + "</a>");
             }
             directoryContents.Append(@"</body>");
             directoryContents.Append(@"</html>");
             return directoryContents.ToString();
         }
 
-        public string helloWorld()
+        public string HelloWorld()
         {
-            StringBuilder helloWorldPage = new StringBuilder();
+            var helloWorldPage = new StringBuilder();
             helloWorldPage.Append(@"<!DOCTYPE html>");
             helloWorldPage.Append(@"<html>");
             helloWorldPage.Append(@"<head><title>Vatic File Server</title></head>");
@@ -48,9 +55,9 @@ namespace Server.Core
             return helloWorldPage.ToString();
         }
 
-        public string error404Page()
+        public string Error404Page()
         {
-            StringBuilder error = new StringBuilder();
+            var error = new StringBuilder();
             error.Append(@"<!DOCTYPE html>");
             error.Append(@"<html>");
             error.Append(@"<head><title>Vatic File Server</title></head>");

@@ -1,5 +1,5 @@
-﻿using Xunit;
-using Server.Core;
+﻿using Server.Core;
+using Xunit;
 
 namespace Server.Test
 {
@@ -12,6 +12,7 @@ namespace Server.Test
             Assert.NotEmpty(dirProxy.GetDirectories(@"C:/"));
             Assert.NotEmpty(dirProxy.GetFiles(@"C:/"));
         }
+
         [Fact]
         public void Is_A_Dir()
         {

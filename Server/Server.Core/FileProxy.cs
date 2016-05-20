@@ -8,6 +8,7 @@ namespace Server.Core
         {
             return File.ReadAllBytes(path);
         }
+
         public bool Exists(string path)
         {
             return File.Exists(path);

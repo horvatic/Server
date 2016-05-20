@@ -9,25 +9,25 @@ namespace Server.Core
     {
         public static int Main(string[] args)
         {
-            runServer(makeServer(args));
+            RunServer(MakeServer(args));
             return 0;
         }
 
-        public static void runServer(IMainServer runningServer)
+        public static void RunServer(IMainServer runningServer)
         {
             if (runningServer != null)
             {
                 Console.WriteLine("Server Running...");
                 do
                 {
-                    runningServer.run();
-                } while (runningServer.stillAlive());
+                    runningServer.Run();
+                } while (runningServer.StillAlive);
             }
             else
-                Console.WriteLine(getError());
+                Console.WriteLine(GetError());
         }
 
-        public static string getError()
+        public static string GetError()
         {
             var error = new StringBuilder();
             error.Append("Invaild Input Detected.\n");
@@ -41,31 +41,30 @@ namespace Server.Core
 
             return error.ToString();
         }
-        public static IMainServer makeServer(string[] args)
+        public static IMainServer MakeServer(string[] args)
         {
             try
             {
-                if (args.Length == 2)
+                switch (args.Length)
                 {
-                    return helloWorldServer(args);
+                    case 2:
+                        return HelloWorldServer(args);
+                    case 4:
+                        return DirectoryServer(args);
+                    default:
+                        return null;
                 }
-                else if (args.Length == 4)
-                {
-                    return directoryServer(args);
-                }
-                else
-                    return null;
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 return null;
             }
         }
 
-        public static IMainServer makedirectoryServer(string chosenPort, string homeDirectory)
+        public static IMainServer MakedirectoryServer(string chosenPort, string homeDirectory)
         {
             int port;
-            if (Int32.TryParse(chosenPort, out port) && Directory.Exists(homeDirectory))
+            if (int.TryParse(chosenPort, out port) && Directory.Exists(homeDirectory))
             {
                 if (port > 1999 && port < 65001)
                 {
@@ -82,26 +81,26 @@ namespace Server.Core
             }
         }
 
-        public static IMainServer directoryServer(string[] args)
+        public static IMainServer DirectoryServer(string[] args)
         {
             if (args[0] == "-p" && args[2] == "-d")
             {
-                return makedirectoryServer(args[1], args[3]);
+                return MakedirectoryServer(args[1], args[3]);
             }
             else if (args[2] == "-p" && args[0] == "-d")
             {
-                return makedirectoryServer(args[3], args[1]);
+                return MakedirectoryServer(args[3], args[1]);
             }
             else
                 return null;
         }
 
-        public static IMainServer helloWorldServer(string[] args)
+        public static IMainServer HelloWorldServer(string[] args)
         {
-            int port;
             if (args[0] == "-p")
             {
-                if (Int32.TryParse(args[1], out port))
+                int port;
+                if (int.TryParse(args[1], out port))
                 {
                     if (port > 1999 && port < 65001)
                     {
