@@ -36,6 +36,18 @@ namespace Server.Test
         }
 
         [Fact]
+        public void Make_Dirctory_Server_Twice_Same_Port()
+        {
+            string[] args = { "-p", "8765", "-d", "C:\\" };
+            var serverMade = Program.makeServer(args);
+            Assert.NotNull(serverMade);
+
+            string[] argsInvaild = { "-p", "8765", "-d", "C:\\" };
+            var serverMadeInvaild = Program.makeServer(args);
+            Assert.Null(serverMadeInvaild);
+        }
+
+        [Fact]
         public void Make_Dirctory_Server_Correct_Arg_Backwords()
         {
             string[] args = { "-d", "C:\\", "-p", "2020" };
@@ -157,12 +169,13 @@ namespace Server.Test
             System.Console.SetOut(output);
             var correctOutput = new StringBuilder();
             correctOutput.Append("Invaild Input Detected.\n");
+            correctOutput.Append("Server.exe may already be running on port\n");
             correctOutput.Append("must be Server.Core.exe -p PORT -d directory\n");
             correctOutput.Append("Vaild Ports 2000 - 65000\n");
             correctOutput.Append("Examples:\n");
-            correctOutput.Append("Server.Core.exe -p 8080 -d C:/\n");
-            correctOutput.Append("Server.Core.exe -d C:/HelloWorld -p 5555\n");
-            correctOutput.Append("Server.Core.exe -p 9999\n\r\n");
+            correctOutput.Append("Server.exe -p 8080 -d C:/\n");
+            correctOutput.Append("Server.exe -d C:/HelloWorld -p 5555\n");
+            correctOutput.Append("Server.exe -p 9999\n\r\n\r\n");
 
             Program.runServer(null);
             Assert.Equal(correctOutput.ToString(), output.ToString());

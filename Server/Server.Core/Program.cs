@@ -31,26 +31,35 @@ namespace Server.Core
         {
             var error = new StringBuilder();
             error.Append("Invaild Input Detected.\n");
+            error.Append("Server.exe may already be running on port\n");
             error.Append("must be Server.Core.exe -p PORT -d directory\n");
             error.Append("Vaild Ports 2000 - 65000\n");
             error.Append("Examples:\n");
-            error.Append("Server.Core.exe -p 8080 -d C:/\n");
-            error.Append("Server.Core.exe -d C:/HelloWorld -p 5555\n");
-            error.Append("Server.Core.exe -p 9999\n");
+            error.Append("Server.exe -p 8080 -d C:/\n");
+            error.Append("Server.exe -d C:/HelloWorld -p 5555\n");
+            error.Append("Server.exe -p 9999\n\r\n");
+
             return error.ToString();
         }
         public static IMainServer makeServer(string[] args)
         {
-            if (args.Length == 2)
+            try
             {
-                return helloWorldServer(args);
+                if (args.Length == 2)
+                {
+                    return helloWorldServer(args);
+                }
+                else if (args.Length == 4)
+                {
+                    return directoryServer(args);
+                }
+                else
+                    return null;
             }
-            else if(args.Length == 4)
+            catch(Exception e)
             {
-                return directoryServer(args);
-            }
-            else
                 return null;
+            }
         }
 
         public static IMainServer makedirectoryServer(string chosenPort, string homeDirectory)
