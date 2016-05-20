@@ -6,10 +6,15 @@ namespace Server.Core
     public class SocketProxy : ISocketProxy
     {
         Socket tcpSocket;
+
         public SocketProxy()
         {
             tcpSocket = new Socket(AddressFamily.InterNetwork,
                         SocketType.Stream, ProtocolType.Tcp);
+        }
+        public bool Connected()
+        {
+            return tcpSocket.Connected;
         }
         public SocketProxy(Socket tcpSocket)
         {

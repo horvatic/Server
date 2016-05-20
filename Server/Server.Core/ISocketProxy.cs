@@ -5,6 +5,7 @@ namespace Server.Core
 {
     public interface ISocketProxy
     {
+        bool Connected();
         void Close();
         void Shutdown(SocketShutdown how);
         int Send(byte[] buffer);

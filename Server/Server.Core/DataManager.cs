@@ -13,6 +13,10 @@ namespace Server.Core
             socket.Bind(localEndPoint);
             socket.Listen(10);
         }
+        public bool connected()
+        {
+            return socket.Connected();
+        }
         public DataManager(ISocketProxy socket)
         {
             this.socket = socket;

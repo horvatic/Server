@@ -2,7 +2,7 @@
 
 namespace Server.Core
 {
-    class FileProxy : IFileProxy
+    public class FileProxy : IFileProxy
     {
         public byte[] ReadAllBytes(string path)
         {

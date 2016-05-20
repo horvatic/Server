@@ -64,7 +64,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataManagerTest.cs" />
+    <Compile Include="DirectoryProxyTest.cs" />
     <Compile Include="DirectoryServerTest.cs" />
+    <Compile Include="FileProxyTest.cs" />
     <Compile Include="HelloWorldServerTest.cs" />
     <Compile Include="MockDataManager.cs" />
     <Compile Include="MockDirectoryProxy.cs" />

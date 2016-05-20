@@ -15,17 +15,41 @@ namespace Server.Test
         }
 
         [Fact]
+        public void Make_Web_Server_LIVE_SOCKET()
+        {
+            var webMaker = new WebPageMaker();
+            var dataManager = new DataManager(new SocketProxy());
+            var server = new HelloWorldServer(dataManager, webMaker);
+            server.runningProcess(dataManager);
+
+        }
+
+        [Fact]
+        public void Make_Web_Server_Starts_Server()
+        {
+            var webMaker = new WebPageMaker();
+            var dataManager = new MockDataManager()
+                    .stubSentToReturn(10)
+                    .stubReceive("GET / HTTP/1.1")
+                    .stubConnect(true);
+            dataManager = dataManager.stubAccpetObject(dataManager);
+            var server = new HelloWorldServer(dataManager, webMaker);
+            server.run();
+            dataManager.VerifyAccept();
+
+        }
+
+        [Fact]
         public void Make_Web_Server_Get_Request_Send_Back_Repsonce()
         {
             var webMaker = new WebPageMaker();
             var dataManager = new MockDataManager()
                     .stubSentToReturn(10)
-                    .stubReceive("GET / HTTP/1.1");
+                    .stubReceive("GET / HTTP/1.1")
+                    .stubConnect(true);
             dataManager = dataManager.stubAccpetObject(dataManager);
             var server = new HelloWorldServer(dataManager, webMaker);
-            server.run();
-
-            dataManager.VerifyAccept();
+            server.runningProcess(dataManager);
             dataManager.VerifyReceive();
             dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
             dataManager.VerifySend("Content-Type: text/html\r\n");
@@ -40,13 +64,12 @@ namespace Server.Test
         {
             var dataManager = new MockDataManager()
                     .stubSentToReturn(10)
-                    .stubReceive("/Hello");
+                    .stubReceive("/Hello")
+                    .stubConnect(true);
             dataManager = dataManager.stubAccpetObject(dataManager);
             var webMaker = new WebPageMaker();
             var server = new HelloWorldServer(dataManager, new WebPageMaker());
-            server.run();
-
-            dataManager.VerifyAccept();
+            server.runningProcess(dataManager);
             dataManager.VerifyReceive();
             dataManager.VerifySend("HTTP/1.1 404 Not Found\r\n");
             dataManager.VerifySend("Content-Type: text/html\r\n");
