@@ -1,45 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace Server.Core
 {
     public class WebPageMaker : IWebPageMaker
     {
-        private readonly IDirectoryProxy _reader;
         private readonly int _port;
         public WebPageMaker()
         {
-            _reader = null;
             _port = 0;
         }
-        public WebPageMaker(IDirectoryProxy reader, int port)
+        public WebPageMaker(int port)
         {
-            _reader = reader;
             _port = port;
         }
-        public string directoryContents(string dir)
+        public string directoryContents(string dir, IDirectoryProxy reader)
         {
             StringBuilder directoryContents = new StringBuilder();
-            var files = _reader.GetFiles(dir);
+            directoryContents.Append(@"<!DOCTYPE html>");
+            directoryContents.Append(@"<html>");
+            directoryContents.Append(@"<head><title>Vatic File Server</title></head>");
+            directoryContents.Append(@"<body>");
+            var files = reader.GetFiles(dir);
             foreach (string file in files)
             {
-                directoryContents.Append("<br><a href=http://localhost:"+_port+"/" + file.Replace('\\', '/') + " download>" + file.Replace('\\', '/') + "</a>");
+                directoryContents.Append(@"<br><a href=""http://localhost:"+_port+"/" + file.Replace('\\', '/').Replace(" ", "%20") + @""" >" + file.Replace('\\', '/') + "</a>");
             }
-            var subDirs = _reader.GetDirectories(dir);
+            var subDirs = reader.GetDirectories(dir);
             foreach (string subDir in subDirs)
             {
-                directoryContents.Append("<br><a href=http://localhost:" + _port + "/" + subDir.Replace('\\', '/') + " >" + subDir.Replace('\\', '/') + "</a>");
+                directoryContents.Append(@"<br><a href=""http://localhost:" + _port + "/" + subDir.Replace('\\', '/').Replace(" ", "%20") + @""" >" + subDir.Replace('\\', '/') + "</a>");
             }
-
+            directoryContents.Append(@"</body>");
+            directoryContents.Append(@"</html>");
             return directoryContents.ToString();
         }
 
         public string helloWorld()
         {
-            return "<h1>Hello World</h1>";
+            StringBuilder helloWorldPage = new StringBuilder();
+            helloWorldPage.Append(@"<!DOCTYPE html>");
+            helloWorldPage.Append(@"<html>");
+            helloWorldPage.Append(@"<head><title>Vatic File Server</title></head>");
+            helloWorldPage.Append(@"<body>");
+            helloWorldPage.Append(@"<h1>Hello World</h1>");
+            helloWorldPage.Append(@"</body>");
+            helloWorldPage.Append(@"</html>");
+            return helloWorldPage.ToString();
+        }
+
+        public string error404Page()
+        {
+            StringBuilder error = new StringBuilder();
+            error.Append(@"<!DOCTYPE html>");
+            error.Append(@"<html>");
+            error.Append(@"<head><title>Vatic File Server</title></head>");
+            error.Append(@"<body>");
+            error.Append(@"<h1>404</h1>");
+            error.Append(@"</body>");
+            error.Append(@"</html>");
+            return error.ToString();
         }
     }
 }

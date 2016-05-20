@@ -11,6 +11,10 @@ namespace Server.Test
         {
             _mock = new Mock<IDataManager>();
         }
+        public bool connected()
+        {
+            return _mock.Object.connected();
+        }
         public IDataManager accept()
         {
             return _mock.Object.accept();
@@ -60,6 +64,11 @@ namespace Server.Test
         public MockDataManager stubSentToReturn(int value)
         {
             _mock.Setup(m => m.send(It.IsAny<string>())).Returns(value);
+            return this;
+        }
+        public MockDataManager stubConnect(bool value)
+        {
+            _mock.Setup(m => m.connected()).Returns(value);
             return this;
         }
 

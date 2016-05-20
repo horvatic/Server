@@ -19,7 +19,10 @@ namespace Server.Test
         {
             _mock.Object.Close();
         }
-
+        public bool Connected()
+        {
+            return _mock.Object.Connected();
+        }
         public void Shutdown(SocketShutdown how)
         {
             _mock.Object.Shutdown(how);

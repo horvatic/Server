@@ -1,15 +1,50 @@
 ﻿using Server.Core;
+using System.IO;
+using System.Text;
 using Xunit;
 namespace Server.Test
 {
     public class ProgramTest
     {
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(0)]
+        [InlineData(1000)]
+        [InlineData(1999)]
+        [InlineData(65001)]
+        [InlineData(9999999)]
+        public void Out_Of_Range_Ports(int invaildPorts)
+        {
+            string[] argsHelloWorld = { "-p", invaildPorts.ToString()};
+            var serverMadeHelloWorld = Program.makeServer(argsHelloWorld);
+            Assert.Null(serverMadeHelloWorld);
+
+            string[] args = { "-p", invaildPorts.ToString(), "-d", "C:\\" };
+            var serverMade = Program.makeServer(args);
+            Assert.Null(serverMade);
+
+            string[] argsSwaped = { "-d", "C:\\", "-p", invaildPorts.ToString() };
+            var serverMadeSwaped = Program.makeServer(argsSwaped);
+            Assert.Null(serverMadeSwaped);
+        }
         [Fact]
         public void Make_Dirctory_Server_Correct()
         {
             string[] args = { "-p", "32000", "-d", "C:\\" };
             var serverMade = Program.makeServer(args);
             Assert.NotNull(serverMade);
+        }
+
+        [Fact]
+        public void Make_Dirctory_Server_Twice_Same_Port()
+        {
+            string[] args = { "-p", "8765", "-d", "C:\\" };
+            var serverMade = Program.makeServer(args);
+            Assert.NotNull(serverMade);
+
+            string[] argsInvaild = { "-p", "8765", "-d", "C:\\" };
+            var serverMadeInvaild = Program.makeServer(args);
+            Assert.Null(serverMadeInvaild);
         }
 
         [Fact]
@@ -71,7 +106,7 @@ namespace Server.Test
         [Fact]
         public void Make_Hello_World_Server_Correct()
         {
-            string[] args = { "-p", "8080"};
+            string[] args = { "-p", "9560"};
             var serverMade = Program.makeServer(args);
             Assert.NotNull(serverMade);
         }
@@ -79,7 +114,7 @@ namespace Server.Test
         [Fact]
         public void Make_Hello_World_Incorrect_Correct()
         {
-            string[] args = { "8080", "-p" };
+            string[] args = { "2750", "-p" };
             var serverMade = Program.makeServer(args);
             Assert.Null(serverMade);
         }
@@ -109,6 +144,8 @@ namespace Server.Test
         [Fact]
         public void Main_Starting_Program()
         {
+            var output = new StringWriter();
+            System.Console.SetOut(output);
             string[] args = { };
             Assert.Equal(0, Program.Main(args));
         }
@@ -116,10 +153,32 @@ namespace Server.Test
         [Fact]
         public void Test_Running_Of_Server()
         {
+            var output = new StringWriter();
+            System.Console.SetOut(output);
             var mockServer = new MockMainServer().stubStillAlive();
             Program.runServer(mockServer);
             mockServer.VerifyRun();
             mockServer.VerifyStillAlive();
+            Assert.Equal("Server Running...\r\n", output.ToString());
+        }
+
+        [Fact]
+        public void Test_User_Inputs_Invaild_Settings_Dump_Error()
+        {
+            var output = new StringWriter();
+            System.Console.SetOut(output);
+            var correctOutput = new StringBuilder();
+            correctOutput.Append("Invaild Input Detected.\n");
+            correctOutput.Append("Server.exe may already be running on port\n");
+            correctOutput.Append("must be Server.Core.exe -p PORT -d directory\n");
+            correctOutput.Append("Vaild Ports 2000 - 65000\n");
+            correctOutput.Append("Examples:\n");
+            correctOutput.Append("Server.exe -p 8080 -d C:/\n");
+            correctOutput.Append("Server.exe -d C:/HelloWorld -p 5555\n");
+            correctOutput.Append("Server.exe -p 9999\n\r\n\r\n");
+
+            Program.runServer(null);
+            Assert.Equal(correctOutput.ToString(), output.ToString());
         }
     }
 }

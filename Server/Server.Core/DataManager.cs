@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Server.Core
 {
@@ -16,6 +12,10 @@ namespace Server.Core
             this.socket = socket;
             socket.Bind(localEndPoint);
             socket.Listen(10);
+        }
+        public bool connected()
+        {
+            return socket.Connected();
         }
         public DataManager(ISocketProxy socket)
         {

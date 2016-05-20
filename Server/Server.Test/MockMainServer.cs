@@ -14,6 +14,10 @@ namespace Server.Test
         {
             return _mock.Object.stillAlive();
         }
+        void IMainServer.runningProcess(IDataManager handler)
+        {
+            _mock.Object.runningProcess(handler);
+        }
         public void run()
         {
             _mock.Object.run();
@@ -31,5 +35,6 @@ namespace Server.Test
             _mock.Setup(m => m.stillAlive()).Returns(false);
             return this;
         }
+
     }
 }
