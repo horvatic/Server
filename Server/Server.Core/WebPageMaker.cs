@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 
 namespace Server.Core
 {
@@ -24,19 +25,20 @@ namespace Server.Core
             directoryContents.Append(@"<head><title>Vatic File Server</title></head>");
             directoryContents.Append(@"<body>");
             var files = reader.GetFiles(dir);
-            foreach (var file in files)
+            foreach (var replacedBackSlash in files.Select(file => file.Replace('\\', '/')))
             {
                 directoryContents.Append(@"<br><a href=""http://localhost:" + _port + "/" +
-                                         file.Replace('\\', '/').Replace(" ", "%20").Replace(root, "") + @""" >" +
-                                         file.Replace('\\', '/').Replace(root, "") +
-                                         "</a>");
+                                         replacedBackSlash.Replace(" ", "%20").Replace(root, "") + @""" >" +
+                                         replacedBackSlash.Remove(0, replacedBackSlash.LastIndexOf('/') + 1)
+                                         + "</a>");
             }
             var subDirs = reader.GetDirectories(dir);
-            foreach (var subDir in subDirs)
+            foreach (var replacedBackSlash in subDirs.Select(subDir => subDir.Replace('\\', '/')))
             {
                 directoryContents.Append(@"<br><a href=""http://localhost:" + _port + "/" +
-                                         subDir.Replace('\\', '/').Replace(" ", "%20").Replace(root, "") + @""" >" +
-                                         subDir.Replace('\\', '/') + "</a>").Replace(root, "");
+                                         replacedBackSlash.Replace(" ", "%20").Replace(root, "") + @""" >" +
+                                        replacedBackSlash.Remove(0, replacedBackSlash.LastIndexOf('/') + 1)
+                                             + "</a>");
             }
             directoryContents.Append(@"</body>");
             directoryContents.Append(@"</html>");

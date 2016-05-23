@@ -95,11 +95,11 @@ namespace Server.Test
             correctOutput.Append(@"<html>");
             correctOutput.Append(@"<head><title>Vatic File Server</title></head>");
             correctOutput.Append(@"<body>");
-            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir0/file1"" >dir0/file1</a>");
-            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir0/file2"" >dir0/file2</a>");
-            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir0/file3"" >dir0/file3</a>");
-            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir0/dir1"" >dir0/dir1</a>");
-            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir0/dir2"" >dir0/dir2</a>");
+            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir0/file1"" >file1</a>");
+            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir0/file2"" >file2</a>");
+            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir0/file3"" >file3</a>");
+            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir0/dir1"" >dir1</a>");
+            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir0/dir2"" >dir2</a>");
             correctOutput.Append(@"</body>");
             correctOutput.Append(@"</html>");
             var maker = new WebPageMaker(8080);
@@ -124,6 +124,29 @@ namespace Server.Test
             correctOutput.Append(@"<br><a href=""http://localhost:8080/file3"" >file3</a>");
             correctOutput.Append(@"<br><a href=""http://localhost:8080/dir1"" >dir1</a>");
             correctOutput.Append(@"<br><a href=""http://localhost:8080/dir2"" >dir2</a>");
+            correctOutput.Append(@"</body>");
+            correctOutput.Append(@"</html>");
+            var maker = new WebPageMaker(8080);
+            Assert.Equal(correctOutput.ToString(), maker.DirectoryContents(@"dir0/", mockRead, "dir0/"));
+            mockRead.VerifyGetDirectories(@"dir0/");
+            mockRead.VerifyGetFiles(@"dir0/");
+        }
+        [Fact]
+        public void Making_Directory_Page_With_Removed_Sub_Directorys()
+        {
+            var mockRead = new MockDirectoryProxy()
+                .StubGetDirectories(new[] { "dir0\\dir1\\dir2\\dir1", "dir0\\dir1\\dir2\\dir2" })
+                .StubGetFiles(new[] { "dir0\\dir1\\dir2\\file1", "dir0\\dir1\\dir2\\file2", "dir0\\dir1\\dir2\\file3" });
+            var correctOutput = new StringBuilder();
+            correctOutput.Append(@"<!DOCTYPE html>");
+            correctOutput.Append(@"<html>");
+            correctOutput.Append(@"<head><title>Vatic File Server</title></head>");
+            correctOutput.Append(@"<body>");
+            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir1/dir2/file1"" >file1</a>");
+            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir1/dir2/file2"" >file2</a>");
+            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir1/dir2/file3"" >file3</a>");
+            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir1/dir2/dir1"" >dir1</a>");
+            correctOutput.Append(@"<br><a href=""http://localhost:8080/dir1/dir2/dir2"" >dir2</a>");
             correctOutput.Append(@"</body>");
             correctOutput.Append(@"</html>");
             var maker = new WebPageMaker(8080);

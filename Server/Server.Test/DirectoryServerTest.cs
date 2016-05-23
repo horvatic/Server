@@ -108,6 +108,34 @@ namespace Server.Test
         }
 
         [Fact]
+        public void Make_Web_Server_Get_Request_Send_Back_Repsonce_In_Deep_Subdirectory()
+        {
+            var mockRead = new MockDirectoryProxy()
+                .StubGetDirectories(new[] { "dir1", "dir2" })
+                .StubGetFiles(new[] { "file1", "file2", "file3" })
+                .StubExists(false);
+            var webMaker = new WebPageMaker(8080);
+            var mockFileReader = new MockFileProxy().StubExists(true).StubReadAllBytes(new byte[] { 1, 2 });
+            var dataManager = new MockDataManager()
+                .StubSentToReturn(10)
+                .StubReceive("GET /dir0/dir1/dir2/NotHome.txt HTTP/1.1")
+                .StubConnect(true);
+            dataManager = dataManager.StubAccpetObject(dataManager);
+            var server = new DirectoryServer(dataManager, webMaker, @"Home", mockRead, mockFileReader);
+            server.RunningProcess(dataManager);
+            mockFileReader.VerifyExists("Home/dir0/dir1/dir2/NotHome.txt");
+            mockFileReader.VerifyReadAllBytes("Home/dir0/dir1/dir2/NotHome.txt");
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
+            dataManager.VerifySend("Content-Type: application/octet-stream\r\n");
+            dataManager.VerifySend("Content-Disposition: attachment; filename = NotHome.txt\r\n");
+            dataManager.VerifySend("Content-Length: " + mockFileReader.ReadAllBytes("Home/dir0/dir1/dir2/NotHome.txt").Length +
+                                   "\r\n\r\n");
+            dataManager.VerifySendFile("Home/dir0/dir1/dir2/NotHome.txt");
+            dataManager.VerifyClose();
+        }
+
+        [Fact]
         public void Make_Web_Server_Get_Request_Send_Back_Repsonce_Not_Home_Dir_Output()
         {
             var mockRead = new MockDirectoryProxy()

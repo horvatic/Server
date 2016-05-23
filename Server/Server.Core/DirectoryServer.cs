@@ -87,7 +87,7 @@ namespace Server.Core
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Content-Type: application/octet-stream\r\n");
-            handler.Send("Content-Disposition: attachment; filename = " + path.Replace(_currentDir, "") + "\r\n");
+            handler.Send("Content-Disposition: attachment; filename = " + path.Remove(0, path.LastIndexOf('/') + 1) + "\r\n");
             handler.Send("Content-Length: " + _fileReader.ReadAllBytes(path).Length + "\r\n\r\n");
             handler.SendFile(path);
         }
