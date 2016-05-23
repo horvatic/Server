@@ -30,7 +30,7 @@ namespace Server.Test
                 new FileProxy());
             new Thread(() => RunServer(testingServer)).Start();
 
-            var wrGeturl = WebRequest.Create(@"http://localhost:54321/C:/Program%20Files%20(x86)/Internet%20Explorer/ie9props.propdesc");
+            var wrGeturl = WebRequest.Create(@"http://localhost:54321/Program%20Files%20(x86)/Internet%20Explorer/ie9props.propdesc");
 
             wrGeturl.GetResponse();
         }

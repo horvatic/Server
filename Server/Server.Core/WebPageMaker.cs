@@ -16,7 +16,7 @@ namespace Server.Core
             _port = port;
         }
 
-        public string DirectoryContents(string dir, IDirectoryProxy reader)
+        public string DirectoryContents(string dir, IDirectoryProxy reader, string root)
         {
             var directoryContents = new StringBuilder();
             directoryContents.Append(@"<!DOCTYPE html>");
@@ -27,15 +27,16 @@ namespace Server.Core
             foreach (var file in files)
             {
                 directoryContents.Append(@"<br><a href=""http://localhost:" + _port + "/" +
-                                         file.Replace('\\', '/').Replace(" ", "%20") + @""" >" + file.Replace('\\', '/') +
+                                         file.Replace('\\', '/').Replace(" ", "%20").Replace(root, "") + @""" >" +
+                                         file.Replace('\\', '/').Replace(root, "") +
                                          "</a>");
             }
             var subDirs = reader.GetDirectories(dir);
             foreach (var subDir in subDirs)
             {
                 directoryContents.Append(@"<br><a href=""http://localhost:" + _port + "/" +
-                                         subDir.Replace('\\', '/').Replace(" ", "%20") + @""" >" +
-                                         subDir.Replace('\\', '/') + "</a>");
+                                         subDir.Replace('\\', '/').Replace(" ", "%20").Replace(root, "") + @""" >" +
+                                         subDir.Replace('\\', '/') + "</a>").Replace(root, "");
             }
             directoryContents.Append(@"</body>");
             directoryContents.Append(@"</html>");

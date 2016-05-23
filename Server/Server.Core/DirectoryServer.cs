@@ -19,7 +19,7 @@ namespace Server.Core
             _dirReader = dirReader;
             _socket = socket;
             _webMaker = webMaker;
-            _currentDir = currentDir;
+            _currentDir = currentDir.EndsWith("/") ? currentDir : currentDir + "/";
         }
 
         public bool StillAlive => true;
@@ -39,19 +39,19 @@ namespace Server.Core
                     handler.Send("HTTP/1.1 200 OK\r\n");
                     handler.Send("Content-Type: text/html\r\n");
                     handler.Send("Content-Length: " +
-                                 Encoding.ASCII.GetBytes(_webMaker.DirectoryContents(_currentDir, _dirReader)).Length +
+                                 Encoding.ASCII.GetBytes(_webMaker.DirectoryContents(_currentDir, _dirReader, _currentDir)).Length +
                                  "\r\n\r\n");
-                    handler.Send(_webMaker.DirectoryContents(_currentDir, _dirReader));
+                    handler.Send(_webMaker.DirectoryContents(_currentDir, _dirReader, _currentDir));
                 }
                 else
                 {
-                    if (_fileReader.Exists(requestItem))
+                    if (_fileReader.Exists(_currentDir + requestItem))
                     {
-                        PushFile(requestItem, handler);
+                        PushFile(_currentDir + requestItem, handler);
                     }
-                    else if (_dirReader.Exists(requestItem))
+                    else if (_dirReader.Exists(_currentDir + requestItem))
                     {
-                        PushDir(requestItem, handler);
+                        PushDir(_currentDir + requestItem, handler);
                     }
                     else
                         Error404(handler);
@@ -79,15 +79,15 @@ namespace Server.Core
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Content-Type: text/html\r\n");
             handler.Send("Content-Length: " +
-                         Encoding.ASCII.GetBytes(_webMaker.DirectoryContents(path, _dirReader)).Length + "\r\n\r\n");
-            handler.Send(_webMaker.DirectoryContents(path, _dirReader));
+                         Encoding.ASCII.GetBytes(_webMaker.DirectoryContents(path, _dirReader, _currentDir)).Length + "\r\n\r\n");
+            handler.Send(_webMaker.DirectoryContents(path, _dirReader, _currentDir));
         }
 
         private void PushFile(string path, IDataManager handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Content-Type: application/octet-stream\r\n");
-            handler.Send("Content-Disposition: attachment; filename = " + path + "\r\n");
+            handler.Send("Content-Disposition: attachment; filename = " + path.Replace(_currentDir, "") + "\r\n");
             handler.Send("Content-Length: " + _fileReader.ReadAllBytes(path).Length + "\r\n\r\n");
             handler.SendFile(path);
         }
