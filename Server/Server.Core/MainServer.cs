@@ -107,7 +107,7 @@ namespace Server.Core
 
         private void PostProcessor(string request, IDataManager handler)
         {
-            if (request.Contains("POST /action_page.php HTTP/1.1"))
+            if (request.Contains("POST /action_page.php HTTP/1.1") || request.Contains("POST /action_page.php HTTP/1.0"))
             {
                 var name = request.Remove(0, request.LastIndexOf("\r\n\r\n", StringComparison.Ordinal) + 4);
                 var firstName = WebUtility.UrlDecode(name.Substring(0, name.IndexOf("&", StringComparison.Ordinal))
@@ -123,21 +123,30 @@ namespace Server.Core
             }
         }
 
+        private string CleanRequest(string request)
+        {
+            if(request.Contains("HTTP/1.1"))
+                return request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
+                        request.IndexOf(" HTTP/1.1", StringComparison.Ordinal) - 5)
+                        .Replace("%20", " ");
+            else
+                return request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
+                        request.IndexOf(" HTTP/1.0", StringComparison.Ordinal) - 5)
+                        .Replace("%20", " ");
+        }
+
         private void GetProcessor(string request, IDataManager handler)
         {
-            var requestItem =
-                request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
-                    request.IndexOf(" HTTP/1.1", StringComparison.Ordinal) - 5)
-                    .Replace("%20", " ");
+            var requestItem = CleanRequest(request);
 
-            if (request.Contains("GET / HTTP/1.1"))
+            if (request.Contains("GET / HTTP/1.1") || request.Contains("GET / HTTP/1.0"))
             {
                 if (_currentDir != null)
                     HomeDir(handler);
                 else
                     HelloWorld(handler);
             }
-            else if (request.Contains("GET /form HTTP/1.1"))
+            else if (request.Contains("GET /form HTTP/1.1") || request.Contains("GET /form HTTP/1.0"))
             {
                 Form(handler);
             }

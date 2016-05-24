@@ -189,6 +189,30 @@ namespace Server.Test
         }
 
         [Fact]
+        public void Make_Web_Server_Get_Request_Send_Back_Repsonce_Http_1_0()
+        {
+            var mockRead = new MockDirectoryProxy()
+                .StubGetDirectories(new[] { "dir1", "dir2" })
+                .StubGetFiles(new[] { "file1", "file2", "file3" });
+            var webMaker = new WebPageMaker(8080);
+            var dataManager = new MockDataManager()
+                .StubSentToReturn(10)
+                .StubReceive("GET / HTTP/1.0")
+                .StubConnect(true);
+            dataManager = dataManager.StubAccpetObject(dataManager);
+            var server = new MainServer(dataManager, webMaker, @"Home", mockRead, new MockFileProxy());
+            server.RunningProcess(dataManager);
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
+            dataManager.VerifySend("Content-Type: text/html\r\n");
+            dataManager.VerifySend("Content-Length: " +
+                                   Encoding.ASCII.GetBytes(webMaker.DirectoryContents(@"Home", mockRead, "Home")).Length +
+                                   "\r\n\r\n");
+            dataManager.VerifySend(webMaker.DirectoryContents(@"Home", mockRead, "Home"));
+            dataManager.VerifyClose();
+        }
+
+        [Fact]
         public void Make_Web_Server_Get_Request_Send_Back_Repsonce()
         {
             var mockRead = new MockDirectoryProxy()

@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using Server.Core;
 using Xunit;
@@ -60,7 +59,7 @@ namespace Server.Test
             var mockSocket = new MockSocketProxy();
             var localEndPoint = new IPEndPoint((IPAddress.Loopback), 32000);
             var manager = new DataManager(mockSocket, localEndPoint);
-            var message = "C:/Shawn/Docs";
+            const string message = "C:/Shawn/Docs";
 
             manager.SendFile(message);
 
