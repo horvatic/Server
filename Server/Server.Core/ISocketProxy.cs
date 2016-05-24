@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Net.Sockets;
 
 namespace Server.Core
 {
@@ -13,6 +12,5 @@ namespace Server.Core
         void Bind(EndPoint localEp);
         void Listen(int backlog);
         ISocketProxy Accept();
-
     }
 }

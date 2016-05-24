@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Net.Sockets;
+using System.Net;
 using System.Text;
 using System.Threading;
 
@@ -7,28 +7,27 @@ namespace Server.Core
 {
     public class MainServer : IMainServer
     {
+        private static int _numberOfThreads;
         private readonly string _currentDir;
         private readonly IDirectoryProxy _dirReader;
         private readonly IFileProxy _fileReader;
         private readonly IDataManager _socket;
         private readonly IWebPageMaker _webMaker;
         private bool _acceptNewConn;
-        private static int _numberOfThreads;
 
         public MainServer(IDataManager socket, IWebPageMaker webMaker, string currentDir, IDirectoryProxy dirReader,
             IFileProxy fileReader)
         {
-
             _numberOfThreads = 0;
             _fileReader = fileReader;
             _acceptNewConn = true;
             _dirReader = dirReader;
             _socket = socket;
             _webMaker = webMaker;
-            if(currentDir == null)
-                _currentDir = currentDir;
+            if (currentDir == null)
+                _currentDir = null;
             else
-            _currentDir = currentDir.EndsWith("/") ? currentDir : currentDir + "/";
+                _currentDir = currentDir.EndsWith("/") ? currentDir : currentDir + "/";
         }
 
         public void StopNewConn()
@@ -46,36 +45,17 @@ namespace Server.Core
             {
                 var request = handler.Receive();
                 if (request.Length == 0) return;
-                var requestItem =
-                    request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
-                        request.IndexOf(" HTTP/1.1", StringComparison.Ordinal) - 5)
-                        .Replace("%20", " ");
-                if (request.Contains("GET / HTTP/1.1"))
+                if (request.Contains("GET /"))
                 {
-                    if (_currentDir != null)
-                        HomeDir(handler);
-                    else
-                        HelloWorld(handler);
+                    GetProcessor(request, handler);
+                }
+                else if (request.Contains("POST /"))
+                {
+                    PostProcessor(request, handler);
                 }
                 else
                 {
-                    if (_currentDir != null)
-                    {
-                        if (_fileReader.Exists(_currentDir + requestItem))
-                        {
-                            PushFile(_currentDir + requestItem, handler);
-                        }
-                        else if (_dirReader.Exists(_currentDir + requestItem))
-                        {
-                            PushDir(_currentDir + requestItem, handler);
-                        }
-                        else
-                            Error404(handler);
-                    }
-                    else
-                    {
-                        Error404(handler);
-                    }
+                    Error404(handler);
                 }
             }
             catch (Exception)
@@ -88,7 +68,6 @@ namespace Server.Core
                     handler.Close();
                 Interlocked.Decrement(ref _numberOfThreads);
             }
-            
         }
 
         public void Run()
@@ -105,17 +84,103 @@ namespace Server.Core
             }
         }
 
-        public void HomeDir(IDataManager handler)
+        private void FileAndDirProcessing(string requestItem, IDataManager handler)
+        {
+            if (_currentDir != null)
+            {
+                if (_fileReader.Exists(_currentDir + requestItem))
+                {
+                    PushFile(_currentDir + requestItem, handler);
+                }
+                else if (_dirReader.Exists(_currentDir + requestItem))
+                {
+                    PushDir(_currentDir + requestItem, handler);
+                }
+                else
+                    Error404(handler);
+            }
+            else
+            {
+                Error404(handler);
+            }
+        }
+
+        private void PostProcessor(string request, IDataManager handler)
+        {
+            if (request.Contains("POST /action_page.php HTTP/1.1"))
+            {
+                var name = request.Remove(0, request.LastIndexOf("\r\n\r\n", StringComparison.Ordinal) + 4);
+                var firstName = WebUtility.UrlDecode(name.Substring(0, name.IndexOf("&", StringComparison.Ordinal))
+                    .Replace("firstname=", ""));
+                var lastName =
+                    WebUtility.UrlDecode(name.Substring(name.IndexOf("&", StringComparison.Ordinal) + 1)
+                        .Replace("lastname=", ""));
+                SendNames(handler, firstName, lastName);
+            }
+            else
+            {
+                Error404(handler);
+            }
+        }
+
+        private void GetProcessor(string request, IDataManager handler)
+        {
+            var requestItem =
+                request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
+                    request.IndexOf(" HTTP/1.1", StringComparison.Ordinal) - 5)
+                    .Replace("%20", " ");
+
+            if (request.Contains("GET / HTTP/1.1"))
+            {
+                if (_currentDir != null)
+                    HomeDir(handler);
+                else
+                    HelloWorld(handler);
+            }
+            else if (request.Contains("GET /form HTTP/1.1"))
+            {
+                Form(handler);
+            }
+            else
+            {
+                FileAndDirProcessing(requestItem, handler);
+            }
+        }
+
+        private void SendNames(IDataManager handler, string firstName, string lastName)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Content-Type: text/html\r\n");
             handler.Send("Content-Length: " +
-                         Encoding.ASCII.GetBytes(_webMaker.DirectoryContents(_currentDir, _dirReader, _currentDir)).Length +
+                         Encoding.ASCII.GetBytes(_webMaker.OutPutNames(firstName, lastName))
+                             .Length +
+                         "\r\n\r\n");
+            handler.Send(_webMaker.OutPutNames(firstName, lastName));
+        }
+
+        private void Form(IDataManager handler)
+        {
+            handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Content-Type: text/html\r\n");
+            handler.Send("Content-Length: " +
+                         Encoding.ASCII.GetBytes(_webMaker.NameForm())
+                             .Length +
+                         "\r\n\r\n");
+            handler.Send(_webMaker.NameForm());
+        }
+
+        private void HomeDir(IDataManager handler)
+        {
+            handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Content-Type: text/html\r\n");
+            handler.Send("Content-Length: " +
+                         Encoding.ASCII.GetBytes(_webMaker.DirectoryContents(_currentDir, _dirReader, _currentDir))
+                             .Length +
                          "\r\n\r\n");
             handler.Send(_webMaker.DirectoryContents(_currentDir, _dirReader, _currentDir));
         }
 
-        public void HelloWorld(IDataManager handler)
+        private void HelloWorld(IDataManager handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Content-Type: text/html\r\n");
@@ -123,12 +188,14 @@ namespace Server.Core
                          "\r\n\r\n");
             handler.Send(_webMaker.HelloWorld());
         }
-        public void PushDir(string path, IDataManager handler)
+
+        private void PushDir(string path, IDataManager handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Content-Type: text/html\r\n");
             handler.Send("Content-Length: " +
-                         Encoding.ASCII.GetBytes(_webMaker.DirectoryContents(path, _dirReader, _currentDir)).Length + "\r\n\r\n");
+                         Encoding.ASCII.GetBytes(_webMaker.DirectoryContents(path, _dirReader, _currentDir)).Length +
+                         "\r\n\r\n");
             handler.Send(_webMaker.DirectoryContents(path, _dirReader, _currentDir));
         }
 
@@ -136,7 +203,8 @@ namespace Server.Core
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Content-Type: application/octet-stream\r\n");
-            handler.Send("Content-Disposition: attachment; filename = " + path.Remove(0, path.LastIndexOf('/') + 1) + "\r\n");
+            handler.Send("Content-Disposition: attachment; filename = " + path.Remove(0, path.LastIndexOf('/') + 1) +
+                         "\r\n");
             handler.Send("Content-Length: " + _fileReader.ReadAllBytes(path).Length + "\r\n\r\n");
             handler.SendFile(path);
         }

@@ -7,9 +7,9 @@ namespace Server.Core
 {
     public class Program
     {
-        public static bool StopServer = false;
-
         public delegate void ShutDown(object sender, ConsoleCancelEventArgs e);
+
+        public static bool StopServer;
 
         public static void ShutDownServer(object sender, ConsoleCancelEventArgs e)
         {
@@ -55,6 +55,7 @@ namespace Server.Core
 
             return error.ToString();
         }
+
         public static IMainServer MakeServer(string[] args)
         {
             try
@@ -69,7 +70,7 @@ namespace Server.Core
                         return null;
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return null;
             }
@@ -84,15 +85,12 @@ namespace Server.Core
                 {
                     var endPoint = new IPEndPoint((IPAddress.Loopback), port);
                     var manager = new DataManager(new SocketProxy(), endPoint);
-                    return new MainServer(manager, new WebPageMaker(port), homeDirectory, new DirectoryProxy(), new FileProxy());
+                    return new MainServer(manager, new WebPageMaker(port), homeDirectory, new DirectoryProxy(),
+                        new FileProxy());
                 }
-                else
-                    return null;
-            }
-            else
-            {
                 return null;
             }
+            return null;
         }
 
         public static IMainServer DirectoryServer(string[] args)
@@ -101,12 +99,11 @@ namespace Server.Core
             {
                 return MakedirectoryServer(args[1], args[3]);
             }
-            else if (args[2] == "-p" && args[0] == "-d")
+            if (args[2] == "-p" && args[0] == "-d")
             {
                 return MakedirectoryServer(args[3], args[1]);
             }
-            else
-                return null;
+            return null;
         }
 
         public static IMainServer HelloWorldServer(string[] args)
@@ -122,14 +119,11 @@ namespace Server.Core
                         var manager = new DataManager(new SocketProxy(), endPoint);
                         return new MainServer(manager, new WebPageMaker(), null, new DirectoryProxy(), new FileProxy());
                     }
-                    else
-                        return null;
-                }
-                else
                     return null;
-            }
-            else
+                }
                 return null;
+            }
+            return null;
         }
     }
 }

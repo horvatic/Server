@@ -1,5 +1,4 @@
-﻿using System.Net.Sockets;
-using System.Text;
+﻿using System.Text;
 using Server.Core;
 using Xunit;
 
@@ -112,6 +111,7 @@ namespace Server.Test
 
             Assert.Equal(true, server.StillAlive);
         }
+
         [Fact]
         public void Make_Sure_New_Main_Server_Is_Not_Null()
         {
@@ -166,8 +166,8 @@ namespace Server.Test
         public void Server_Is_Shuting_Down()
         {
             var mockRead = new MockDirectoryProxy()
-                .StubGetDirectories(new[] { "dir1", "dir2" })
-                .StubGetFiles(new[] { "file1", "file2", "file3" });
+                .StubGetDirectories(new[] {"dir1", "dir2"})
+                .StubGetFiles(new[] {"file1", "file2", "file3"});
             var webMaker = new WebPageMaker(8080);
             var dataManager = new MockDataManager()
                 .StubSentToReturn(10)
@@ -381,6 +381,96 @@ namespace Server.Test
             dataManager.VerifySend("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.Error404Page()).Length +
                                    "\r\n\r\n");
             dataManager.VerifySend(webMaker.Error404Page());
+            dataManager.VerifyClose();
+        }
+
+        [Fact]
+        public void Web_Server_Send_Web_Form()
+        {
+            var webMaker = new WebPageMaker();
+            var dataManager = new MockDataManager()
+                .StubSentToReturn(10)
+                .StubReceive("GET /form HTTP/1.1")
+                .StubConnect(true);
+            dataManager = dataManager.StubAccpetObject(dataManager);
+            var server = new MainServer(dataManager, webMaker, null, new MockDirectoryProxy(),
+                new MockFileProxy());
+            server.RunningProcess(dataManager);
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
+            dataManager.VerifySend("Content-Type: text/html\r\n");
+            dataManager.VerifySend("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.NameForm()).Length +
+                                   "\r\n\r\n");
+            dataManager.VerifySend(webMaker.NameForm());
+            dataManager.VerifyClose();
+        }
+
+        [Fact]
+        public void Web_Server_Send_Web_Form_Name_Back_As_HTML()
+        {
+            var webMaker = new WebPageMaker();
+            var dataManager = new MockDataManager()
+                .StubSentToReturn(10)
+                .StubReceive("POST /action_page.php HTTP/1.1\r\n" +
+                             "Host: localhost:8080\r\n" +
+                             "Connection: keep - alive\r\n" +
+                             "Content - Length: 33\r\n" +
+                             "Cache - Control: max - age = 0\r\n" +
+                             "Accept: text / html,application / xhtml + xml,application / xml; q = 0.9,image / webp,*/*;q=0.8\r\n" +
+                             "Origin: http://localhost:8080\r\n" +
+                             "Upgrade-Insecure-Requests: 1\r\n" +
+                             "User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36\r\n" +
+                             "Content-Type: application/x-www-form-urlencoded\r\n" +
+                             "Referer: http://localhost:8080/form\r\n" +
+                             "Accept-Encoding: gzip, deflate\r\n" +
+                             "Accept-Language: en-US,en;q=0.8\r\n\r\n" +
+                             "firstname=John&lastname=Walsher")
+                .StubConnect(true);
+            dataManager = dataManager.StubAccpetObject(dataManager);
+            var server = new MainServer(dataManager, webMaker, null, new MockDirectoryProxy(),
+                new MockFileProxy());
+            server.RunningProcess(dataManager);
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
+            dataManager.VerifySend("Content-Type: text/html\r\n");
+            dataManager.VerifySend("Content-Length: " +
+                                   Encoding.ASCII.GetBytes(webMaker.OutPutNames("John", "Walsher")).Length +
+                                   "\r\n\r\n");
+            dataManager.VerifySend(webMaker.OutPutNames("John", "Walsher"));
+            dataManager.VerifyClose();
+        }
+        [Fact]
+        public void Web_Server_Send_Web_Form_Name_Back_As_HTML_Speical_Chars()
+        {
+            var webMaker = new WebPageMaker();
+            var dataManager = new MockDataManager()
+                .StubSentToReturn(10)
+                .StubReceive("POST /action_page.php HTTP/1.1\r\n" +
+                             "Host: localhost:8080\r\n" +
+                             "Connection: keep - alive\r\n" +
+                             "Content - Length: 33\r\n" +
+                             "Cache - Control: max - age = 0\r\n" +
+                             "Accept: text / html,application / xhtml + xml,application / xml; q = 0.9,image / webp,*/*;q=0.8\r\n" +
+                             "Origin: http://localhost:8080\r\n" +
+                             "Upgrade-Insecure-Requests: 1\r\n" +
+                             "User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36\r\n" +
+                             "Content-Type: application/x-www-form-urlencoded\r\n" +
+                             "Referer: http://localhost:8080/form\r\n" +
+                             "Accept-Encoding: gzip, deflate\r\n" +
+                             "Accept-Language: en-US,en;q=0.8\r\n\r\n" +
+                             "firstname=%26&lastname=%26")
+                .StubConnect(true);
+            dataManager = dataManager.StubAccpetObject(dataManager);
+            var server = new MainServer(dataManager, webMaker, null, new MockDirectoryProxy(),
+                new MockFileProxy());
+            server.RunningProcess(dataManager);
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
+            dataManager.VerifySend("Content-Type: text/html\r\n");
+            dataManager.VerifySend("Content-Length: " +
+                                   Encoding.ASCII.GetBytes(webMaker.OutPutNames("&", "&")).Length +
+                                   "\r\n\r\n");
+            dataManager.VerifySend(webMaker.OutPutNames("&", "&"));
             dataManager.VerifyClose();
         }
     }

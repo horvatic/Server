@@ -7,6 +7,50 @@ namespace Server.Test
     public class WebPageMakerTest
     {
         [Fact]
+        public void Return_Web_Page_With_Names()
+        {
+            var maker = new WebPageMaker();
+            var correctOutput = new StringBuilder();
+            correctOutput.Append(@"<!DOCTYPE html>");
+            correctOutput.Append(@"<html>");
+            correctOutput.Append(@"<head><title>Vatic File Server</title></head>");
+            correctOutput.Append(@"<body>");
+
+            correctOutput.Append(@"First Name Submitted:<br>");
+            correctOutput.Append(@"John<br>");
+            correctOutput.Append(@"Last Name Submitted:<br>");
+            correctOutput.Append(@"Walsher<br>");
+
+
+            correctOutput.Append(@"</body>");
+            correctOutput.Append(@"</html>");
+            Assert.Equal(correctOutput.ToString(), maker.OutPutNames("John", "Walsher"));
+        }
+        [Fact]
+        public void Making_Web_Form_Page()
+        {
+            var maker = new WebPageMaker();
+            var correctOutput = new StringBuilder();
+            correctOutput.Append(@"<!DOCTYPE html>");
+            correctOutput.Append(@"<html>");
+            correctOutput.Append(@"<head><title>Vatic File Server</title></head>");
+            correctOutput.Append(@"<body>");
+
+            correctOutput.Append(@"<form action=""action_page.php"" method=""post"">");
+            correctOutput.Append(@"First name:<br>");
+            correctOutput.Append(@"<input type=""text"" name=""firstname""><br>");
+            correctOutput.Append(@"Last name:<br>");
+            correctOutput.Append(@"<input type=""text"" name=""lastname""><br><br>");
+            correctOutput.Append(@"<input type=""submit"" value=""Submit"">");
+            correctOutput.Append(@"</form>");
+
+
+            correctOutput.Append(@"</body>");
+            correctOutput.Append(@"</html>");
+            Assert.Equal(correctOutput.ToString(), maker.NameForm());
+        }
+
+        [Fact]
         public void Making_404_Page()
         {
             var maker = new WebPageMaker();
