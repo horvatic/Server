@@ -150,6 +150,7 @@ namespace Server.Core
         private void SendNames(IDataManager handler, string firstName, string lastName)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Cache-Control: no-cache\r\n");
             handler.Send("Content-Type: text/html\r\n");
             handler.Send("Content-Length: " +
                          Encoding.ASCII.GetBytes(_webMaker.OutPutNames(firstName, lastName))
@@ -161,6 +162,7 @@ namespace Server.Core
         private void Form(IDataManager handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Cache-Control: no-cache\r\n");
             handler.Send("Content-Type: text/html\r\n");
             handler.Send("Content-Length: " +
                          Encoding.ASCII.GetBytes(_webMaker.NameForm())
@@ -172,6 +174,7 @@ namespace Server.Core
         private void HomeDir(IDataManager handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Cache-Control: no-cache\r\n");
             handler.Send("Content-Type: text/html\r\n");
             handler.Send("Content-Length: " +
                          Encoding.ASCII.GetBytes(_webMaker.DirectoryContents(_currentDir, _dirReader, _currentDir))
@@ -183,6 +186,7 @@ namespace Server.Core
         private void HelloWorld(IDataManager handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Cache-Control: no-cache\r\n");
             handler.Send("Content-Type: text/html\r\n");
             handler.Send("Content-Length: " + Encoding.ASCII.GetBytes(_webMaker.HelloWorld()).Length +
                          "\r\n\r\n");
@@ -192,6 +196,7 @@ namespace Server.Core
         private void PushDir(string path, IDataManager handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Cache-Control: no-cache\r\n");
             handler.Send("Content-Type: text/html\r\n");
             handler.Send("Content-Length: " +
                          Encoding.ASCII.GetBytes(_webMaker.DirectoryContents(path, _dirReader, _currentDir)).Length +
@@ -202,6 +207,7 @@ namespace Server.Core
         private void PushNormalFile(string path, IDataManager handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Cache-Control: no-cache\r\n");
             handler.Send("Content-Type: application/octet-stream\r\n");
             handler.Send("Content-Disposition: attachment; filename = " + path.Remove(0, path.LastIndexOf('/') + 1) +
                          "\r\n");
@@ -212,6 +218,7 @@ namespace Server.Core
         private void PushSmallPdfFile(string path, IDataManager handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Cache-Control: no-cache\r\n");
             handler.Send("Content-Type: application/pdf\r\n");
             handler.Send("Content-Disposition: inline; filename = " + path.Remove(0, path.LastIndexOf('/') + 1) +
                          "\r\n");
@@ -222,7 +229,19 @@ namespace Server.Core
         private void PushTextFile(string path, IDataManager handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Cache-Control: no-cache\r\n");
             handler.Send("Content-Type: text/plain\r\n");
+            handler.Send("Content-Disposition: inline; filename = " + path.Remove(0, path.LastIndexOf('/') + 1) +
+                         "\r\n");
+            handler.Send("Content-Length: " + _fileReader.ReadAllBytes(path).Length + "\r\n\r\n");
+            handler.SendFile(path);
+        }
+
+        private void PushPngFile(string path, IDataManager handler)
+        {
+            handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Cache-Control: no-cache\r\n");
+            handler.Send("Content-Type: image/png\r\n");
             handler.Send("Content-Disposition: inline; filename = " + path.Remove(0, path.LastIndexOf('/') + 1) +
                          "\r\n");
             handler.Send("Content-Length: " + _fileReader.ReadAllBytes(path).Length + "\r\n\r\n");
@@ -236,6 +255,8 @@ namespace Server.Core
                 PushSmallPdfFile(path, handler);
             else if (path.Remove(0, path.LastIndexOf('/') + 1).EndsWith(".txt"))
                 PushTextFile(path, handler);
+            else if (path.Remove(0, path.LastIndexOf('/') + 1).EndsWith(".png"))
+                PushPngFile(path, handler);
             else
                 PushNormalFile(path, handler);
         }

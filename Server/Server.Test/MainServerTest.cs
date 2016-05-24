@@ -641,5 +641,36 @@ namespace Server.Test
             dataManager.VerifySendFile(home + text);
             dataManager.VerifyClose();
         }
+
+        [Fact]
+        public void Web_Server_Send_Inline_PNG_File()
+        {
+            const string home = @"C:/text/";
+            const string png = @"smallimage.png";
+            var largeBtyeArray = new byte[100];
+            var mockRead = new MockDirectoryProxy()
+                            .StubGetFiles(new[] { png })
+                            .StubExists(false);
+            var webMaker = new WebPageMaker(8080);
+            var mockFileReader = new MockFileProxy().StubExists(true).StubReadAllBytes(largeBtyeArray);
+            var dataManager = new MockDataManager()
+                .StubSentToReturn(10)
+                .StubReceive("GET /" + png + " HTTP/1.1")
+                .StubConnect(true);
+            dataManager = dataManager.StubAccpetObject(dataManager);
+            var server = new MainServer(dataManager, webMaker, home, mockRead, mockFileReader);
+            server.RunningProcess(dataManager);
+            mockFileReader.VerifyExists(home + png);
+            mockFileReader.VerifyReadAllBytes(home + png);
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
+            dataManager.VerifySend("Content-Type: image/png\r\n");
+            dataManager.VerifySend("Content-Disposition: inline; filename = " + png + "\r\n");
+            dataManager.VerifySend("Content-Length: " +
+                                   mockFileReader.ReadAllBytes(home + png).Length +
+                                   "\r\n\r\n");
+            dataManager.VerifySendFile(home + png);
+            dataManager.VerifyClose();
+        }
     }
 }
