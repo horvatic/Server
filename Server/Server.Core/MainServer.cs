@@ -219,11 +219,23 @@ namespace Server.Core
             handler.SendFile(path);
         }
 
+        private void PushTextFile(string path, IDataManager handler)
+        {
+            handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Content-Type: text/plain\r\n");
+            handler.Send("Content-Disposition: inline; filename = " + path.Remove(0, path.LastIndexOf('/') + 1) +
+                         "\r\n");
+            handler.Send("Content-Length: " + _fileReader.ReadAllBytes(path).Length + "\r\n\r\n");
+            handler.SendFile(path);
+        }
+
         private void PushFile(string path, IDataManager handler)
         {
             var fileSize = _fileReader.ReadAllBytes(path).Length;
-            if (path.Remove(0, path.LastIndexOf('/') + 1).EndsWith("pdf") && fileSize <= 10000000)
+            if (path.Remove(0, path.LastIndexOf('/') + 1).EndsWith(".pdf") && fileSize <= 10000000)
                 PushSmallPdfFile(path, handler);
+            else if (path.Remove(0, path.LastIndexOf('/') + 1).EndsWith(".txt"))
+                PushTextFile(path, handler);
             else
                 PushNormalFile(path, handler);
         }
