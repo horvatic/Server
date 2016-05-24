@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Threading;
 using Server.Core;
 using Xunit;
 
@@ -161,7 +162,6 @@ namespace Server.Test
             server.Run();
             dataManager.VerifyNoAccept();
         }
-
         [Fact]
         public void Server_Is_Shuting_Down()
         {
@@ -539,6 +539,76 @@ namespace Server.Test
             dataManager.VerifySend("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.Error404Page()).Length +
                                    "\r\n\r\n");
             dataManager.VerifySend(webMaker.Error404Page());
+            dataManager.VerifyClose();
+        }
+
+        //NOTE FOR LIVE TESTING USE THESE
+        /*
+        http://publibz.boulder.ibm.com/epubs/pdf/db2v75kz.pdf
+        http://www-03.ibm.com/systems/z/os/zos/library/bkserv/v2r2pdf/
+        http://www-03.ibm.com/systems/z/os/zos/library/bkserv/v2r2pdf/index.html#AZK
+        http://www-03.ibm.com/systems/z/os/zos/library/bkserv/zvsepdf/
+        http://publibz.boulder.ibm.com/epubs/pdf/aemm0a00.pdf
+        */
+        [Fact]
+        public void Web_Server_Send_PDF_Greater_Than_10_MB()
+        {
+            const string home = @"C:/PDF/";
+            const string pdf = @"largePDF.pdf";
+            var largeBtyeArray = new byte[10000001];
+            var mockRead = new MockDirectoryProxy()
+                            .StubGetFiles(new[] { pdf })
+                            .StubExists(false);
+            var webMaker = new WebPageMaker(8080);
+            var mockFileReader = new MockFileProxy().StubExists(true).StubReadAllBytes(largeBtyeArray);
+            var dataManager = new MockDataManager()
+                .StubSentToReturn(10)
+                .StubReceive("GET /"+ pdf +" HTTP/1.1")
+                .StubConnect(true);
+            dataManager = dataManager.StubAccpetObject(dataManager);
+            var server = new MainServer(dataManager, webMaker, home, mockRead, mockFileReader);
+            server.RunningProcess(dataManager);
+            mockFileReader.VerifyExists(home + pdf);
+            mockFileReader.VerifyReadAllBytes(home + pdf);
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
+            dataManager.VerifySend("Content-Type: application/octet-stream\r\n");
+            dataManager.VerifySend("Content-Disposition: attachment; filename = "+ pdf +"\r\n");
+            dataManager.VerifySend("Content-Length: " +
+                                   mockFileReader.ReadAllBytes(home + pdf).Length +
+                                   "\r\n\r\n");
+            dataManager.VerifySendFile(home + pdf);
+            dataManager.VerifyClose();
+        }
+
+        [Fact]
+        public void Web_Server_Send_PDF_Less_Than_10_MB()
+        {
+            const string home = @"C:/PDF/";
+            const string pdf = @"smallPDF.pdf";
+            var largeBtyeArray = new byte[100];
+            var mockRead = new MockDirectoryProxy()
+                            .StubGetFiles(new[] { pdf })
+                            .StubExists(false);
+            var webMaker = new WebPageMaker(8080);
+            var mockFileReader = new MockFileProxy().StubExists(true).StubReadAllBytes(largeBtyeArray);
+            var dataManager = new MockDataManager()
+                .StubSentToReturn(10)
+                .StubReceive("GET /" + pdf + " HTTP/1.1")
+                .StubConnect(true);
+            dataManager = dataManager.StubAccpetObject(dataManager);
+            var server = new MainServer(dataManager, webMaker, home, mockRead, mockFileReader);
+            server.RunningProcess(dataManager);
+            mockFileReader.VerifyExists(home + pdf);
+            mockFileReader.VerifyReadAllBytes(home + pdf);
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
+            dataManager.VerifySend("Content-Type: application/pdf\r\n");
+            dataManager.VerifySend("Content-Disposition: inline; filename = " + pdf + "\r\n");
+            dataManager.VerifySend("Content-Length: " +
+                                   mockFileReader.ReadAllBytes(home + pdf).Length +
+                                   "\r\n\r\n");
+            dataManager.VerifySendFile(home + pdf);
             dataManager.VerifyClose();
         }
     }

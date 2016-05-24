@@ -199,7 +199,7 @@ namespace Server.Core
             handler.Send(_webMaker.DirectoryContents(path, _dirReader, _currentDir));
         }
 
-        private void PushFile(string path, IDataManager handler)
+        private void PushNormalFile(string path, IDataManager handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Content-Type: application/octet-stream\r\n");
@@ -207,6 +207,25 @@ namespace Server.Core
                          "\r\n");
             handler.Send("Content-Length: " + _fileReader.ReadAllBytes(path).Length + "\r\n\r\n");
             handler.SendFile(path);
+        }
+
+        private void PushSmallPdfFile(string path, IDataManager handler)
+        {
+            handler.Send("HTTP/1.1 200 OK\r\n");
+            handler.Send("Content-Type: application/pdf\r\n");
+            handler.Send("Content-Disposition: inline; filename = " + path.Remove(0, path.LastIndexOf('/') + 1) +
+                         "\r\n");
+            handler.Send("Content-Length: " + _fileReader.ReadAllBytes(path).Length + "\r\n\r\n");
+            handler.SendFile(path);
+        }
+
+        private void PushFile(string path, IDataManager handler)
+        {
+            var fileSize = _fileReader.ReadAllBytes(path).Length;
+            if (path.Remove(0, path.LastIndexOf('/') + 1).EndsWith("pdf") && fileSize <= 10000000)
+                PushSmallPdfFile(path, handler);
+            else
+                PushNormalFile(path, handler);
         }
 
         private void Error404(IDataManager handler)
