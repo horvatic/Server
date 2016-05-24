@@ -241,20 +241,20 @@ namespace Server.Test
             var mockFileReader = new MockFileProxy().StubExists(true).StubReadAllBytes(new byte[] {1, 2});
             var dataManager = new MockDataManager()
                 .StubSentToReturn(10)
-                .StubReceive("GET /NotHome.txt HTTP/1.1")
+                .StubReceive("GET /NotHome HTTP/1.1")
                 .StubConnect(true);
             dataManager = dataManager.StubAccpetObject(dataManager);
             var server = new MainServer(dataManager, webMaker, @"Home", mockRead, mockFileReader);
             server.RunningProcess(dataManager);
-            mockFileReader.VerifyExists("Home/NotHome.txt");
-            mockFileReader.VerifyReadAllBytes("Home/NotHome.txt");
+            mockFileReader.VerifyExists("Home/NotHome");
+            mockFileReader.VerifyReadAllBytes("Home/NotHome");
             dataManager.VerifyReceive();
             dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
             dataManager.VerifySend("Content-Type: application/octet-stream\r\n");
-            dataManager.VerifySend("Content-Disposition: attachment; filename = NotHome.txt\r\n");
-            dataManager.VerifySend("Content-Length: " + mockFileReader.ReadAllBytes("Home/NotHome.txt").Length +
+            dataManager.VerifySend("Content-Disposition: attachment; filename = NotHome\r\n");
+            dataManager.VerifySend("Content-Length: " + mockFileReader.ReadAllBytes("Home/NotHome").Length +
                                    "\r\n\r\n");
-            dataManager.VerifySendFile("Home/NotHome.txt");
+            dataManager.VerifySendFile("Home/NotHome");
             dataManager.VerifyClose();
         }
 
@@ -269,21 +269,21 @@ namespace Server.Test
             var mockFileReader = new MockFileProxy().StubExists(true).StubReadAllBytes(new byte[] {1, 2});
             var dataManager = new MockDataManager()
                 .StubSentToReturn(10)
-                .StubReceive("GET /dir0/dir1/dir2/NotHome.txt HTTP/1.1")
+                .StubReceive("GET /dir0/dir1/dir2/NotHome HTTP/1.1")
                 .StubConnect(true);
             dataManager = dataManager.StubAccpetObject(dataManager);
             var server = new MainServer(dataManager, webMaker, @"Home", mockRead, mockFileReader);
             server.RunningProcess(dataManager);
-            mockFileReader.VerifyExists("Home/dir0/dir1/dir2/NotHome.txt");
-            mockFileReader.VerifyReadAllBytes("Home/dir0/dir1/dir2/NotHome.txt");
+            mockFileReader.VerifyExists("Home/dir0/dir1/dir2/NotHome");
+            mockFileReader.VerifyReadAllBytes("Home/dir0/dir1/dir2/NotHome");
             dataManager.VerifyReceive();
             dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
             dataManager.VerifySend("Content-Type: application/octet-stream\r\n");
-            dataManager.VerifySend("Content-Disposition: attachment; filename = NotHome.txt\r\n");
+            dataManager.VerifySend("Content-Disposition: attachment; filename = NotHome\r\n");
             dataManager.VerifySend("Content-Length: " +
-                                   mockFileReader.ReadAllBytes("Home/dir0/dir1/dir2/NotHome.txt").Length +
+                                   mockFileReader.ReadAllBytes("Home/dir0/dir1/dir2/NotHome").Length +
                                    "\r\n\r\n");
-            dataManager.VerifySendFile("Home/dir0/dir1/dir2/NotHome.txt");
+            dataManager.VerifySendFile("Home/dir0/dir1/dir2/NotHome");
             dataManager.VerifyClose();
         }
 
@@ -609,6 +609,36 @@ namespace Server.Test
                                    mockFileReader.ReadAllBytes(home + pdf).Length +
                                    "\r\n\r\n");
             dataManager.VerifySendFile(home + pdf);
+            dataManager.VerifyClose();
+        }
+        [Fact]
+        public void Web_Server_Send_Inline_Text_File()
+        {
+            const string home = @"C:/text/";
+            const string text = @"smalltext.txt";
+            var largeBtyeArray = new byte[100];
+            var mockRead = new MockDirectoryProxy()
+                            .StubGetFiles(new[] { text })
+                            .StubExists(false);
+            var webMaker = new WebPageMaker(8080);
+            var mockFileReader = new MockFileProxy().StubExists(true).StubReadAllBytes(largeBtyeArray);
+            var dataManager = new MockDataManager()
+                .StubSentToReturn(10)
+                .StubReceive("GET /" + text + " HTTP/1.1")
+                .StubConnect(true);
+            dataManager = dataManager.StubAccpetObject(dataManager);
+            var server = new MainServer(dataManager, webMaker, home, mockRead, mockFileReader);
+            server.RunningProcess(dataManager);
+            mockFileReader.VerifyExists(home + text);
+            mockFileReader.VerifyReadAllBytes(home + text);
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 200 OK\r\n");
+            dataManager.VerifySend("Content-Type: text/plain\r\n");
+            dataManager.VerifySend("Content-Disposition: inline; filename = " + text + "\r\n");
+            dataManager.VerifySend("Content-Length: " +
+                                   mockFileReader.ReadAllBytes(home + text).Length +
+                                   "\r\n\r\n");
+            dataManager.VerifySendFile(home + text);
             dataManager.VerifyClose();
         }
     }
