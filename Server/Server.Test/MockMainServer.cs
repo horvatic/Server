@@ -12,6 +12,11 @@ namespace Server.Test
             _mock = new Mock<IMainServer>();
         }
 
+        public void StopNewConn()
+        {
+            _mock.Object.StopNewConn();
+        }
+
         public bool StillAlive => _mock.Object.StillAlive;
 
         void IMainServer.RunningProcess(IDataManager handler)

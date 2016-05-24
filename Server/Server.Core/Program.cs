@@ -7,6 +7,15 @@ namespace Server.Core
 {
     public class Program
     {
+        public static bool StopServer = false;
+
+        public delegate void ShutDown(object sender, ConsoleCancelEventArgs e);
+
+        public static void ShutDownServer(object sender, ConsoleCancelEventArgs e)
+        {
+            StopServer = true;
+        }
+
         public static int Main(string[] args)
         {
             RunServer(MakeServer(args));
@@ -15,12 +24,17 @@ namespace Server.Core
 
         public static void RunServer(IMainServer runningServer)
         {
+            Console.CancelKeyPress += ShutDownServer;
+
             if (runningServer != null)
             {
                 Console.WriteLine("Server Running...");
                 do
                 {
                     runningServer.Run();
+                    if (!StopServer) continue;
+                    runningServer.StopNewConn();
+                    Console.WriteLine("Server Shuting Down...");
                 } while (runningServer.StillAlive);
             }
             else
@@ -70,7 +84,7 @@ namespace Server.Core
                 {
                     var endPoint = new IPEndPoint((IPAddress.Loopback), port);
                     var manager = new DataManager(new SocketProxy(), endPoint);
-                    return new DirectoryServer(manager, new WebPageMaker(port), homeDirectory, new DirectoryProxy(), new FileProxy());
+                    return new MainServer(manager, new WebPageMaker(port), homeDirectory, new DirectoryProxy(), new FileProxy());
                 }
                 else
                     return null;
@@ -106,7 +120,7 @@ namespace Server.Core
                     {
                         var endPoint = new IPEndPoint((IPAddress.Loopback), port);
                         var manager = new DataManager(new SocketProxy(), endPoint);
-                        return new HelloWorldServer(manager, new WebPageMaker());
+                        return new MainServer(manager, new WebPageMaker(), null, new DirectoryProxy(), new FileProxy());
                     }
                     else
                         return null;

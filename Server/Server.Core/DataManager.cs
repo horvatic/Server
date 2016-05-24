@@ -12,7 +12,7 @@ namespace Server.Core
         {
             _socket = socket;
             socket.Bind(localEndPoint);
-            socket.Listen(10);
+            socket.Listen(100);
         }
 
         public DataManager(ISocketProxy socket)
@@ -32,7 +32,6 @@ namespace Server.Core
 
         public void Close()
         {
-            _socket.Shutdown(SocketShutdown.Both);
             _socket.Close();
         }
 
