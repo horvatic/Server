@@ -10,7 +10,7 @@ namespace Server.Core
         public SocketProxy()
         {
             _tcpSocket = new Socket(AddressFamily.InterNetwork,
-                SocketType.Stream, ProtocolType.Tcp);
+                SocketType.Stream, ProtocolType.Tcp) {LingerState = new LingerOption(true, 1), NoDelay = true};
         }
 
         public SocketProxy(Socket tcpSocket)
@@ -56,11 +56,6 @@ namespace Server.Core
         public void SendFile(string fileName)
         {
             _tcpSocket.SendFile(fileName);
-        }
-
-        public void Shutdown(SocketShutdown how)
-        {
-            _tcpSocket.Shutdown(how);
         }
     }
 }

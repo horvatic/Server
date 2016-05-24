@@ -13,7 +13,6 @@ namespace Server.Test
         {
             _mock = new Mock<ISocketProxy>();
         }
-
         public void Close()
         {
             _mock.Object.Close();
@@ -22,11 +21,6 @@ namespace Server.Test
         public bool Connected()
         {
             return _mock.Object.Connected();
-        }
-
-        public void Shutdown(SocketShutdown how)
-        {
-            _mock.Object.Shutdown(how);
         }
 
         public ISocketProxy Accept()
@@ -82,11 +76,6 @@ namespace Server.Test
         public void VerifyClose()
         {
             _mock.Verify(m => m.Close(), Times.Once);
-        }
-
-        public void VerifyShutdown(SocketShutdown how)
-        {
-            _mock.Verify(m => m.Shutdown(how), Times.Once);
         }
 
         public void VerifySendFile(string fileName)

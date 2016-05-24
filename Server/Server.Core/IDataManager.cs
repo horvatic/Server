@@ -1,4 +1,5 @@
-﻿namespace Server.Core
+﻿
+namespace Server.Core
 {
     public interface IDataManager
     {

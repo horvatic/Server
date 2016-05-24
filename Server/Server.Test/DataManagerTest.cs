@@ -16,7 +16,7 @@ namespace Server.Test
             var manager = new DataManager(mockSocket, localEndPoint);
             Assert.NotNull(manager);
             mockSocket.VerifyBind(localEndPoint);
-            mockSocket.VerifyListen(10);
+            mockSocket.VerifyListen(100);
         }
 
         [Fact]
@@ -40,7 +40,6 @@ namespace Server.Test
             manager.Close();
 
             mockSocket.VerifyClose();
-            mockSocket.VerifyShutdown(SocketShutdown.Both);
         }
 
         [Fact]

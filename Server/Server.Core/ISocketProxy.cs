@@ -7,7 +7,6 @@ namespace Server.Core
     {
         bool Connected();
         void Close();
-        void Shutdown(SocketShutdown how);
         int Send(byte[] buffer);
         void SendFile(string fileName);
         int Receive(byte[] buffer);

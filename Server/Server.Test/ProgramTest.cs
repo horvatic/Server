@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using Server.Core;
 using Xunit;
 
@@ -8,6 +9,27 @@ namespace Server.Test
 {
     public class ProgramTest
     {
+        [Fact]
+        public void User_Presses_CTRL_C()
+        {
+
+            var dataManager = new MockDataManager();
+            var webMaker = new WebPageMaker();
+            dataManager = dataManager.StubAccpetObject(dataManager);
+            var server = new MainServer(dataManager, webMaker, null, new MockDirectoryProxy(),
+                new MockFileProxy());
+
+            var output = new StringWriter();
+            Console.SetOut(output);
+            var mockServer = new MockMainServer().StubStillAlive();
+
+            var testingThead = new Thread( () => Program.RunServer(server));
+            testingThead.Start();
+            Program.ShutDownServer(null, null);
+            testingThead.Join();
+        }
+
+
         [Theory]
         [InlineData(-1)]
         [InlineData(0)]

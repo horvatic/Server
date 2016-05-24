@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System.Net.Sockets;
+using Moq;
 using Server.Core;
 
 namespace Server.Test
@@ -52,6 +53,10 @@ namespace Server.Test
             _mock.Verify(m => m.SendFile(message), Times.AtLeastOnce);
         }
 
+        public void VerifyNoAccept()
+        {
+            _mock.Verify(m => m.Accept(), Times.Never);
+        }
         public void VerifyAccept()
         {
             _mock.Verify(m => m.Accept(), Times.Once);
@@ -70,6 +75,11 @@ namespace Server.Test
         public MockDataManager StubSentToReturn(int value)
         {
             _mock.Setup(m => m.Send(It.IsAny<string>())).Returns(value);
+            return this;
+        }
+        public MockDataManager StubIsBound(bool value)
+        {
+            _mock.Setup(m => m.Connected()).Returns(value);
             return this;
         }
 
