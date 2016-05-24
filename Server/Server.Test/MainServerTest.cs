@@ -473,5 +473,73 @@ namespace Server.Test
             dataManager.VerifySend(webMaker.OutPutNames("&", "&"));
             dataManager.VerifyClose();
         }
+
+        [Fact]
+        public void Web_Server_Get_Post_Cant_Process()
+        {
+            var webMaker = new WebPageMaker();
+            var dataManager = new MockDataManager()
+                .StubSentToReturn(10)
+                .StubReceive("POST /page.php HTTP/1.1\r\n" +
+                             "Host: localhost:8080\r\n" +
+                             "Connection: keep - alive\r\n" +
+                             "Content - Length: 33\r\n" +
+                             "Cache - Control: max - age = 0\r\n" +
+                             "Accept: text / html,application / xhtml + xml,application / xml; q = 0.9,image / webp,*/*;q=0.8\r\n" +
+                             "Origin: http://localhost:8080\r\n" +
+                             "Upgrade-Insecure-Requests: 1\r\n" +
+                             "User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36\r\n" +
+                             "Content-Type: application/x-www-form-urlencoded\r\n" +
+                             "Referer: http://localhost:8080/form\r\n" +
+                             "Accept-Encoding: gzip, deflate\r\n" +
+                             "Accept-Language: en-US,en;q=0.8\r\n\r\n" +
+                             "firstname=%26&lastname=%26")
+                .StubConnect(true);
+            dataManager = dataManager.StubAccpetObject(dataManager);
+            var server = new MainServer(dataManager, webMaker, null, new MockDirectoryProxy(),
+                new MockFileProxy());
+            server.RunningProcess(dataManager);
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 404 Not Found\r\n");
+            dataManager.VerifySend("Content-Type: text/html\r\n");
+            dataManager.VerifySend("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.Error404Page()).Length +
+                                   "\r\n\r\n");
+            dataManager.VerifySend(webMaker.Error404Page());
+            dataManager.VerifyClose();
+        }
+
+        [Fact]
+        public void Web_Server_Get_Odd_Request_Cant_Process()
+        {
+            var webMaker = new WebPageMaker();
+            var dataManager = new MockDataManager()
+                .StubSentToReturn(10)
+                .StubReceive("PUT /page.php HTTP/1.1\r\n" +
+                             "Host: localhost:8080\r\n" +
+                             "Connection: keep - alive\r\n" +
+                             "Content - Length: 33\r\n" +
+                             "Cache - Control: max - age = 0\r\n" +
+                             "Accept: text / html,application / xhtml + xml,application / xml; q = 0.9,image / webp,*/*;q=0.8\r\n" +
+                             "Origin: http://localhost:8080\r\n" +
+                             "Upgrade-Insecure-Requests: 1\r\n" +
+                             "User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36\r\n" +
+                             "Content-Type: application/x-www-form-urlencoded\r\n" +
+                             "Referer: http://localhost:8080/form\r\n" +
+                             "Accept-Encoding: gzip, deflate\r\n" +
+                             "Accept-Language: en-US,en;q=0.8\r\n\r\n" +
+                             "firstname=%26&lastname=%26")
+                .StubConnect(true);
+            dataManager = dataManager.StubAccpetObject(dataManager);
+            var server = new MainServer(dataManager, webMaker, null, new MockDirectoryProxy(),
+                new MockFileProxy());
+            server.RunningProcess(dataManager);
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 404 Not Found\r\n");
+            dataManager.VerifySend("Content-Type: text/html\r\n");
+            dataManager.VerifySend("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.Error404Page()).Length +
+                                   "\r\n\r\n");
+            dataManager.VerifySend(webMaker.Error404Page());
+            dataManager.VerifyClose();
+        }
     }
 }
