@@ -17,6 +17,13 @@ namespace Server.Test
         }
 
         [Fact]
+        public void Active_Catch_When_Server_Is_Shuting_Down()
+        {
+            var server = new MainServer(null, null, null, null, null);
+            server.Run();
+        }
+
+        [Fact]
         public void Make_Web_Server_LIVE_SOCKET_Hello_World()
         {
             var webMaker = new WebPageMaker();

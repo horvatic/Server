@@ -282,7 +282,7 @@ namespace Server.Test
             Program.RunServer(mockServer);
             mockServer.VerifyRun();
             mockServer.VerifyAccectingNewConn();
-            Assert.Equal("Server Running...\r\n", output.ToString());
+            output.Close();
         }
 
         public void Test_User_Inputs_Invaild_Settings_Dump_Error()

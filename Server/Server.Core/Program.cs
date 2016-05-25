@@ -16,13 +16,8 @@ namespace Server.Core
 
         public static void RunServer(IMainServer runningServer)
         {
-            Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
-            {
-                e.Cancel = true;
-                runningServer.StopNewConn();
-                Console.WriteLine("Server Shuting Down...");
-                runningServer.CleanUp();
-            };
+            var closeServerProcess = new ClosingServerHandler(runningServer);
+            Console.CancelKeyPress += closeServerProcess.ShutdownProcess;
 
             if (runningServer == null) return;
             Console.WriteLine("Server Running...");

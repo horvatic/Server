@@ -35,10 +35,18 @@ namespace Server.Test
         {
             _mock.Verify(m => m.Run(), Times.Once);
         }
-
         public void VerifyAccectingNewConn()
         {
             _mock.Verify(m => m.AccectingNewConn, Times.AtLeastOnce);
+        }
+        public void VerifyCleanUp()
+        {
+            _mock.Verify(m => m.CleanUp(), Times.AtLeastOnce);
+        }
+
+        public void VerifyStopNewConn()
+        {
+            _mock.Verify(m => m.StopNewConn(), Times.AtLeastOnce);
         }
 
         public MockMainServer StubAccectingNewConn()

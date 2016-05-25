@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClosingServerHandler.cs" />
     <Compile Include="ZSocket.cs" />
     <Compile Include="DirectoryProcessor.cs" />
     <Compile Include="MainServer.cs" />
