@@ -13,8 +13,8 @@ namespace Server.Core
 
         public void ShutdownProcess(object sender, ConsoleCancelEventArgs e)
         {
-            _runningServer.StopNewConn();
             Console.WriteLine("Server Shuting Down...");
+            _runningServer.StopNewConn();
             _runningServer.CleanUp();
         }
     }

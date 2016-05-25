@@ -38,8 +38,8 @@ namespace Server.Core
 
         public void CleanUp()
         {
-            while (_numberOfThreads != 0) ;
             _socket.Close();
+            while (_numberOfThreads != 0);
         }
 
         public void RunningProcess(IZSocket handler)

@@ -22,7 +22,6 @@ namespace Server.Test
         {
             return _mock.Object.Accept();
         }
-
         public void Close()
         {
             _mock.Object.Close();

@@ -13,9 +13,8 @@ namespace Server.Core
             _tcpSocket = new Socket(AddressFamily.InterNetwork,
                 SocketType.Stream, ProtocolType.Tcp);
             _tcpSocket.Bind(localEndPoint);
-            _tcpSocket.Listen(100);
+            _tcpSocket.Listen(int.MaxValue);
         }
-
         public ZSocket(Socket tcpSocket)
         {
             _tcpSocket = tcpSocket;
