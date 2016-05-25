@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -8,6 +7,7 @@ namespace Server.Core
     public class ZSocket : IZSocket
     {
         private readonly Socket _tcpSocket;
+
         public ZSocket(IPEndPoint localEndPoint)
         {
             _tcpSocket = new Socket(AddressFamily.InterNetwork,
@@ -15,10 +15,12 @@ namespace Server.Core
             _tcpSocket.Bind(localEndPoint);
             _tcpSocket.Listen(int.MaxValue);
         }
+
         public ZSocket(Socket tcpSocket)
         {
             _tcpSocket = tcpSocket;
         }
+
         public IZSocket Accept()
         {
             return new ZSocket(_tcpSocket.Accept());

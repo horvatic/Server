@@ -7,7 +7,6 @@ namespace Server.Core
 {
     public class Program
     {
-
         public static int Main(string[] args)
         {
             RunServer(MakeServer(args));
@@ -25,7 +24,6 @@ namespace Server.Core
             {
                 runningServer.Run();
             } while (runningServer.AccectingNewConn);
-
         }
 
         public static IMainServer MakeServer(string[] args)
@@ -88,18 +86,17 @@ namespace Server.Core
             var manager = new ZSocket(endPoint);
             return new MainServer(manager, new WebPageMaker(), null, new DirectoryProcessor(), new FileProcessor());
         }
+
         private static bool VaildDrive(string dir)
         {
             if (Directory.Exists(dir))
             {
                 return true;
             }
-            else
-            {
-                Console.WriteLine("Not a vaild directory");
-                return false;
-            }
+            Console.WriteLine("Not a vaild directory");
+            return false;
         }
+
         private static int PortWithinRange(string port)
         {
             int portconvert;
@@ -110,17 +107,10 @@ namespace Server.Core
                     Console.Write(GetInvaildPortError());
                     return -1;
                 }
-                else
-                {
-                    return portconvert;
-                }
+                return portconvert;
             }
-            else
-            {
-                Console.Write(GetInvaildPortError());
-                return -1;
-            }
-
+            Console.Write(GetInvaildPortError());
+            return -1;
         }
 
         private static string WrongNumberOfArgs()
@@ -144,8 +134,8 @@ namespace Server.Core
             error.Append("Vaild Ports 2000 - 65000");
 
             return error.ToString();
-
         }
+
         private static string InvaildOption()
         {
             var error = new StringBuilder();

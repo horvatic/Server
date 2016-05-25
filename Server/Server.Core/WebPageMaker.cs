@@ -64,7 +64,7 @@ namespace Server.Core
             formHtml.Append(@"<input type=""submit"" value=""Submit"">");
             formHtml.Append(@"</form>");
 
-            return HtmlHeader() + formHtml.ToString() + HtmlTail();
+            return HtmlHeader() + formHtml + HtmlTail();
         }
 
         public string OutPutNames(string firstName, string lastName)
@@ -75,8 +75,9 @@ namespace Server.Core
             nameOutput.Append(@"Last Name Submitted:<br>");
             nameOutput.Append(lastName + "<br>");
 
-            return HtmlHeader() + nameOutput.ToString() + HtmlTail();
+            return HtmlHeader() + nameOutput + HtmlTail();
         }
+
         private string HtmlHeader()
         {
             var header = new StringBuilder();

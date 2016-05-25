@@ -4,8 +4,10 @@ namespace Server.Core
 {
     public class ClosingServerHandler
     {
-        private readonly IMainServer _runningServer;
         public delegate void Shutdown(object sender, ConsoleCancelEventArgs e);
+
+        private readonly IMainServer _runningServer;
+
         public ClosingServerHandler(IMainServer runningServer)
         {
             _runningServer = runningServer;
