@@ -37,24 +37,6 @@ namespace Server.Test
 
             wrGeturl.GetResponse();
         }
-        /*
-        [Fact]
-        public void Make_Web_Request_For_File_Not_Accpeting_New_Connections()
-        {
-            var endPoint = new IPEndPoint((IPAddress.Loopback), 65488);
-            var manager = new DataManager(new SocketProxy(), endPoint);
-            var testingServer = new MainServer(manager, new WebPageMaker(65488), "C:/", new DirectoryProxy(),
-                new FileProxy());
-            var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));
-            testServerThread.Start();
-            var wrGeturl =
-                WebRequest.Create(@"http://localhost:65488/Program%20Files/Internet%20Explorer/F12Resources.dll");
-            wrGeturl.GetResponse();
-            testingServer.StopNewConn();
-            var wrFailurl =
-                WebRequest.Create(@"http://localhost:65488/Program%20Files/Internet%20Explorer/F12Resources.dll");
-            Assert.Throws<WebException>(() => (wrFailurl.GetResponse()));
-        }
 
         [Fact]
         public void Make_Web_Request_For_File_Not_Accpeting_New_Connections_Hello_World()
@@ -69,6 +51,7 @@ namespace Server.Test
             var wrGeturl = WebRequest.Create(@"http://localhost:65418/");
             wrGeturl.GetResponse();
             testingServer.StopNewConn();
+            testingServer.CleanUp();
             var wrFailurl = WebRequest.Create(@"http://localhost:65418/");
             Assert.Throws<WebException>(() => (wrFailurl.GetResponse()));
         }
@@ -80,8 +63,8 @@ namespace Server.Test
             {
                 server.Run();
             }
+            
         }
-        */
         public void RunServerNoUntilEndRequest(IMainServer server)
         {
             server.Run();

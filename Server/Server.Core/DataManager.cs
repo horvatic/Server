@@ -13,7 +13,7 @@ namespace Server.Core
             socket.Bind(localEndPoint);
             socket.Listen(100);
         }
-
+        
         public DataManager(ISocketProxy socket)
         {
             _socket = socket;

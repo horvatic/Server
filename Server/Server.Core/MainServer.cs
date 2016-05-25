@@ -38,9 +38,7 @@ namespace Server.Core
 
         public void CleanUp()
         {
-            while (_numberOfThreads != 0)
-            {
-            }
+            while (_numberOfThreads != 0);
             _socket.Close();
         } 
 
@@ -80,13 +78,13 @@ namespace Server.Core
         {
             try
             {
-                if (!AccectingNewConn) return;
                 var handler = _socket.Accept();
+                if (!AccectingNewConn) return;
                 new Thread(() => RunningProcess(handler)).Start();
             }
             catch (Exception)
             {
-                StopNewConn();
+                // ignored
             }
         }
 

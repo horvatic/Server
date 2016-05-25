@@ -17,7 +17,6 @@ namespace Server.Test
         {
             _mock.Object.Close();
         }
-
         public bool Connected()
         {
             return _mock.Object.Connected();

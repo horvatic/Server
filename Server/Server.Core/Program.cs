@@ -16,6 +16,13 @@ namespace Server.Core
 
         public static void RunServer(IMainServer runningServer)
         {
+            Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
+            {
+                e.Cancel = true;
+                runningServer.StopNewConn();
+                Console.WriteLine("Server Shuting Down...");
+                runningServer.CleanUp();
+            };
 
             if (runningServer == null) return;
             Console.WriteLine("Server Running...");
@@ -24,13 +31,6 @@ namespace Server.Core
                 runningServer.Run();
             } while (runningServer.AccectingNewConn);
 
-            Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
-            {
-                e.Cancel = true;
-                runningServer.StopNewConn();
-                Console.WriteLine("Server Shuting Down...");
-                runningServer.CleanUp();
-            };
         }
 
         public static IMainServer MakeServer(string[] args)

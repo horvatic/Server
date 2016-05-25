@@ -10,14 +10,13 @@ namespace Server.Core
         public SocketProxy()
         {
             _tcpSocket = new Socket(AddressFamily.InterNetwork,
-                SocketType.Stream, ProtocolType.Tcp) {LingerState = new LingerOption(true, 1), NoDelay = true};
+                SocketType.Stream, ProtocolType.Tcp);
         }
 
         public SocketProxy(Socket tcpSocket)
         {
             _tcpSocket = tcpSocket;
         }
-
         public bool Connected()
         {
             return _tcpSocket.Connected;
