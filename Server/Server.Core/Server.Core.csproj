@@ -55,7 +55,6 @@
     <Compile Include="IWebPageMaker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SocketProxy.cs" />
     <Compile Include="WebPageMaker.cs" />
   </ItemGroup>
   <ItemGroup>
