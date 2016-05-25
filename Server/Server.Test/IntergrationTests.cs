@@ -17,7 +17,7 @@ namespace Server.Test
                 new FileProcessor());
             var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));
             testServerThread.Start();
-            for (var i = 0; i < 100; i++)
+            for (var i = 0; i < 1000; i++)
             {
                 new Thread(() => WebRequest.Create(@"http://localhost:55999//ShawnDocs/Apprenticeships/week6/LargePDFs/Greater10/h2450081.pdf").GetResponse()).Start();
             }
