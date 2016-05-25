@@ -78,8 +78,8 @@ namespace Server.Core
         {
             try
             {
-                var handler = _socket.Accept();
                 if (!AccectingNewConn) return;
+                var handler = _socket.Accept();
                 new Thread(() => RunningProcess(handler)).Start();
             }
             catch (Exception)
