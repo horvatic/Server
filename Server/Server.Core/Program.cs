@@ -7,14 +7,6 @@ namespace Server.Core
 {
     public class Program
     {
-        public delegate void ShutDown(object sender, ConsoleCancelEventArgs e);
-
-        public static bool StopServer;
-
-        public static void ShutDownServer(object sender, ConsoleCancelEventArgs e)
-        {
-            StopServer = true;
-        }
 
         public static int Main(string[] args)
         {
@@ -24,17 +16,21 @@ namespace Server.Core
 
         public static void RunServer(IMainServer runningServer)
         {
-            Console.CancelKeyPress += ShutDownServer;
 
             if (runningServer == null) return;
             Console.WriteLine("Server Running...");
             do
             {
                 runningServer.Run();
-                if (!StopServer) continue;
+            } while (runningServer.AccectingNewConn);
+
+            Console.CancelKeyPress += delegate (object sender, ConsoleCancelEventArgs e)
+            {
+                e.Cancel = true;
                 runningServer.StopNewConn();
                 Console.WriteLine("Server Shuting Down...");
-            } while (runningServer.StillAlive);
+                runningServer.CleanUp();
+            };
         }
 
         public static IMainServer MakeServer(string[] args)

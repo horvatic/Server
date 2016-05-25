@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Threading;
 using Server.Core;
 using Xunit;
 
@@ -110,7 +109,7 @@ namespace Server.Test
             var server = new MainServer(dataManager, webMaker, null, new MockDirectoryProxy(),
                 new MockFileProxy());
 
-            Assert.Equal(true, server.StillAlive);
+            Assert.Equal(true, server.AccectingNewConn);
         }
 
         [Fact]
@@ -129,7 +128,7 @@ namespace Server.Test
             var webMaker = new WebPageMaker();
             var dirServer = new MainServer(mockDataMangaer, webMaker, "", new MockDirectoryProxy(),
                 new MockFileProxy());
-            Assert.Equal(true, dirServer.StillAlive);
+            Assert.Equal(true, dirServer.AccectingNewConn);
         }
 
         [Fact]
@@ -185,7 +184,6 @@ namespace Server.Test
             dataManager.VerifySend(webMaker.DirectoryContents(@"Home", mockRead, "Home"));
             dataManager.VerifyClose();
             server.StopNewConn();
-            Assert.Equal(false, server.StillAlive);
         }
 
         [Fact]

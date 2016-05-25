@@ -13,14 +13,13 @@ namespace Server.Core
         private readonly IFileProxy _fileReader;
         private readonly IDataManager _socket;
         private readonly IWebPageMaker _webMaker;
-        private bool _acceptNewConn;
 
         public MainServer(IDataManager socket, IWebPageMaker webMaker, string currentDir, IDirectoryProxy dirReader,
             IFileProxy fileReader)
         {
             _numberOfThreads = 0;
             _fileReader = fileReader;
-            _acceptNewConn = true;
+            AccectingNewConn = true;
             _dirReader = dirReader;
             _socket = socket;
             _webMaker = webMaker;
@@ -32,11 +31,18 @@ namespace Server.Core
 
         public void StopNewConn()
         {
-            _acceptNewConn = false;
-            _socket.Close();
+            AccectingNewConn = false;
         }
 
-        public bool StillAlive => !(_numberOfThreads == 0 && _acceptNewConn == false);
+        public bool AccectingNewConn { get; private set; }
+
+        public void CleanUp()
+        {
+            while (_numberOfThreads != 0)
+            {
+            }
+            _socket.Close();
+        } 
 
         public void RunningProcess(IDataManager handler)
         {
@@ -74,7 +80,7 @@ namespace Server.Core
         {
             try
             {
-                if (!_acceptNewConn) return;
+                if (!AccectingNewConn) return;
                 var handler = _socket.Accept();
                 new Thread(() => RunningProcess(handler)).Start();
             }

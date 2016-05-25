@@ -2,7 +2,8 @@
 {
     public interface IMainServer
     {
-        bool StillAlive { get; }
+        bool AccectingNewConn { get; }
+        void CleanUp();
         void StopNewConn();
 
         void RunningProcess(IDataManager handler);
