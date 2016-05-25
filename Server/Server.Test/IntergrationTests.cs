@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Server.Test
 {
-    public class LiveTest
+    public class IntergrationTests
     {
         [Fact]
         public void Live_User_Presses_CTRL_C_Finsh_Request_No_New_Request()
@@ -33,7 +33,6 @@ namespace Server.Test
         public void Make_Web_Request()
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 4321);
-            //var manager = new DataManager(new SocketProxy(), endPoint);
             var manager = new ZSocket(endPoint);
             var testingServer = new MainServer(manager, new WebPageMaker(4321), null, new DirectoryProcessor(),
                 new FileProcessor());
@@ -49,7 +48,6 @@ namespace Server.Test
         public void Make_Web_Request_For_File()
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 50321);
-            //var manager = new DataManager(new SocketProxy(), endPoint);
             var manager = new ZSocket(endPoint);
             var testingServer = new MainServer(manager, new WebPageMaker(50321), "C:/", new DirectoryProcessor(),
                 new FileProcessor());
