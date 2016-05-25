@@ -11,9 +11,10 @@ namespace Server.Test
         public void Make_Web_Request()
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 4321);
-            var manager = new DataManager(new SocketProxy(), endPoint);
-            var testingServer = new MainServer(manager, new WebPageMaker(4321), null, new DirectoryProxy(),
-                new FileProxy());
+            //var manager = new DataManager(new SocketProxy(), endPoint);
+            var manager = new ZSocket(endPoint);
+            var testingServer = new MainServer(manager, new WebPageMaker(4321), null, new DirectoryProcessor(),
+                new FileProcessor());
             new Thread(() => RunServerNoUntilEndRequest(testingServer)).Start();
 
 
@@ -26,9 +27,10 @@ namespace Server.Test
         public void Make_Web_Request_For_File()
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 50321);
-            var manager = new DataManager(new SocketProxy(), endPoint);
-            var testingServer = new MainServer(manager, new WebPageMaker(50321), "C:/", new DirectoryProxy(),
-                new FileProxy());
+            //var manager = new DataManager(new SocketProxy(), endPoint);
+            var manager = new ZSocket(endPoint);
+            var testingServer = new MainServer(manager, new WebPageMaker(50321), "C:/", new DirectoryProcessor(),
+                new FileProcessor());
             new Thread(() => RunServerNoUntilEndRequest(testingServer)).Start();
 
             var wrGeturl =
@@ -42,10 +44,11 @@ namespace Server.Test
         public void Make_Web_Request_For_File_Not_Accpeting_New_Connections_Hello_World()
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 65418);
-            var manager = new DataManager(new SocketProxy(), endPoint);
+            //var manager = new DataManager(new SocketProxy(), endPoint);
+            var manager = new ZSocket(endPoint);
             var testingServer = new MainServer(manager, new WebPageMaker(65418), 
-                null, new DirectoryProxy(),
-                new FileProxy());
+                null, new DirectoryProcessor(),
+                new FileProcessor());
             var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));
             testServerThread.Start();
             var wrGeturl = WebRequest.Create(@"http://localhost:65418/");

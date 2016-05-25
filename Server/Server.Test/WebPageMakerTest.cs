@@ -83,7 +83,7 @@ namespace Server.Test
         [Fact]
         public void Making_Directory_Page_With_Name_With_Spaces()
         {
-            var mockRead = new MockDirectoryProxy()
+            var mockRead = new MockDirectoryProcessor()
                 .StubGetDirectories(new[] {"dir 1", "dir2"})
                 .StubGetFiles(new[] {"file 1", "file2", "file3"});
             var correctOutput = new StringBuilder();
@@ -107,7 +107,7 @@ namespace Server.Test
         [Fact]
         public void Making_Directory_Page()
         {
-            var mockRead = new MockDirectoryProxy()
+            var mockRead = new MockDirectoryProcessor()
                 .StubGetDirectories(new[] {"dir1", "dir2"})
                 .StubGetFiles(new[] {"file1", "file2", "file3"});
             var correctOutput = new StringBuilder();
@@ -131,7 +131,7 @@ namespace Server.Test
         [Fact]
         public void Making_Directory_Page_With_Slashes()
         {
-            var mockRead = new MockDirectoryProxy()
+            var mockRead = new MockDirectoryProcessor()
                 .StubGetDirectories(new[] {"dir0\\dir1", "dir0\\dir2"})
                 .StubGetFiles(new[] {"dir0\\file1", "dir0\\file2", "dir0\\file3"});
             var correctOutput = new StringBuilder();
@@ -155,7 +155,7 @@ namespace Server.Test
         [Fact]
         public void Making_Directory_Page_With_Removed_Root()
         {
-            var mockRead = new MockDirectoryProxy()
+            var mockRead = new MockDirectoryProcessor()
                 .StubGetDirectories(new[] { "dir0\\dir1", "dir0\\dir2" })
                 .StubGetFiles(new[] { "dir0\\file1", "dir0\\file2", "dir0\\file3" });
             var correctOutput = new StringBuilder();
@@ -178,7 +178,7 @@ namespace Server.Test
         [Fact]
         public void Making_Directory_Page_With_Removed_Sub_Directorys()
         {
-            var mockRead = new MockDirectoryProxy()
+            var mockRead = new MockDirectoryProcessor()
                 .StubGetDirectories(new[] { "dir0\\dir1\\dir2\\dir1", "dir0\\dir1\\dir2\\dir2" })
                 .StubGetFiles(new[] { "dir0\\dir1\\dir2\\file1", "dir0\\dir1\\dir2\\file2", "dir0\\dir1\\dir2\\file3" });
             var correctOutput = new StringBuilder();

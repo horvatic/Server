@@ -6,7 +6,7 @@
         void CleanUp();
         void StopNewConn();
 
-        void RunningProcess(IDataManager handler);
+        void RunningProcess(IZSocket handler);
 
         void Run();
     }

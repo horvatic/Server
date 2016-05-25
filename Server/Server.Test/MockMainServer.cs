@@ -21,7 +21,7 @@ namespace Server.Test
 
         public bool AccectingNewConn => _mock.Object.AccectingNewConn;
 
-        void IMainServer.RunningProcess(IDataManager handler)
+        void IMainServer.RunningProcess(IZSocket handler)
         {
             _mock.Object.RunningProcess(handler);
         }

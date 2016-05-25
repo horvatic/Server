@@ -17,7 +17,7 @@ namespace Server.Core
             _port = port;
         }
 
-        public string DirectoryContents(string dir, IDirectoryProxy reader, string root)
+        public string DirectoryContents(string dir, IDirectoryProcessor reader, string root)
         {
             var directoryContents = new StringBuilder();
             var files = reader.GetFiles(dir);

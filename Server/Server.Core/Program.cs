@@ -62,9 +62,10 @@ namespace Server.Core
             if (port == -1) return null;
             if (!VaildDrive(cleanHomeDir)) return null;
             var endPoint = new IPEndPoint((IPAddress.Loopback), port);
-            var manager = new DataManager(new SocketProxy(), endPoint);
-            return new MainServer(manager, new WebPageMaker(port), cleanHomeDir, new DirectoryProxy(),
-                new FileProxy());
+            //var manager = new DataManager(new SocketProxy(), endPoint);
+            var manager = new ZSocket(endPoint);
+            return new MainServer(manager, new WebPageMaker(port), cleanHomeDir, new DirectoryProcessor(),
+                new FileProcessor());
         }
 
 
@@ -88,8 +89,9 @@ namespace Server.Core
             var port = PortWithinRange(args[1]);
             if (port == -1) return null;
             var endPoint = new IPEndPoint((IPAddress.Loopback), port);
-            var manager = new DataManager(new SocketProxy(), endPoint);
-            return new MainServer(manager, new WebPageMaker(), null, new DirectoryProxy(), new FileProxy());
+            //var manager = new DataManager(new SocketProxy(), endPoint);
+            var manager = new ZSocket(endPoint);
+            return new MainServer(manager, new WebPageMaker(), null, new DirectoryProcessor(), new FileProcessor());
         }
         private static bool VaildDrive(string dir)
         {

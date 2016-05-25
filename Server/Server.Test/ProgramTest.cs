@@ -11,11 +11,11 @@ namespace Server.Test
     {
         public void User_Presses_CTRL_C()
         {
-            var dataManager = new MockDataManager();
+            var dataManager = new MockZSocket();
             var webMaker = new WebPageMaker();
             dataManager = dataManager.StubAccpetObject(dataManager);
-            var server = new MainServer(dataManager, webMaker, null, new MockDirectoryProxy(),
-                new MockFileProxy());
+            var server = new MainServer(dataManager, webMaker, null, new MockDirectoryProcessor(),
+                new MockFileProcessor());
 
             var output = new StringWriter();
             Console.SetOut(output);

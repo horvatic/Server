@@ -3,13 +3,13 @@ using Server.Core;
 
 namespace Server.Test
 {
-    public class MockDirectoryProxy : IDirectoryProxy
+    public class MockDirectoryProcessor : IDirectoryProcessor
     {
-        private readonly Mock<IDirectoryProxy> _mock;
+        private readonly Mock<IDirectoryProcessor> _mock;
 
-        public MockDirectoryProxy()
+        public MockDirectoryProcessor()
         {
-            _mock = new Mock<IDirectoryProxy>();
+            _mock = new Mock<IDirectoryProcessor>();
         }
 
         public bool Exists(string path)
@@ -27,19 +27,19 @@ namespace Server.Test
             return _mock.Object.GetFiles(path);
         }
 
-        public MockDirectoryProxy StubGetFiles(string[] files)
+        public MockDirectoryProcessor StubGetFiles(string[] files)
         {
             _mock.Setup(m => m.GetFiles(It.IsAny<string>())).Returns(files);
             return this;
         }
 
-        public MockDirectoryProxy StubGetDirectories(string[] dirs)
+        public MockDirectoryProcessor StubGetDirectories(string[] dirs)
         {
             _mock.Setup(m => m.GetDirectories(It.IsAny<string>())).Returns(dirs);
             return this;
         }
 
-        public MockDirectoryProxy StubExists(bool isDir)
+        public MockDirectoryProcessor StubExists(bool isDir)
         {
             _mock.Setup(m => m.Exists(It.IsAny<string>())).Returns(isDir);
             return this;

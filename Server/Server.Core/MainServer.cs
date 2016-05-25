@@ -9,13 +9,13 @@ namespace Server.Core
     {
         private static int _numberOfThreads;
         private readonly string _currentDir;
-        private readonly IDirectoryProxy _dirReader;
-        private readonly IFileProxy _fileReader;
-        private readonly IDataManager _socket;
+        private readonly IDirectoryProcessor _dirReader;
+        private readonly IFileProcessor _fileReader;
+        private readonly IZSocket _socket;
         private readonly IWebPageMaker _webMaker;
 
-        public MainServer(IDataManager socket, IWebPageMaker webMaker, string currentDir, IDirectoryProxy dirReader,
-            IFileProxy fileReader)
+        public MainServer(IZSocket socket, IWebPageMaker webMaker, string currentDir, IDirectoryProcessor dirReader,
+            IFileProcessor fileReader)
         {
             _numberOfThreads = 0;
             _fileReader = fileReader;
@@ -38,11 +38,11 @@ namespace Server.Core
 
         public void CleanUp()
         {
-            while (_numberOfThreads != 0);
+            while (_numberOfThreads != 0) ;
             _socket.Close();
-        } 
+        }
 
-        public void RunningProcess(IDataManager handler)
+        public void RunningProcess(IZSocket handler)
         {
             Interlocked.Increment(ref _numberOfThreads);
             try
@@ -88,7 +88,7 @@ namespace Server.Core
             }
         }
 
-        private void FileAndDirProcessing(string requestItem, IDataManager handler)
+        private void FileAndDirProcessing(string requestItem, IZSocket handler)
         {
             if (_currentDir != null)
             {
@@ -109,7 +109,7 @@ namespace Server.Core
             }
         }
 
-        private void PostProcessor(string request, IDataManager handler)
+        private void PostProcessor(string request, IZSocket handler)
         {
             if (request.Contains("POST /action_page.php HTTP/1.1") || request.Contains("POST /action_page.php HTTP/1.0"))
             {
@@ -129,17 +129,16 @@ namespace Server.Core
 
         private string CleanRequest(string request)
         {
-            if(request.Contains("HTTP/1.1"))
+            if (request.Contains("HTTP/1.1"))
                 return request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
-                        request.IndexOf(" HTTP/1.1", StringComparison.Ordinal) - 5)
-                        .Replace("%20", " ");
-            else
-                return request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
-                        request.IndexOf(" HTTP/1.0", StringComparison.Ordinal) - 5)
-                        .Replace("%20", " ");
+                    request.IndexOf(" HTTP/1.1", StringComparison.Ordinal) - 5)
+                    .Replace("%20", " ");
+            return request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
+                request.IndexOf(" HTTP/1.0", StringComparison.Ordinal) - 5)
+                .Replace("%20", " ");
         }
 
-        private void GetProcessor(string request, IDataManager handler)
+        private void GetProcessor(string request, IZSocket handler)
         {
             var requestItem = CleanRequest(request);
 
@@ -160,7 +159,7 @@ namespace Server.Core
             }
         }
 
-        private void SendNames(IDataManager handler, string firstName, string lastName)
+        private void SendNames(IZSocket handler, string firstName, string lastName)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Cache-Control: no-cache\r\n");
@@ -172,7 +171,7 @@ namespace Server.Core
             handler.Send(_webMaker.OutPutNames(firstName, lastName));
         }
 
-        private void Form(IDataManager handler)
+        private void Form(IZSocket handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Cache-Control: no-cache\r\n");
@@ -184,7 +183,7 @@ namespace Server.Core
             handler.Send(_webMaker.NameForm());
         }
 
-        private void HomeDir(IDataManager handler)
+        private void HomeDir(IZSocket handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Cache-Control: no-cache\r\n");
@@ -196,7 +195,7 @@ namespace Server.Core
             handler.Send(_webMaker.DirectoryContents(_currentDir, _dirReader, _currentDir));
         }
 
-        private void HelloWorld(IDataManager handler)
+        private void HelloWorld(IZSocket handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Cache-Control: no-cache\r\n");
@@ -206,7 +205,7 @@ namespace Server.Core
             handler.Send(_webMaker.HelloWorld());
         }
 
-        private void PushDir(string path, IDataManager handler)
+        private void PushDir(string path, IZSocket handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Cache-Control: no-cache\r\n");
@@ -217,7 +216,7 @@ namespace Server.Core
             handler.Send(_webMaker.DirectoryContents(path, _dirReader, _currentDir));
         }
 
-        private void PushNormalFile(string path, IDataManager handler)
+        private void PushNormalFile(string path, IZSocket handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Cache-Control: no-cache\r\n");
@@ -228,7 +227,7 @@ namespace Server.Core
             handler.SendFile(path);
         }
 
-        private void PushSmallPdfFile(string path, IDataManager handler)
+        private void PushSmallPdfFile(string path, IZSocket handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Cache-Control: no-cache\r\n");
@@ -239,7 +238,7 @@ namespace Server.Core
             handler.SendFile(path);
         }
 
-        private void PushTextFile(string path, IDataManager handler)
+        private void PushTextFile(string path, IZSocket handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Cache-Control: no-cache\r\n");
@@ -250,7 +249,7 @@ namespace Server.Core
             handler.SendFile(path);
         }
 
-        private void PushPngFile(string path, IDataManager handler)
+        private void PushPngFile(string path, IZSocket handler)
         {
             handler.Send("HTTP/1.1 200 OK\r\n");
             handler.Send("Cache-Control: no-cache\r\n");
@@ -261,7 +260,7 @@ namespace Server.Core
             handler.SendFile(path);
         }
 
-        private void PushFile(string path, IDataManager handler)
+        private void PushFile(string path, IZSocket handler)
         {
             var fileSize = _fileReader.ReadAllBytes(path).Length;
             if (path.Remove(0, path.LastIndexOf('/') + 1).EndsWith(".pdf") && fileSize <= 10000000)
@@ -274,7 +273,7 @@ namespace Server.Core
                 PushNormalFile(path, handler);
         }
 
-        private void Error404(IDataManager handler)
+        private void Error404(IZSocket handler)
         {
             handler.Send("HTTP/1.1 404 Not Found\r\n");
             handler.Send("Content-Type: text/html\r\n");

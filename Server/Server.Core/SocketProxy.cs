@@ -3,6 +3,7 @@ using System.Net.Sockets;
 
 namespace Server.Core
 {
+    /*
     public class SocketProxy : ISocketProxy
     {
         private readonly Socket _tcpSocket;
@@ -57,4 +58,5 @@ namespace Server.Core
             _tcpSocket.SendFile(fileName);
         }
     }
+    */
 }

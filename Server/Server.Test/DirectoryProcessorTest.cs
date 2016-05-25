@@ -3,12 +3,12 @@ using Xunit;
 
 namespace Server.Test
 {
-    public class DirectoryProxyTest
+    public class DirectoryProcessorTest
     {
         [Fact]
         public void Read_Directory_Contents()
         {
-            var dirProxy = new DirectoryProxy();
+            var dirProxy = new DirectoryProcessor();
             Assert.NotEmpty(dirProxy.GetDirectories(@"C:/"));
             Assert.NotEmpty(dirProxy.GetFiles(@"C:/"));
         }
@@ -16,7 +16,7 @@ namespace Server.Test
         [Fact]
         public void Is_A_Dir()
         {
-            var dirProxy = new DirectoryProxy();
+            var dirProxy = new DirectoryProcessor();
             Assert.True(dirProxy.Exists(@"C:/"));
         }
     }
