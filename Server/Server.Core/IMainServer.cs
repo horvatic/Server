@@ -2,7 +2,7 @@
 {
     public interface IMainServer
     {
-        bool AccectingNewConn { get; }
+        bool AcceptingNewConn { get; }
         void CleanUp();
         void StopNewConn();
 

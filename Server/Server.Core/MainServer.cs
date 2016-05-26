@@ -19,7 +19,7 @@ namespace Server.Core
         {
             _numberOfThreads = 0;
             _fileReader = fileReader;
-            AccectingNewConn = true;
+            AcceptingNewConn = true;
             _dirReader = dirReader;
             _socket = socket;
             _webMaker = webMaker;
@@ -31,10 +31,10 @@ namespace Server.Core
 
         public void StopNewConn()
         {
-            AccectingNewConn = false;
+            AcceptingNewConn = false;
         }
 
-        public bool AccectingNewConn { get; private set; }
+        public bool AcceptingNewConn { get; private set; }
 
         public void CleanUp()
         {
@@ -78,7 +78,7 @@ namespace Server.Core
         {
             try
             {
-                if (!AccectingNewConn) return;
+                if (!AcceptingNewConn) return;
                 var handler = _socket.Accept();
                 new Thread(() => RunningProcess(handler)).Start();
             }
@@ -92,16 +92,23 @@ namespace Server.Core
         {
             if (_currentDir != null)
             {
-                if (_fileReader.Exists(_currentDir + requestItem))
+                try
                 {
-                    PushFile(_currentDir + requestItem, handler);
+                    if (_fileReader.Exists(_currentDir + requestItem))
+                    {
+                        PushFile(_currentDir + requestItem, handler);
+                    }
+                    else if (_dirReader.Exists(_currentDir + requestItem))
+                    {
+                        PushDir(_currentDir + requestItem, handler);
+                    }
+                    else
+                        Error404(handler);
                 }
-                else if (_dirReader.Exists(_currentDir + requestItem))
+                catch (Exception)
                 {
-                    PushDir(_currentDir + requestItem, handler);
+                    Error403(handler);
                 }
-                else
-                    Error404(handler);
             }
             else
             {
@@ -279,6 +286,14 @@ namespace Server.Core
             handler.Send("Content-Type: text/html\r\n");
             handler.Send("Content-Length: " + Encoding.ASCII.GetBytes(_webMaker.Error404Page()).Length + "\r\n\r\n");
             handler.Send(_webMaker.Error404Page());
+        }
+
+        private void Error403(IZSocket handler)
+        {
+            handler.Send("HTTP/1.1 403 Forbidden\r\n");
+            handler.Send("Content-Type: text/html\r\n");
+            handler.Send("Content-Length: " + Encoding.ASCII.GetBytes(_webMaker.Error403Page()).Length + "\r\n\r\n");
+            handler.Send(_webMaker.Error403Page());
         }
     }
 }

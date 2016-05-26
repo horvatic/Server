@@ -97,7 +97,7 @@ namespace Server.Test
 
         public void RunServerUntilEndRequest(IMainServer server)
         {
-            while (server.AccectingNewConn)
+            while (server.AcceptingNewConn)
             {
                 server.Run();
             }

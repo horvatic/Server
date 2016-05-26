@@ -87,7 +87,7 @@ namespace Server.Test
         }
 
         [Fact]
-        public void Make_Web_Server_Get_Bad_Request_Send_Back_Repsonce_Hello_World()
+        public void Make_Web_Server_Get_Bad_Request_Send_Back_Repsonce__404_Hello_World()
         {
             var dataManager = new MockZSocket()
                 .StubSentToReturn(10)
@@ -107,6 +107,8 @@ namespace Server.Test
             dataManager.VerifyClose();
         }
 
+
+
         [Fact]
         public void Make_Sure_Server_Is_Always_Alive_Hello_World()
         {
@@ -118,7 +120,7 @@ namespace Server.Test
             var server = new MainServer(dataManager, webMaker, null, new MockDirectoryProcessor(),
                 new MockFileProcessor());
 
-            Assert.Equal(true, server.AccectingNewConn);
+            Assert.Equal(true, server.AcceptingNewConn);
         }
 
         [Fact]
@@ -137,7 +139,7 @@ namespace Server.Test
             var webMaker = new WebPageMaker();
             var dirServer = new MainServer(mockDataMangaer, webMaker, "", new MockDirectoryProcessor(),
                 new MockFileProcessor());
-            Assert.Equal(true, dirServer.AccectingNewConn);
+            Assert.Equal(true, dirServer.AcceptingNewConn);
         }
 
         [Fact]
@@ -412,6 +414,29 @@ namespace Server.Test
             dataManager.VerifySend("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.Error404Page()).Length +
                                    "\r\n\r\n");
             dataManager.VerifySend(webMaker.Error404Page());
+            dataManager.VerifyClose();
+        }
+
+        [Fact]
+        public void Make_Web_Server_Get_Bad_Request_Send_Back_Repsonce_403()
+        {
+            var mockRead = new MockDirectoryProcessor()
+                .StubGetDirectories(new[] { "dir1", "dir2" })
+                .StubGetFiles(new[] { "pagefile.sys" });
+            var webMaker = new WebPageMaker(8080);
+            var dataManager = new MockZSocket()
+                .StubSentToReturn(10)
+                .StubReceive("GET /pagefile.sys HTTP/1.1")
+                .StubConnect(true);
+            dataManager = dataManager.StubAccpetObject(dataManager);
+            var server = new MainServer(dataManager, webMaker, @"c:/", mockRead, new MockFileProcessor().StubExists(true));
+            server.RunningProcess(dataManager);
+            dataManager.VerifyReceive();
+            dataManager.VerifySend("HTTP/1.1 403 Forbidden\r\n");
+            dataManager.VerifySend("Content-Type: text/html\r\n");
+            dataManager.VerifySend("Content-Length: " + Encoding.ASCII.GetBytes(webMaker.Error403Page()).Length +
+                                   "\r\n\r\n");
+            dataManager.VerifySend(webMaker.Error403Page());
             dataManager.VerifyClose();
         }
 

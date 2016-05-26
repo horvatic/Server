@@ -19,7 +19,7 @@ namespace Server.Test
         }
         
 
-        public bool AccectingNewConn => _mock.Object.AccectingNewConn;
+        public bool AcceptingNewConn => _mock.Object.AcceptingNewConn;
 
         void IMainServer.RunningProcess(IZSocket handler)
         {
@@ -35,9 +35,9 @@ namespace Server.Test
         {
             _mock.Verify(m => m.Run(), Times.Once);
         }
-        public void VerifyAccectingNewConn()
+        public void VerifyAcceptingNewConn()
         {
-            _mock.Verify(m => m.AccectingNewConn, Times.AtLeastOnce);
+            _mock.Verify(m => m.AcceptingNewConn, Times.AtLeastOnce);
         }
         public void VerifyCleanUp()
         {
@@ -49,9 +49,9 @@ namespace Server.Test
             _mock.Verify(m => m.StopNewConn(), Times.AtLeastOnce);
         }
 
-        public MockMainServer StubAccectingNewConn()
+        public MockMainServer StubAcceptingNewConn()
         {
-            _mock.Setup(m => m.AccectingNewConn).Returns(false);
+            _mock.Setup(m => m.AcceptingNewConn).Returns(false);
             return this;
         }
 

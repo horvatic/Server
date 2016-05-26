@@ -19,6 +19,10 @@ namespace Server.Test
 
         public byte[] ReadAllBytes(string path)
         {
+            if (path == "c:/pagefile.sys")
+            {
+                throw new System.Exception();
+            }
             return _mock.Object.ReadAllBytes(path);
         }
 

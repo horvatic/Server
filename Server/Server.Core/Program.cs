@@ -23,7 +23,7 @@ namespace Server.Core
             do
             {
                 runningServer.Run();
-            } while (runningServer.AccectingNewConn);
+            } while (runningServer.AcceptingNewConn);
         }
 
         public static IMainServer MakeServer(string[] args)

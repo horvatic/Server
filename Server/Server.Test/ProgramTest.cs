@@ -19,7 +19,7 @@ namespace Server.Test
 
             var output = new StringWriter();
             Console.SetOut(output);
-            var mockServer = new MockMainServer().StubAccectingNewConn();
+            var mockServer = new MockMainServer().StubAcceptingNewConn();
 
             var testingThead = new Thread(() => Program.RunServer(server));
             testingThead.Start();
@@ -278,10 +278,10 @@ namespace Server.Test
         {
             var output = new StringWriter();
             Console.SetOut(output);
-            var mockServer = new MockMainServer().StubAccectingNewConn();
+            var mockServer = new MockMainServer().StubAcceptingNewConn();
             Program.RunServer(mockServer);
             mockServer.VerifyRun();
-            mockServer.VerifyAccectingNewConn();
+            mockServer.VerifyAcceptingNewConn();
             output.Close();
         }
 

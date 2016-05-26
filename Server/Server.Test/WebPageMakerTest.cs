@@ -66,6 +66,21 @@ namespace Server.Test
         }
 
         [Fact]
+        public void Making_403_Page()
+        {
+            var maker = new WebPageMaker();
+            var correctOutput = new StringBuilder();
+            correctOutput.Append(@"<!DOCTYPE html>");
+            correctOutput.Append(@"<html>");
+            correctOutput.Append(@"<head><title>Vatic File Server</title></head>");
+            correctOutput.Append(@"<body>");
+            correctOutput.Append(@"<h1>403</h1>");
+            correctOutput.Append(@"</body>");
+            correctOutput.Append(@"</html>");
+            Assert.Equal(correctOutput.ToString(), maker.Error403Page());
+        }
+
+        [Fact]
         public void Making_Hello_World_Page()
         {
             var maker = new WebPageMaker();

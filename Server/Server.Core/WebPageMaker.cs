@@ -53,6 +53,13 @@ namespace Server.Core
             return HtmlHeader() + error + HtmlTail();
         }
 
+        public string Error403Page()
+        {
+            var error = new StringBuilder();
+            error.Append(@"<h1>403</h1>");
+            return HtmlHeader() + error + HtmlTail();
+        }
+
         public string NameForm()
         {
             var formHtml = new StringBuilder();
