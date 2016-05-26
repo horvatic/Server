@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Cache;
 using System.Threading;
 using Server.Core;
 using Xunit;
@@ -8,15 +9,19 @@ namespace Server.Test
     public class IntergrationTests
     {
         public static bool GotRequest = false;
-        private async void WebPageHit()
+        private static async void WebPageHit()
         {
             var getUrl =
                 WebRequest.Create(
                     @"http://localhost:55999/ShawnDocs/Apprenticeships/week6/LargePDFs/Greater10/aemm0a00.pdf");
+            getUrl.CachePolicy = new HttpRequestCachePolicy(HttpRequestCacheLevel.NoCacheNoStore);
             var responce = getUrl.GetResponseAsync();
             await responce;
             GotRequest = true;
-            var legnth = responce.Result.ContentLength;
+            var data = responce.Result.GetResponseStream();
+            responce = getUrl.GetResponseAsync();
+            await responce;
+            data = responce.Result.GetResponseStream();
             responce.Result.Dispose();
         }
 
