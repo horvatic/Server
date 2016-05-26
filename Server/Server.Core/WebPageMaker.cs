@@ -64,7 +64,7 @@ namespace Server.Core
         public string NameForm()
         {
             var formHtml = new StringBuilder();
-            formHtml.Append(@"<form action=""action_page.php"" method=""post"">");
+            formHtml.Append(@"<form action=""form"" method=""post"">");
             formHtml.Append(@"First name:<br>");
             formHtml.Append(@"<input type=""text"" name=""firstname""><br>");
             formHtml.Append(@"Last name:<br>");

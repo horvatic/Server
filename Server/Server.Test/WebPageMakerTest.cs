@@ -58,7 +58,7 @@ namespace Server.Test
             correctOutput.Append(@"<head><title>Vatic File Server</title></head>");
             correctOutput.Append(@"<body>");
 
-            correctOutput.Append(@"<form action=""action_page.php"" method=""post"">");
+            correctOutput.Append(@"<form action=""form"" method=""post"">");
             correctOutput.Append(@"First name:<br>");
             correctOutput.Append(@"<input type=""text"" name=""firstname""><br>");
             correctOutput.Append(@"Last name:<br>");

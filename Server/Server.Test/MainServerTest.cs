@@ -167,9 +167,9 @@ namespace Server.Test
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
             var server = new MainServer(zSocket, webMaker, @"Home", mockRead, new MockFileProcessor());
-            server.StopNewConn();
+            server.StopNewConnAndCleanUp();
             server.Run();
-            //zSocket.VerifyNoAccept();
+            zSocket.VerifyNoAccept();
         }
         [Fact]
         public void Server_Is_Shuting_Down()
@@ -193,7 +193,7 @@ namespace Server.Test
                                    "\r\n\r\n");
             zSocket.VerifySend(webMaker.DirectoryContents(@"Home", mockRead, "Home"));
             zSocket.VerifyClose();
-            server.StopNewConn();
+            server.StopNewConnAndCleanUp();
         }
 
         [Fact]
@@ -466,7 +466,7 @@ namespace Server.Test
             var webMaker = new WebPageMaker();
             var zSocket = new MockZSocket()
                 .StubSentToReturn(10)
-                .StubReceive("POST /action_page.php HTTP/1.1\r\n" +
+                .StubReceive("POST /form HTTP/1.1\r\n" +
                              "Host: localhost:8080\r\n" +
                              "Connection: keep - alive\r\n" +
                              "Content - Length: 33\r\n" +
@@ -500,7 +500,7 @@ namespace Server.Test
             var webMaker = new WebPageMaker();
             var zSocket = new MockZSocket()
                 .StubSentToReturn(10)
-                .StubReceive("POST /action_page.php HTTP/1.1\r\n" +
+                .StubReceive("POST /form HTTP/1.1\r\n" +
                              "Host: localhost:8080\r\n" +
                              "Connection: keep - alive\r\n" +
                              "Content - Length: 33\r\n" +

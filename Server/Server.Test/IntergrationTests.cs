@@ -39,8 +39,7 @@ namespace Server.Test
             new Thread(WebPageHit).Start();
             while (!GotRequest) ;
 
-            testingServer.StopNewConn();
-            testingServer.CleanUp();
+            testingServer.StopNewConnAndCleanUp();
 
             var wrFailurl = WebRequest.Create(@"http://localhost:55999//ShawnDocs/Apprenticeships/week6/LargePDFs/Greater10/h2450081.pdf");
             Assert.Throws<WebException>(() => (wrFailurl.GetResponse()));
@@ -89,8 +88,7 @@ namespace Server.Test
             testServerThread.Start();
             var wrGeturl = WebRequest.Create(@"http://localhost:45418/");
             wrGeturl.GetResponse();
-            testingServer.StopNewConn();
-            testingServer.CleanUp();
+            testingServer.StopNewConnAndCleanUp();
             var wrFailurl = WebRequest.Create(@"http://localhost:45418/");
             Assert.Throws<WebException>(() => (wrFailurl.GetResponse()));
         }
@@ -106,7 +104,7 @@ namespace Server.Test
         public void RunServerNoUntilEndRequest(IMainServer server)
         {
             server.Run();
-            server.CleanUp();
+            server.StopNewConnAndCleanUp();
         }
     }
 }

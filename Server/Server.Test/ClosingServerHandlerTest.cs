@@ -23,8 +23,7 @@ namespace Server.Test
             var testServer = new MockMainServer();
             var closeProcessor = new ClosingServerHandler(testServer);
             closeProcessor.ShutdownProcess(null, null);
-            testServer.VerifyStopNewConn();
-            testServer.VerifyCleanUp();
+            testServer.StopNewConnAndCleanUp();
             output.Close();
 
 

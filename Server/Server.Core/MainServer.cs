@@ -29,18 +29,14 @@ namespace Server.Core
                 _currentDir = currentDir.EndsWith("/") ? currentDir : currentDir + "/";
         }
 
-        public void StopNewConn()
+        public void StopNewConnAndCleanUp()
         {
             AcceptingNewConn = false;
-        }
-
-        public bool AcceptingNewConn { get; private set; }
-
-        public void CleanUp()
-        {
             _socket.Close();
             while (_numberOfThreads != 0) ;
         }
+
+        public bool AcceptingNewConn { get; private set; }
 
         public void RunningProcess(IZSocket handler)
         {
@@ -118,7 +114,7 @@ namespace Server.Core
 
         private void PostProcessor(string request, IZSocket handler)
         {
-            if (request.Contains("POST /action_page.php HTTP/1.1") || request.Contains("POST /action_page.php HTTP/1.0"))
+            if (request.Contains("POST /form HTTP/1.1") || request.Contains("POST /form HTTP/1.0"))
             {
                 var name = request.Remove(0, request.LastIndexOf("\r\n\r\n", StringComparison.Ordinal) + 4);
                 var firstName = WebUtility.UrlDecode(name.Substring(0, name.IndexOf("&", StringComparison.Ordinal))

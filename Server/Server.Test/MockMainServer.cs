@@ -13,9 +13,9 @@ namespace Server.Test
             _mock = new Mock<IMainServer>();
         }
 
-        public void StopNewConn()
+        public void StopNewConnAndCleanUp()
         {
-            _mock.Object.StopNewConn();
+            _mock.Object.StopNewConnAndCleanUp();
         }
         
 
@@ -39,25 +39,16 @@ namespace Server.Test
         {
             _mock.Verify(m => m.AcceptingNewConn, Times.AtLeastOnce);
         }
-        public void VerifyCleanUp()
+        public void VerifyStopNewConnAndCleanUp()
         {
-            _mock.Verify(m => m.CleanUp(), Times.AtLeastOnce);
+            _mock.Verify(m => m.StopNewConnAndCleanUp(), Times.AtLeastOnce);
         }
 
-        public void VerifyStopNewConn()
-        {
-            _mock.Verify(m => m.StopNewConn(), Times.AtLeastOnce);
-        }
 
         public MockMainServer StubAcceptingNewConn()
         {
             _mock.Setup(m => m.AcceptingNewConn).Returns(false);
             return this;
-        }
-
-        public void CleanUp()
-        {
-            _mock.Object.CleanUp();
         }
     }
 }
