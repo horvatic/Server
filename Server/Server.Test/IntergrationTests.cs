@@ -7,21 +7,33 @@ namespace Server.Test
 {
     public class IntergrationTests
     {
+        public static bool GotRequest = false;
+        private async void WebPageHit()
+        {
+            var getUrl =
+                WebRequest.Create(
+                    @"http://localhost:55999/ShawnDocs/Apprenticeships/week6/LargePDFs/Greater10/aemm0a00.pdf");
+            var responce = getUrl.GetResponseAsync();
+            await responce;
+            GotRequest = true;
+            var legnth = responce.Result.ContentLength;
+            responce.Result.Dispose();
+        }
+
         [Fact]
         public void Live_User_Presses_CTRL_C_Finsh_Request_No_New_Request()
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 55999);
             var manager = new ZSocket(endPoint);
             var testingServer = new MainServer(manager, new WebPageMaker(55999),
-                null, new DirectoryProcessor(),
+                "c:/", new DirectoryProcessor(),
                 new FileProcessor());
             var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));
             testServerThread.Start();
-            for (var i = 0; i < 1000; i++)
-            {
-                new Thread(() => WebRequest.Create(@"http://localhost:55999//ShawnDocs/Apprenticeships/week6/LargePDFs/Greater10/h2450081.pdf").GetResponse()).Start();
-            }
             
+            new Thread(WebPageHit).Start();
+            while (!GotRequest) ;
+
             testingServer.StopNewConn();
             testingServer.CleanUp();
 
