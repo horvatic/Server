@@ -88,7 +88,7 @@ namespace Server.Test
             return this;
         }
 
-        public MockZSocket StubAccpetObject(IZSocket returnObject)
+        public MockZSocket StubAcceptObject(IZSocket returnObject)
         {
             _mock.Setup(m => m.Accept()).Returns(returnObject);
             return this;

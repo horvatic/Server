@@ -7,6 +7,10 @@ namespace Server.Core
 {
     public class Program
     {
+        private const int LowerBoundPort = 2000;
+        private const int UpperBoundPort = 65000;
+        private const string PortOption = "-p";
+        private const string DirectoryOption = "-d";
         public static int Main(string[] args)
         {
             RunServer(MakeServer(args));
@@ -55,20 +59,19 @@ namespace Server.Core
             if (port == -1) return null;
             if (!VaildDrive(cleanHomeDir)) return null;
             var endPoint = new IPEndPoint((IPAddress.Loopback), port);
-            //var manager = new DataManager(new SocketProxy(), endPoint);
-            var manager = new ZSocket(endPoint);
-            return new MainServer(manager, new WebPageMaker(port), cleanHomeDir, new DirectoryProcessor(),
+            var zSocket = new ZSocket(endPoint);
+            return new MainServer(zSocket, new WebPageMaker(port), cleanHomeDir, new DirectoryProcessor(),
                 new FileProcessor());
         }
 
 
         public static IMainServer DirectoryServer(string[] args)
         {
-            if (args[0] == "-p" && args[2] == "-d")
+            if (args[0] == PortOption && args[2] == DirectoryOption)
             {
                 return MakedirectoryServer(args[1], args[3]);
             }
-            if (args[2] == "-p" && args[0] == "-d")
+            if (args[2] == PortOption && args[0] == DirectoryOption)
             {
                 return MakedirectoryServer(args[3], args[1]);
             }
@@ -78,13 +81,12 @@ namespace Server.Core
 
         public static IMainServer HelloWorldServer(string[] args)
         {
-            if (args[0] != "-p") return null;
+            if (args[0] != PortOption) return null;
             var port = PortWithinRange(args[1]);
             if (port == -1) return null;
             var endPoint = new IPEndPoint((IPAddress.Loopback), port);
-            //var manager = new DataManager(new SocketProxy(), endPoint);
-            var manager = new ZSocket(endPoint);
-            return new MainServer(manager, new WebPageMaker(), null, new DirectoryProcessor(), new FileProcessor());
+            var zSocket = new ZSocket(endPoint);
+            return new MainServer(zSocket, new WebPageMaker(), null, new DirectoryProcessor(), new FileProcessor());
         }
 
         private static bool VaildDrive(string dir)
@@ -102,12 +104,9 @@ namespace Server.Core
             int portconvert;
             if (int.TryParse(port, out portconvert))
             {
-                if (portconvert <= 1999 || portconvert >= 65001)
-                {
-                    Console.Write(GetInvaildPortError());
-                    return -1;
-                }
-                return portconvert;
+                if (portconvert >= LowerBoundPort && portconvert <= UpperBoundPort) return portconvert;
+                Console.Write(GetInvaildPortError());
+                return -1;
             }
             Console.Write(GetInvaildPortError());
             return -1;

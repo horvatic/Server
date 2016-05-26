@@ -11,10 +11,10 @@ namespace Server.Test
     {
         public void User_Presses_CTRL_C()
         {
-            var dataManager = new MockZSocket();
+            var zSocket = new MockZSocket();
             var webMaker = new WebPageMaker();
-            dataManager = dataManager.StubAccpetObject(dataManager);
-            var server = new MainServer(dataManager, webMaker, null, new MockDirectoryProcessor(),
+            zSocket = zSocket.StubAcceptObject(zSocket);
+            var server = new MainServer(zSocket, webMaker, null, new MockDirectoryProcessor(),
                 new MockFileProcessor());
 
             var output = new StringWriter();

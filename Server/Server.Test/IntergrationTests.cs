@@ -29,8 +29,8 @@ namespace Server.Test
         public void Live_User_Presses_CTRL_C_Finsh_Request_No_New_Request()
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 55999);
-            var manager = new ZSocket(endPoint);
-            var testingServer = new MainServer(manager, new WebPageMaker(55999),
+            var zSocket = new ZSocket(endPoint);
+            var testingServer = new MainServer(zSocket, new WebPageMaker(55999),
                 "c:/", new DirectoryProcessor(),
                 new FileProcessor());
             var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));
@@ -50,8 +50,8 @@ namespace Server.Test
         public void Make_Web_Request()
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 4321);
-            var manager = new ZSocket(endPoint);
-            var testingServer = new MainServer(manager, new WebPageMaker(4321), null, new DirectoryProcessor(),
+            var zSocket = new ZSocket(endPoint);
+            var testingServer = new MainServer(zSocket, new WebPageMaker(4321), null, new DirectoryProcessor(),
                 new FileProcessor());
             new Thread(() => RunServerNoUntilEndRequest(testingServer)).Start();
 
@@ -65,8 +65,8 @@ namespace Server.Test
         public void Make_Web_Request_For_File()
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 50321);
-            var manager = new ZSocket(endPoint);
-            var testingServer = new MainServer(manager, new WebPageMaker(50321), "C:/", new DirectoryProcessor(),
+            var zSocket = new ZSocket(endPoint);
+            var testingServer = new MainServer(zSocket, new WebPageMaker(50321), "C:/", new DirectoryProcessor(),
                 new FileProcessor());
             new Thread(() => RunServerNoUntilEndRequest(testingServer)).Start();
 
@@ -81,8 +81,8 @@ namespace Server.Test
         public void Make_Web_Request_For_File_Not_Accpeting_New_Connections_Hello_World()
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 45418);
-            var manager = new ZSocket(endPoint);
-            var testingServer = new MainServer(manager, new WebPageMaker(45418),
+            var zSocket = new ZSocket(endPoint);
+            var testingServer = new MainServer(zSocket, new WebPageMaker(45418),
                 null, new DirectoryProcessor(),
                 new FileProcessor());
             var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));
