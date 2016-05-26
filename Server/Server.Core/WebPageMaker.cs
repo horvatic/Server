@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 using System.Text;
 
 namespace Server.Core
@@ -78,9 +79,9 @@ namespace Server.Core
         {
             var nameOutput = new StringBuilder();
             nameOutput.Append(@"First Name Submitted:<br>");
-            nameOutput.Append(firstName + "<br>");
+            nameOutput.Append(WebUtility.HtmlEncode(firstName) + "<br>");
             nameOutput.Append(@"Last Name Submitted:<br>");
-            nameOutput.Append(lastName + "<br>");
+            nameOutput.Append(WebUtility.HtmlEncode(lastName) + "<br>");
 
             return HtmlHeader() + nameOutput + HtmlTail();
         }

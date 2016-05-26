@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using Server.Core;
 using Xunit;
 
@@ -6,6 +7,27 @@ namespace Server.Test
 {
     public class WebPageMakerTest
     {
+        [Fact]
+        public void Return_Web_Page_With_Names_HTML_Safe()
+        {
+            var maker = new WebPageMaker();
+            var correctOutput = new StringBuilder();
+            correctOutput.Append(@"<!DOCTYPE html>");
+            correctOutput.Append(@"<html>");
+            correctOutput.Append(@"<head><title>Vatic File Server</title></head>");
+            correctOutput.Append(@"<body>");
+
+            correctOutput.Append(@"First Name Submitted:<br>");
+            correctOutput.Append(WebUtility.HtmlEncode("<p>John</p>") +"<br>");
+            correctOutput.Append(@"Last Name Submitted:<br>");
+            correctOutput.Append(WebUtility.HtmlEncode("<p>Walsher</p>") + "<br>");
+
+
+            correctOutput.Append(@"</body>");
+            correctOutput.Append(@"</html>");
+            Assert.Equal(correctOutput.ToString(), maker.OutPutNames("<p>John</p>", "<p>Walsher</p>"));
+        }
+
         [Fact]
         public void Return_Web_Page_With_Names()
         {
