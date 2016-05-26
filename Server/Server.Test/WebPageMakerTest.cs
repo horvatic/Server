@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using Server.Core;
 using Xunit;
 
@@ -6,6 +7,27 @@ namespace Server.Test
 {
     public class WebPageMakerTest
     {
+        [Fact]
+        public void Return_Web_Page_With_Names_HTML_Safe()
+        {
+            var maker = new WebPageMaker();
+            var correctOutput = new StringBuilder();
+            correctOutput.Append(@"<!DOCTYPE html>");
+            correctOutput.Append(@"<html>");
+            correctOutput.Append(@"<head><title>Vatic File Server</title></head>");
+            correctOutput.Append(@"<body>");
+
+            correctOutput.Append(@"First Name Submitted:<br>");
+            correctOutput.Append(WebUtility.HtmlEncode("<p>John</p>") +"<br>");
+            correctOutput.Append(@"Last Name Submitted:<br>");
+            correctOutput.Append(WebUtility.HtmlEncode("<p>Walsher</p>") + "<br>");
+
+
+            correctOutput.Append(@"</body>");
+            correctOutput.Append(@"</html>");
+            Assert.Equal(correctOutput.ToString(), maker.OutPutNames("<p>John</p>", "<p>Walsher</p>"));
+        }
+
         [Fact]
         public void Return_Web_Page_With_Names()
         {
@@ -66,6 +88,21 @@ namespace Server.Test
         }
 
         [Fact]
+        public void Making_403_Page()
+        {
+            var maker = new WebPageMaker();
+            var correctOutput = new StringBuilder();
+            correctOutput.Append(@"<!DOCTYPE html>");
+            correctOutput.Append(@"<html>");
+            correctOutput.Append(@"<head><title>Vatic File Server</title></head>");
+            correctOutput.Append(@"<body>");
+            correctOutput.Append(@"<h1>403</h1>");
+            correctOutput.Append(@"</body>");
+            correctOutput.Append(@"</html>");
+            Assert.Equal(correctOutput.ToString(), maker.Error403Page());
+        }
+
+        [Fact]
         public void Making_Hello_World_Page()
         {
             var maker = new WebPageMaker();
@@ -83,7 +120,7 @@ namespace Server.Test
         [Fact]
         public void Making_Directory_Page_With_Name_With_Spaces()
         {
-            var mockRead = new MockDirectoryProxy()
+            var mockRead = new MockDirectoryProcessor()
                 .StubGetDirectories(new[] {"dir 1", "dir2"})
                 .StubGetFiles(new[] {"file 1", "file2", "file3"});
             var correctOutput = new StringBuilder();
@@ -107,7 +144,7 @@ namespace Server.Test
         [Fact]
         public void Making_Directory_Page()
         {
-            var mockRead = new MockDirectoryProxy()
+            var mockRead = new MockDirectoryProcessor()
                 .StubGetDirectories(new[] {"dir1", "dir2"})
                 .StubGetFiles(new[] {"file1", "file2", "file3"});
             var correctOutput = new StringBuilder();
@@ -131,7 +168,7 @@ namespace Server.Test
         [Fact]
         public void Making_Directory_Page_With_Slashes()
         {
-            var mockRead = new MockDirectoryProxy()
+            var mockRead = new MockDirectoryProcessor()
                 .StubGetDirectories(new[] {"dir0\\dir1", "dir0\\dir2"})
                 .StubGetFiles(new[] {"dir0\\file1", "dir0\\file2", "dir0\\file3"});
             var correctOutput = new StringBuilder();
@@ -155,7 +192,7 @@ namespace Server.Test
         [Fact]
         public void Making_Directory_Page_With_Removed_Root()
         {
-            var mockRead = new MockDirectoryProxy()
+            var mockRead = new MockDirectoryProcessor()
                 .StubGetDirectories(new[] { "dir0\\dir1", "dir0\\dir2" })
                 .StubGetFiles(new[] { "dir0\\file1", "dir0\\file2", "dir0\\file3" });
             var correctOutput = new StringBuilder();
@@ -178,7 +215,7 @@ namespace Server.Test
         [Fact]
         public void Making_Directory_Page_With_Removed_Sub_Directorys()
         {
-            var mockRead = new MockDirectoryProxy()
+            var mockRead = new MockDirectoryProcessor()
                 .StubGetDirectories(new[] { "dir0\\dir1\\dir2\\dir1", "dir0\\dir1\\dir2\\dir2" })
                 .StubGetFiles(new[] { "dir0\\dir1\\dir2\\file1", "dir0\\dir1\\dir2\\file2", "dir0\\dir1\\dir2\\file3" });
             var correctOutput = new StringBuilder();

@@ -3,13 +3,13 @@ using Server.Core;
 
 namespace Server.Test
 {
-    internal class MockFileProxy : IFileProxy
+    internal class MockFileProcessor : IFileProcessor
     {
-        private readonly Mock<IFileProxy> _mock;
+        private readonly Mock<IFileProcessor> _mock;
 
-        public MockFileProxy()
+        public MockFileProcessor()
         {
-            _mock = new Mock<IFileProxy>();
+            _mock = new Mock<IFileProcessor>();
         }
 
         public bool Exists(string path)
@@ -19,10 +19,14 @@ namespace Server.Test
 
         public byte[] ReadAllBytes(string path)
         {
+            if (path == "c:/pagefile.sys")
+            {
+                throw new System.Exception();
+            }
             return _mock.Object.ReadAllBytes(path);
         }
 
-        public MockFileProxy StubExists(bool isDir)
+        public MockFileProcessor StubExists(bool isDir)
         {
             _mock.Setup(m => m.Exists(It.IsAny<string>())).Returns(isDir);
             return this;
@@ -33,7 +37,7 @@ namespace Server.Test
             _mock.Verify(m => m.Exists(path), Times.AtLeastOnce);
         }
 
-        public MockFileProxy StubReadAllBytes(byte[] size)
+        public MockFileProcessor StubReadAllBytes(byte[] size)
         {
             _mock.Setup(m => m.ReadAllBytes(It.IsAny<string>())).Returns(size);
             return this;

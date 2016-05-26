@@ -2,10 +2,11 @@
 {
     public interface IMainServer
     {
-        bool StillAlive { get; }
+        bool AcceptingNewConn { get; }
+        void CleanUp();
         void StopNewConn();
 
-        void RunningProcess(IDataManager handler);
+        void RunningProcess(IZSocket handler);
 
         void Run();
     }

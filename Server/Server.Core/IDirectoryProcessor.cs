@@ -1,6 +1,6 @@
 ﻿namespace Server.Core
 {
-    public interface IDirectoryProxy
+    public interface IDirectoryProcessor
     {
         bool Exists(string path);
         string[] GetDirectories(string path);

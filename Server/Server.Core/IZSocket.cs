@@ -1,12 +1,12 @@
 ﻿namespace Server.Core
 {
-    public interface IDataManager
+    public interface IZSocket
     {
         bool Connected();
         string Receive();
         int Send(string message);
         void SendFile(string message);
-        IDataManager Accept();
+        IZSocket Accept();
         void Close();
     }
 }

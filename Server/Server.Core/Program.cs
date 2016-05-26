@@ -7,15 +7,10 @@ namespace Server.Core
 {
     public class Program
     {
-        public delegate void ShutDown(object sender, ConsoleCancelEventArgs e);
-
-        public static bool StopServer;
-
-        public static void ShutDownServer(object sender, ConsoleCancelEventArgs e)
-        {
-            StopServer = true;
-        }
-
+        private const int LowerBoundPort = 2000;
+        private const int UpperBoundPort = 65000;
+        private const string PortOption = "-p";
+        private const string DirectoryOption = "-d";
         public static int Main(string[] args)
         {
             RunServer(MakeServer(args));
@@ -24,36 +19,15 @@ namespace Server.Core
 
         public static void RunServer(IMainServer runningServer)
         {
-            Console.CancelKeyPress += ShutDownServer;
+            var closeServerProcess = new ClosingServerHandler(runningServer);
+            Console.CancelKeyPress += closeServerProcess.ShutdownProcess;
 
-            if (runningServer != null)
+            if (runningServer == null) return;
+            Console.WriteLine("Server Running...");
+            do
             {
-                Console.WriteLine("Server Running...");
-                do
-                {
-                    runningServer.Run();
-                    if (!StopServer) continue;
-                    runningServer.StopNewConn();
-                    Console.WriteLine("Server Shuting Down...");
-                } while (runningServer.StillAlive);
-            }
-            else
-                Console.WriteLine(GetError());
-        }
-
-        public static string GetError()
-        {
-            var error = new StringBuilder();
-            error.Append("Invaild Input Detected.\n");
-            error.Append("Server.exe may already be running on port\n");
-            error.Append("must be Server.Core.exe -p PORT -d directory\n");
-            error.Append("Vaild Ports 2000 - 65000\n");
-            error.Append("Examples:\n");
-            error.Append("Server.exe -p 8080 -d C:/\n");
-            error.Append("Server.exe -d C:/HelloWorld -p 5555\n");
-            error.Append("Server.exe -p 9999\n\r\n");
-
-            return error.ToString();
+                runningServer.Run();
+            } while (runningServer.AcceptingNewConn);
         }
 
         public static IMainServer MakeServer(string[] args)
@@ -67,63 +41,112 @@ namespace Server.Core
                     case 4:
                         return DirectoryServer(args);
                     default:
+                        Console.WriteLine(WrongNumberOfArgs());
                         return null;
                 }
             }
             catch (Exception)
             {
+                Console.WriteLine("Another Server is running on that port");
                 return null;
             }
         }
 
         public static IMainServer MakedirectoryServer(string chosenPort, string homeDirectory)
         {
-            int port;
-            if (int.TryParse(chosenPort, out port) && Directory.Exists(homeDirectory))
-            {
-                if (port > 1999 && port < 65001)
-                {
-                    var endPoint = new IPEndPoint((IPAddress.Loopback), port);
-                    var manager = new DataManager(new SocketProxy(), endPoint);
-                    return new MainServer(manager, new WebPageMaker(port), homeDirectory, new DirectoryProxy(),
-                        new FileProxy());
-                }
-                return null;
-            }
-            return null;
+            var cleanHomeDir = homeDirectory.Replace('\\', '/');
+            var port = PortWithinRange(chosenPort);
+            if (port == -1) return null;
+            if (!VaildDrive(cleanHomeDir)) return null;
+            var endPoint = new IPEndPoint((IPAddress.Loopback), port);
+            var zSocket = new ZSocket(endPoint);
+            return new MainServer(zSocket, new WebPageMaker(port), cleanHomeDir, new DirectoryProcessor(),
+                new FileProcessor());
         }
+
 
         public static IMainServer DirectoryServer(string[] args)
         {
-            if (args[0] == "-p" && args[2] == "-d")
+            if (args[0] == PortOption && args[2] == DirectoryOption)
             {
                 return MakedirectoryServer(args[1], args[3]);
             }
-            if (args[2] == "-p" && args[0] == "-d")
+            if (args[2] == PortOption && args[0] == DirectoryOption)
             {
                 return MakedirectoryServer(args[3], args[1]);
             }
+            Console.WriteLine(InvaildOption());
             return null;
         }
 
         public static IMainServer HelloWorldServer(string[] args)
         {
-            if (args[0] == "-p")
+            if (args[0] != PortOption) return null;
+            var port = PortWithinRange(args[1]);
+            if (port == -1) return null;
+            var endPoint = new IPEndPoint((IPAddress.Loopback), port);
+            var zSocket = new ZSocket(endPoint);
+            return new MainServer(zSocket, new WebPageMaker(), null, new DirectoryProcessor(), new FileProcessor());
+        }
+
+        private static bool VaildDrive(string dir)
+        {
+            if (Directory.Exists(dir))
             {
-                int port;
-                if (int.TryParse(args[1], out port))
-                {
-                    if (port > 1999 && port < 65001)
-                    {
-                        var endPoint = new IPEndPoint((IPAddress.Loopback), port);
-                        var manager = new DataManager(new SocketProxy(), endPoint);
-                        return new MainServer(manager, new WebPageMaker(), null, new DirectoryProxy(), new FileProxy());
-                    }
-                    return null;
-                }
-                return null;
+                return true;
             }
-            return null;
+            Console.WriteLine("Not a vaild directory");
+            return false;
+        }
+
+        private static int PortWithinRange(string port)
+        {
+            int portconvert;
+            if (int.TryParse(port, out portconvert))
+            {
+                if (portconvert >= LowerBoundPort && portconvert <= UpperBoundPort) return portconvert;
+                Console.Write(GetInvaildPortError());
+                return -1;
+            }
+            Console.Write(GetInvaildPortError());
+            return -1;
+        }
+
+        private static string WrongNumberOfArgs()
+        {
+            var error = new StringBuilder();
+            error.Append("Invaild Number of Arguments.\n");
+            error.Append("Can only be -p PORT\n");
+            error.Append("or -p PORT -d DIRECTORY\n");
+            error.Append("Examples:\n");
+            error.Append("Server.exe -p 8080 -d C:/\n");
+            error.Append("Server.exe -d C:/HelloWorld -p 5555\n");
+            error.Append("Server.exe -p 9999");
+
+            return error.ToString();
+        }
+
+        private static string GetInvaildPortError()
+        {
+            var error = new StringBuilder();
+            error.Append("Invaild Port Detected.");
+            error.Append("Vaild Ports 2000 - 65000");
+
+            return error.ToString();
+        }
+
+        private static string InvaildOption()
+        {
+            var error = new StringBuilder();
+            error.Append("Invaild Input Detected.\n");
+            error.Append("Can only be -p\n");
+            error.Append("or -p -d\n");
+            error.Append("Examples:\n");
+            error.Append("Server.exe -p 8080 -d C:/\n");
+            error.Append("Server.exe -d C:/HelloWorld -p 5555\n");
+            error.Append("Server.exe -p 9999");
+
+            return error.ToString();
         }
     }
 }

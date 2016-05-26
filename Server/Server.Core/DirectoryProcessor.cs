@@ -2,7 +2,7 @@
 
 namespace Server.Core
 {
-    public class DirectoryProxy : IDirectoryProxy
+    public class DirectoryProcessor : IDirectoryProcessor
     {
         public bool Exists(string path)
         {

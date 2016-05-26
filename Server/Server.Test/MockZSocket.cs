@@ -4,13 +4,13 @@ using Server.Core;
 
 namespace Server.Test
 {
-    public class MockDataManager : IDataManager
+    public class MockZSocket : IZSocket
     {
-        private readonly Mock<IDataManager> _mock;
+        private readonly Mock<IZSocket> _mock;
 
-        public MockDataManager()
+        public MockZSocket()
         {
-            _mock = new Mock<IDataManager>();
+            _mock = new Mock<IZSocket>();
         }
 
         public bool Connected()
@@ -18,11 +18,10 @@ namespace Server.Test
             return _mock.Object.Connected();
         }
 
-        public IDataManager Accept()
+        public IZSocket Accept()
         {
             return _mock.Object.Accept();
         }
-
         public void Close()
         {
             _mock.Object.Close();
@@ -72,30 +71,30 @@ namespace Server.Test
             _mock.Verify(m => m.Receive(), Times.Once);
         }
 
-        public MockDataManager StubSentToReturn(int value)
+        public MockZSocket StubSentToReturn(int value)
         {
             _mock.Setup(m => m.Send(It.IsAny<string>())).Returns(value);
             return this;
         }
-        public MockDataManager StubIsBound(bool value)
+        public MockZSocket StubIsBound(bool value)
         {
             _mock.Setup(m => m.Connected()).Returns(value);
             return this;
         }
 
-        public MockDataManager StubConnect(bool value)
+        public MockZSocket StubConnect(bool value)
         {
             _mock.Setup(m => m.Connected()).Returns(value);
             return this;
         }
 
-        public MockDataManager StubAccpetObject(IDataManager returnObject)
+        public MockZSocket StubAcceptObject(IZSocket returnObject)
         {
             _mock.Setup(m => m.Accept()).Returns(returnObject);
             return this;
         }
 
-        public MockDataManager StubReceive(string message)
+        public MockZSocket StubReceive(string message)
         {
             _mock.Setup(m => m.Receive()).Returns(message);
             return this;

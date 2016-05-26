@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System;
+using Moq;
 using Server.Core;
 
 namespace Server.Test
@@ -16,10 +17,11 @@ namespace Server.Test
         {
             _mock.Object.StopNewConn();
         }
+        
 
-        public bool StillAlive => _mock.Object.StillAlive;
+        public bool AcceptingNewConn => _mock.Object.AcceptingNewConn;
 
-        void IMainServer.RunningProcess(IDataManager handler)
+        void IMainServer.RunningProcess(IZSocket handler)
         {
             _mock.Object.RunningProcess(handler);
         }
@@ -33,16 +35,29 @@ namespace Server.Test
         {
             _mock.Verify(m => m.Run(), Times.Once);
         }
-
-        public void VerifyStillAlive()
+        public void VerifyAcceptingNewConn()
         {
-            _mock.Verify(m => m.StillAlive, Times.Once);
+            _mock.Verify(m => m.AcceptingNewConn, Times.AtLeastOnce);
+        }
+        public void VerifyCleanUp()
+        {
+            _mock.Verify(m => m.CleanUp(), Times.AtLeastOnce);
         }
 
-        public MockMainServer StubStillAlive()
+        public void VerifyStopNewConn()
         {
-            _mock.Setup(m => m.StillAlive).Returns(false);
+            _mock.Verify(m => m.StopNewConn(), Times.AtLeastOnce);
+        }
+
+        public MockMainServer StubAcceptingNewConn()
+        {
+            _mock.Setup(m => m.AcceptingNewConn).Returns(false);
             return this;
+        }
+
+        public void CleanUp()
+        {
+            _mock.Object.CleanUp();
         }
     }
 }

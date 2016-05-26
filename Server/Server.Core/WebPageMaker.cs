@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 using System.Text;
 
 namespace Server.Core
@@ -17,7 +18,7 @@ namespace Server.Core
             _port = port;
         }
 
-        public string DirectoryContents(string dir, IDirectoryProxy reader, string root)
+        public string DirectoryContents(string dir, IDirectoryProcessor reader, string root)
         {
             var directoryContents = new StringBuilder();
             var files = reader.GetFiles(dir);
@@ -53,6 +54,13 @@ namespace Server.Core
             return HtmlHeader() + error + HtmlTail();
         }
 
+        public string Error403Page()
+        {
+            var error = new StringBuilder();
+            error.Append(@"<h1>403</h1>");
+            return HtmlHeader() + error + HtmlTail();
+        }
+
         public string NameForm()
         {
             var formHtml = new StringBuilder();
@@ -64,19 +72,20 @@ namespace Server.Core
             formHtml.Append(@"<input type=""submit"" value=""Submit"">");
             formHtml.Append(@"</form>");
 
-            return HtmlHeader() + formHtml.ToString() + HtmlTail();
+            return HtmlHeader() + formHtml + HtmlTail();
         }
 
         public string OutPutNames(string firstName, string lastName)
         {
             var nameOutput = new StringBuilder();
             nameOutput.Append(@"First Name Submitted:<br>");
-            nameOutput.Append(firstName + "<br>");
+            nameOutput.Append(WebUtility.HtmlEncode(firstName) + "<br>");
             nameOutput.Append(@"Last Name Submitted:<br>");
-            nameOutput.Append(lastName + "<br>");
+            nameOutput.Append(WebUtility.HtmlEncode(lastName) + "<br>");
 
-            return HtmlHeader() + nameOutput.ToString() + HtmlTail();
+            return HtmlHeader() + nameOutput + HtmlTail();
         }
+
         private string HtmlHeader()
         {
             var header = new StringBuilder();
