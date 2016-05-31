@@ -44,6 +44,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClosingServerHandler.cs" />
+    <Compile Include="DirectoryService.cs" />
+    <Compile Include="FileSendService.cs" />
+    <Compile Include="HelloWorldService.cs" />
+    <Compile Include="HttpResponse.cs" />
+    <Compile Include="HttpServiceFactory.cs" />
+    <Compile Include="IHttpResponse.cs" />
+    <Compile Include="IHttpServiceProcessor.cs" />
+    <Compile Include="ServerProperties.cs" />
+    <Compile Include="Service404.cs" />
     <Compile Include="ZSocket.cs" />
     <Compile Include="DirectoryProcessor.cs" />
     <Compile Include="MainServer.cs" />

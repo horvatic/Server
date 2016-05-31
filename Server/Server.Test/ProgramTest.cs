@@ -9,24 +9,6 @@ namespace Server.Test
 {
     public class ProgramTest
     {
-        public void User_Presses_CTRL_C()
-        {
-            var zSocket = new MockZSocket();
-            var webMaker = new WebPageMaker();
-            zSocket = zSocket.StubAcceptObject(zSocket);
-            var server = new MainServer(zSocket, webMaker, null, new MockDirectoryProcessor(),
-                new MockFileProcessor());
-
-            var output = new StringWriter();
-            Console.SetOut(output);
-            var mockServer = new MockMainServer().StubAcceptingNewConn();
-
-            var testingThead = new Thread(() => Program.RunServer(server));
-            testingThead.Start();
-            //Program.ShutDownServer(null, null);
-            testingThead.Join();
-        }
-
 
         [Theory]
         [InlineData(-1)]

@@ -17,7 +17,7 @@ namespace Server.Test
         {
             _mock.Object.StopNewConnAndCleanUp();
         }
-        
+
 
         public bool AcceptingNewConn => _mock.Object.AcceptingNewConn;
 
