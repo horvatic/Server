@@ -31,7 +31,7 @@ namespace Server.Test
             correctOutput.Append(@"</body>");
             correctOutput.Append(@"</html>");
             var httpPackage = new HttpResponse();
-            var serverProperties = new ServerProperties(null, null, null, 5555, new HttpResponse());
+            var serverProperties = new ServerProperties(null, null, null, 5555, new HttpResponse(), new ServerTime());
             var service404 = new Service404();
             httpPackage = (HttpResponse)service404.ProcessRequest("", httpPackage, serverProperties);
             Assert.Equal("404 Not Found", httpPackage.HttpStatusCode);

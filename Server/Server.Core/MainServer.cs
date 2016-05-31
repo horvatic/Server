@@ -8,17 +8,19 @@ namespace Server.Core
     public class MainServer : IMainServer
     {
         private static int _numberOfThreads;
+        private readonly IPrinter _io;
         private readonly ServerProperties _properties;
         private readonly HttpServiceFactory _serviceFactory;
         private readonly IZSocket _socket;
 
-        public MainServer(IZSocket socket, ServerProperties properties, HttpServiceFactory serviceFactory)
+        public MainServer(IZSocket socket, ServerProperties properties, HttpServiceFactory serviceFactory, IPrinter io)
         {
             _numberOfThreads = 0;
             AcceptingNewConn = true;
             _socket = socket;
             _properties = properties;
             _serviceFactory = serviceFactory;
+            _io = io;
         }
 
         public bool AcceptingNewConn { get; private set; }
@@ -29,7 +31,7 @@ namespace Server.Core
             {
                 if (!AcceptingNewConn) return;
                 var handler = _socket.Accept();
-                new Thread(() => RunningProcess(handler)).Start();
+                new Thread(() => RunningProcess(handler, Guid.NewGuid())).Start();
             }
             catch (Exception)
             {
@@ -37,13 +39,17 @@ namespace Server.Core
             }
         }
 
-        public void RunningProcess(IZSocket handler)
+        public void RunningProcess(IZSocket handler, Guid id)
         {
             Interlocked.Increment(ref _numberOfThreads);
             try
             {
                 var request = handler.Receive();
                 if (request.Length == 0) return;
+                var log = request.IndexOf("\r\n", StringComparison.Ordinal) == -1
+                    ? request
+                    : request.Substring(0, request.IndexOf("\r\n", StringComparison.Ordinal));
+                _io.Print("[" + _properties.Time.GetTime() + "] [<" + id + ">] " + log);
                 var processor = _serviceFactory.GetService(request, Assembly.GetExecutingAssembly(), "Server.Core",
                     _properties);
                 var httpResponce = processor.ProcessRequest(request, _properties.DefaultResponse.Clone(), _properties);
@@ -65,6 +71,7 @@ namespace Server.Core
                                  "\r\n\r\n");
                     handler.Send(httpResponce.Body);
                 }
+                _io.Print("[" + _properties.Time.GetTime() + "] [<" + id + ">] " + httpResponce.HttpStatusCode);
             }
             catch (Exception)
             {

@@ -17,14 +17,14 @@ namespace Server.Test
         [Fact]
         public void Close_Program()
         {
-            var output = new StringWriter();
-            Console.SetOut(output);
+            //var output = new StringWriter();
+            //Console.SetOut(output);
 
             var testServer = new MockMainServer();
             var closeProcessor = new ClosingServerHandler(testServer);
             closeProcessor.ShutdownProcess(null, null);
             testServer.StopNewConnAndCleanUp();
-            output.Close();
+            //output.Close();
 
 
         }

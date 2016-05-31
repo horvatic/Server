@@ -19,7 +19,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
             var inlineTextDocService = new InlineTextDocService();
 
             Assert.True(inlineTextDocService.CanProcessRequest(getRequest, properties));
@@ -33,7 +33,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
             var inlineTextDocService = new InlineTextDocService();
 
             Assert.False(inlineTextDocService.CanProcessRequest(getRequest, properties));
@@ -45,7 +45,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
             var inlineTextDocService = new InlineTextDocService();
 
             var httpResponces = inlineTextDocService.ProcessRequest("GET /hello.txt HTTP/1.1", new HttpResponse(), properties);

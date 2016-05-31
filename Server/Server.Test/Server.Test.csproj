@@ -69,6 +69,10 @@
     <Compile Include="InlinePdfServiceTest.cs" />
     <Compile Include="InlinePngServiceTest.cs" />
     <Compile Include="InlineTextDocServiceTest.cs" />
+    <Compile Include="MockPrinter.cs" />
+    <Compile Include="MockServerTime.cs" />
+    <Compile Include="PrinterTest.cs" />
+    <Compile Include="ServerTimeTest.cs" />
     <Compile Include="Service404Test.cs" />
     <Compile Include="ClosingServerHandlerTest.cs" />
     <Compile Include="DirectoryProcessorTest.cs" />

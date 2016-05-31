@@ -22,7 +22,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
             var formService = new FormService();
 
             Assert.True(formService.CanProcessRequest(getRequest, properties));
@@ -34,7 +34,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
             var formService = new FormService();
 
             var httpResponces = formService.ProcessRequest("GET /form HTTP/1.1", new HttpResponse(), properties);
@@ -63,7 +63,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
             var formService = new FormService();
 
             var httpResponces = formService.ProcessRequest("POST /form HTTP/1.1\r\n" +
