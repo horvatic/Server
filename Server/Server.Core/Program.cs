@@ -60,8 +60,8 @@ namespace Server.Core
             if (!VaildDrive(cleanHomeDir)) return null;
             var endPoint = new IPEndPoint((IPAddress.Loopback), port);
             var zSocket = new ZSocket(endPoint);
-            return new MainServer(zSocket, new WebPageMaker(port), cleanHomeDir, new DirectoryProcessor(),
-                new FileProcessor());
+            var properties = new ServerProperties(cleanHomeDir, new DirectoryProcessor(), new FileProcessor(), port, new HttpResponse());
+            return new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
         }
 
 
@@ -86,7 +86,8 @@ namespace Server.Core
             if (port == -1) return null;
             var endPoint = new IPEndPoint((IPAddress.Loopback), port);
             var zSocket = new ZSocket(endPoint);
-            return new MainServer(zSocket, new WebPageMaker(), null, new DirectoryProcessor(), new FileProcessor());
+            var properties = new ServerProperties(null, new DirectoryProcessor(), new FileProcessor(), port, new HttpResponse());
+            return new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
         }
 
         private static bool VaildDrive(string dir)

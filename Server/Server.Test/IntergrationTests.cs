@@ -8,7 +8,8 @@ namespace Server.Test
 {
     public class IntergrationTests
     {
-        public static bool GotRequest = false;
+        public static bool GotRequest;
+
         private static async void WebPageHit()
         {
             var getUrl =
@@ -30,19 +31,20 @@ namespace Server.Test
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 55999);
             var zSocket = new ZSocket(endPoint);
-            var testingServer = new MainServer(zSocket, new WebPageMaker(55999),
-                "c:/", new DirectoryProcessor(),
-                new FileProcessor());
+            var properties = new ServerProperties("c:/", new DirectoryProcessor(),
+                new FileProcessor(), 55999, new HttpResponse());
+            var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
             var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));
             testServerThread.Start();
-            
+
             new Thread(WebPageHit).Start();
             while (!GotRequest) ;
 
-            testingServer.StopNewConn();
-            testingServer.CleanUp();
+            testingServer.StopNewConnAndCleanUp();
 
-            var wrFailurl = WebRequest.Create(@"http://localhost:55999//ShawnDocs/Apprenticeships/week6/LargePDFs/Greater10/h2450081.pdf");
+            var wrFailurl =
+                WebRequest.Create(
+                    @"http://localhost:55999//ShawnDocs/Apprenticeships/week6/LargePDFs/Greater10/h2450081.pdf");
             Assert.Throws<WebException>(() => (wrFailurl.GetResponse()));
         }
 
@@ -51,8 +53,9 @@ namespace Server.Test
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 4321);
             var zSocket = new ZSocket(endPoint);
-            var testingServer = new MainServer(zSocket, new WebPageMaker(4321), null, new DirectoryProcessor(),
-                new FileProcessor());
+            var properties = new ServerProperties("c:/", new DirectoryProcessor(),
+                new FileProcessor(), 4321, new HttpResponse());
+            var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
             new Thread(() => RunServerNoUntilEndRequest(testingServer)).Start();
 
 
@@ -66,8 +69,9 @@ namespace Server.Test
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 50321);
             var zSocket = new ZSocket(endPoint);
-            var testingServer = new MainServer(zSocket, new WebPageMaker(50321), "C:/", new DirectoryProcessor(),
-                new FileProcessor());
+            var properties = new ServerProperties("c:/", new DirectoryProcessor(),
+               new FileProcessor(), 50321, new HttpResponse());
+            var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
             new Thread(() => RunServerNoUntilEndRequest(testingServer)).Start();
 
             var wrGeturl =
@@ -82,15 +86,14 @@ namespace Server.Test
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 45418);
             var zSocket = new ZSocket(endPoint);
-            var testingServer = new MainServer(zSocket, new WebPageMaker(45418),
-                null, new DirectoryProcessor(),
-                new FileProcessor());
+            var properties = new ServerProperties("c:/", new DirectoryProcessor(),
+               new FileProcessor(), 45418, new HttpResponse());
+            var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
             var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));
             testServerThread.Start();
             var wrGeturl = WebRequest.Create(@"http://localhost:45418/");
             wrGeturl.GetResponse();
-            testingServer.StopNewConn();
-            testingServer.CleanUp();
+            testingServer.StopNewConnAndCleanUp();
             var wrFailurl = WebRequest.Create(@"http://localhost:45418/");
             Assert.Throws<WebException>(() => (wrFailurl.GetResponse()));
         }
@@ -106,7 +109,7 @@ namespace Server.Test
         public void RunServerNoUntilEndRequest(IMainServer server)
         {
             server.Run();
-            server.CleanUp();
+            server.StopNewConnAndCleanUp();
         }
     }
 }

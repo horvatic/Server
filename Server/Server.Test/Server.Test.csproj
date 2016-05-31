@@ -63,10 +63,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DirectoryServiceTest.cs" />
+    <Compile Include="FileSendServiceTest.cs" />
+    <Compile Include="FormServiceTest.cs" />
+    <Compile Include="InlinePdfServiceTest.cs" />
+    <Compile Include="InlinePngServiceTest.cs" />
+    <Compile Include="InlineTextDocServiceTest.cs" />
+    <Compile Include="Service404Test.cs" />
     <Compile Include="ClosingServerHandlerTest.cs" />
     <Compile Include="DirectoryProcessorTest.cs" />
+    <Compile Include="HelloWorldServiceTest.cs" />
+    <Compile Include="HttpResponseTest.cs" />
+    <Compile Include="HttpServiceFactoryTest.cs" />
     <Compile Include="MainServerTest.cs" />
     <Compile Include="FileProcessorTest.cs" />
+    <Compile Include="MockHttpService.cs" />
     <Compile Include="MockZSocket.cs" />
     <Compile Include="MockDirectoryProcessor.cs" />
     <Compile Include="MockFileProcessor.cs" />
@@ -74,7 +85,7 @@
     <Compile Include="ProgramTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IntergrationTests.cs" />
-    <Compile Include="WebPageMakerTest.cs" />
+    <Compile Include="ServerPropertiesTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Server.Core\Server.Core.csproj">
@@ -83,6 +94,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

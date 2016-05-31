@@ -3,8 +3,7 @@
     public interface IMainServer
     {
         bool AcceptingNewConn { get; }
-        void CleanUp();
-        void StopNewConn();
+        void StopNewConnAndCleanUp();
 
         void RunningProcess(IZSocket handler);
 
