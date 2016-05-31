@@ -7,6 +7,44 @@ namespace Server.Test
 {
     public class MainServerTest
     {
+        [Fact]
+        public void Get_Empty_Request()
+        {
+            var mockRead = new MockDirectoryProcessor();
+            var zSocket = new MockZSocket()
+                .StubSentToReturn(10)
+                .StubReceive("")
+                .StubConnect(true);
+            zSocket = zSocket.StubAcceptObject(zSocket);
+            var properties = new ServerProperties("", new MockDirectoryProcessor(),
+                new MockFileProcessor(), 5555, new HttpResponse());
+            var dirServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
+            dirServer.Run();
+        }
+        [Fact]
+        public void Web_Server_No_Longer_Taking_Request()
+        {
+            var mockRead = new MockDirectoryProcessor()
+                .StubGetDirectories(new[] { "dir1", "dir2" })
+                .StubGetFiles(new[] { "file1", "file2", "file3" });
+            var zSocket = new MockZSocket()
+                .StubSentToReturn(10)
+                .StubReceive("GET / HTTP/1.1")
+                .StubConnect(true);
+            zSocket = zSocket.StubAcceptObject(zSocket);
+            var properties = new ServerProperties("", new MockDirectoryProcessor(),
+                new MockFileProcessor(), 5555, new HttpResponse());
+            var dirServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
+            dirServer.StopNewConnAndCleanUp();
+            dirServer.Run();
+            zSocket.VerifyNoAccept();
+        }
+        [Fact]
+        public void Active_Catch_When_Server_Is_Shuting_Down()
+        {
+            var server = new MainServer(null, null, null);
+            server.Run();
+        }
 
         [Fact]
         public void Make_Sure_New_Main_Server_Is_Not_Null_Hello_World()
@@ -157,12 +195,6 @@ namespace Server.Test
     }
 }
 
-//        [Fact]
-//        public void Active_Catch_When_Server_Is_Shuting_Down()
-//        {
-//            var server = new MainServer(null, null, null, null, null);
-//            server.Run();
-//        }
 
 //        [Fact]
 //        public void Make_Web_Server_LIVE_SOCKET_Hello_World()

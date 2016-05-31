@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 
@@ -9,6 +10,11 @@ namespace Server.Core
         public bool CanProcessRequest(string request, ServerProperties serverProperties)
         {
             var requestItem = CleanRequest(request);
+            var configManager = ConfigurationManager.AppSettings;
+            if (configManager.AllKeys.Any(key => requestItem.EndsWith(configManager[key])))
+            {
+                return false;
+            }
             return serverProperties.CurrentDir != null &&
                    serverProperties.DirReader.Exists(serverProperties.CurrentDir + requestItem);
         }

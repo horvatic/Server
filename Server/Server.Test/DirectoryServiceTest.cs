@@ -28,6 +28,19 @@ namespace Server.Test
         }
 
         [Theory]
+        [InlineData("GET /form HTTP/1.1")]
+        public void Cant_Process_form(string getRequest)
+        {
+            var mockFileSearch = new MockFileProcessor();
+            mockFileSearch.StubExists(true);
+            var properties = new ServerProperties(@"c:/",
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse());
+            var directoryServer = new DirectoryService();
+
+            Assert.False(directoryServer.CanProcessRequest(getRequest, properties));
+        }
+
+        [Theory]
         [InlineData("GET /fe HTTP/1.1")]
         [InlineData("GET /we HTTP/1.0")]
         public void Cant_Process(string getRequest)
