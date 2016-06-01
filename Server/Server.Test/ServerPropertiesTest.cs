@@ -7,7 +7,7 @@ namespace Server.Test
         [Fact]
         public void Make_Server_Properties_Not_Null()
         {
-            var properties = new ServerProperties(null, null, null, 0, new HttpResponse());
+            var properties = new ServerProperties(null, null, null, 0, new HttpResponse(), null);
             Assert.NotNull(properties);
         }
 
@@ -18,12 +18,14 @@ namespace Server.Test
             var mockDirReader = new MockDirectoryProcessor();
             var currentDir = "Hello/";
             var port = 5555;
-            var properties = new ServerProperties(currentDir, mockDirReader, mockFileReader, port, new HttpResponse());
+            var time = new MockServerTime();
+            var properties = new ServerProperties(currentDir, mockDirReader, mockFileReader, port, new HttpResponse(), time);
             Assert.NotNull(properties);
             Assert.Equal(mockFileReader, properties.FileReader);
             Assert.Equal(mockDirReader, properties.DirReader);
             Assert.Equal(currentDir, properties.CurrentDir);
             Assert.Equal(port, properties.Port);
+            Assert.Equal(time, properties.Time);
         }
 
         [Fact]
@@ -32,7 +34,7 @@ namespace Server.Test
             var mockFileReader = new MockFileProcessor();
             var mockDirReader = new MockDirectoryProcessor();
             var port = 5555;
-            var properties = new ServerProperties(null, mockDirReader, mockFileReader, port, new HttpResponse());
+            var properties = new ServerProperties(null, mockDirReader, mockFileReader, port, new HttpResponse(), new MockServerTime());
             Assert.Equal(null, properties.CurrentDir);
         }
         [Fact]
@@ -42,7 +44,7 @@ namespace Server.Test
             var mockDirReader = new MockDirectoryProcessor();
             var port = 5555;
             var currentDir = "Hello";
-            var properties = new ServerProperties(currentDir, mockDirReader, mockFileReader, port, new HttpResponse());
+            var properties = new ServerProperties(currentDir, mockDirReader, mockFileReader, port, new HttpResponse(), new MockServerTime());
             Assert.Equal(currentDir + "/", properties.CurrentDir);
         }
     }

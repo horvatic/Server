@@ -18,7 +18,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
             var inlinePdfService = new InlinePdfService();
 
             Assert.True(inlinePdfService.CanProcessRequest(getRequest, properties));
@@ -32,7 +32,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
             var inlinePdfService = new InlinePdfService();
 
             Assert.False(inlinePdfService.CanProcessRequest(getRequest, properties));
@@ -45,7 +45,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor().StubReadAllBytes(largeBtyeArray);
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
             var inlinePdfService = new InlinePdfService();
 
             var httpResponces = inlinePdfService.ProcessRequest("GET /hello.pdf HTTP/1.1", new HttpResponse(), properties);
@@ -63,7 +63,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor().StubReadAllBytes(largeBtyeArray);
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
             var inlinePdfService = new InlinePdfService();
 
             var httpResponces = inlinePdfService.ProcessRequest("GET /hello.pdf HTTP/1.1", new HttpResponse(), properties);

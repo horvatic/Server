@@ -18,7 +18,7 @@ namespace Server.Test
         [InlineData("GET / HTTP/1.0")]
         public void Can_Process_Request_HTTP(string request)
         {
-            var serverProperties = new ServerProperties(null, null, null, 5555, new HttpResponse());
+            var serverProperties = new ServerProperties(null, null, null, 5555, new HttpResponse(), new ServerTime());
             var helloWorldService = new HelloWorldService();
             Assert.True(helloWorldService.CanProcessRequest(request, serverProperties));
         }
@@ -30,7 +30,7 @@ namespace Server.Test
         [InlineData("GET /Hello HTTP/1.0", null)]
         public void Cant_Process_Request_HTTP_1_0(string request, string currentDir)
         {
-            var serverProperties = new ServerProperties(currentDir, null, null, 5555, new HttpResponse());
+            var serverProperties = new ServerProperties(currentDir, null, null, 5555, new HttpResponse(), new ServerTime());
             var helloWorldService = new HelloWorldService();
             Assert.False(helloWorldService.CanProcessRequest(request, serverProperties));
         }
@@ -47,7 +47,7 @@ namespace Server.Test
             correctOutput.Append(@"</body>");
             correctOutput.Append(@"</html>");
             var httpPackage = new HttpResponse();
-            var serverProperties = new ServerProperties(null, null, null, 5555, new HttpResponse());
+            var serverProperties = new ServerProperties(null, null, null, 5555, new HttpResponse(), new ServerTime());
             var helloWorldService = new HelloWorldService();
             httpPackage = (HttpResponse) helloWorldService.ProcessRequest("", httpPackage, serverProperties);
             Assert.Equal(correctOutput.ToString(), httpPackage.Body);

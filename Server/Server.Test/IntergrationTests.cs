@@ -32,8 +32,8 @@ namespace Server.Test
             var endPoint = new IPEndPoint((IPAddress.Loopback), 55999);
             var zSocket = new ZSocket(endPoint);
             var properties = new ServerProperties("c:/", new DirectoryProcessor(),
-                new FileProcessor(), 55999, new HttpResponse());
-            var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
+                new FileProcessor(), 55999, new HttpResponse(), new ServerTime());
+            var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()), new MockPrinter());
             var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));
             testServerThread.Start();
 
@@ -54,8 +54,8 @@ namespace Server.Test
             var endPoint = new IPEndPoint((IPAddress.Loopback), 4321);
             var zSocket = new ZSocket(endPoint);
             var properties = new ServerProperties("c:/", new DirectoryProcessor(),
-                new FileProcessor(), 4321, new HttpResponse());
-            var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
+                new FileProcessor(), 4321, new HttpResponse(), new ServerTime());
+            var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()), new MockPrinter());
             new Thread(() => RunServerNoUntilEndRequest(testingServer)).Start();
 
 
@@ -70,8 +70,8 @@ namespace Server.Test
             var endPoint = new IPEndPoint((IPAddress.Loopback), 50321);
             var zSocket = new ZSocket(endPoint);
             var properties = new ServerProperties("c:/", new DirectoryProcessor(),
-               new FileProcessor(), 50321, new HttpResponse());
-            var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
+               new FileProcessor(), 50321, new HttpResponse(), new ServerTime());
+            var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()), new MockPrinter());
             new Thread(() => RunServerNoUntilEndRequest(testingServer)).Start();
 
             var wrGeturl =
@@ -87,8 +87,8 @@ namespace Server.Test
             var endPoint = new IPEndPoint((IPAddress.Loopback), 45418);
             var zSocket = new ZSocket(endPoint);
             var properties = new ServerProperties("c:/", new DirectoryProcessor(),
-               new FileProcessor(), 45418, new HttpResponse());
-            var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
+               new FileProcessor(), 45418, new HttpResponse(), new ServerTime());
+            var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()), new MockPrinter());
             var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));
             testServerThread.Start();
             var wrGeturl = WebRequest.Create(@"http://localhost:45418/");

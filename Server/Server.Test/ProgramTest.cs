@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using System.Threading;
+﻿using System.Text;
 using Server.Core;
 using Xunit;
 
@@ -9,7 +6,6 @@ namespace Server.Test
 {
     public class ProgramTest
     {
-
         [Theory]
         [InlineData(-1)]
         [InlineData(0)]
@@ -19,201 +15,138 @@ namespace Server.Test
         [InlineData(9999999)]
         public void Out_Of_Range_Ports(int invaildPorts)
         {
-            var firstOutput = new StringWriter();
-            Console.SetOut(firstOutput);
             var correctOutput = new StringBuilder();
             correctOutput.Append("Invaild Port Detected.");
             correctOutput.Append("Vaild Ports 2000 - 65000");
 
             string[] argsHelloWorld = {"-p", invaildPorts.ToString()};
-            var serverMadeHelloWorld = Program.MakeServer(argsHelloWorld);
+            var mockPrinterOne = new MockPrinter();
+            var serverMadeHelloWorld = Program.MakeServer(argsHelloWorld, mockPrinterOne);
             Assert.Null(serverMadeHelloWorld);
-            Assert.Equal(correctOutput.ToString(), firstOutput.ToString());
-            firstOutput.Close();
+            mockPrinterOne.VerifyPrint(correctOutput.ToString());
 
-            var secondOutput = new StringWriter();
-            Console.SetOut(secondOutput);
             string[] args = {"-p", invaildPorts.ToString(), "-d", "C:\\"};
-            var serverMade = Program.MakeServer(args);
+            var mockPrinterTwo = new MockPrinter();
+            var serverMade = Program.MakeServer(args, mockPrinterTwo);
             Assert.Null(serverMade);
-            Assert.Equal(correctOutput.ToString(), secondOutput.ToString());
-            secondOutput.Close();
+            mockPrinterTwo.VerifyPrint(correctOutput.ToString());
 
-            var thridOutput = new StringWriter();
-            Console.SetOut(thridOutput);
+            var mockPrinterThree = new MockPrinter();
             string[] argsSwaped = {"-d", "C:\\", "-p", invaildPorts.ToString()};
-            var serverMadeSwaped = Program.MakeServer(argsSwaped);
+            var serverMadeSwaped = Program.MakeServer(argsSwaped, mockPrinterThree);
             Assert.Null(serverMadeSwaped);
-            Assert.Equal(correctOutput.ToString(), thridOutput.ToString());
-            thridOutput.Close();
+            mockPrinterThree.VerifyPrint(correctOutput.ToString());
         }
 
         [Fact]
         public void Make_Dirctory_Server_Correct()
         {
+            var mockPrinter = new MockPrinter();
             string[] args = {"-p", "32000", "-d", "C:\\"};
-            var serverMade = Program.MakeServer(args);
+            var serverMade = Program.MakeServer(args, mockPrinter);
             Assert.NotNull(serverMade);
         }
 
         [Fact]
         public void Make_Dirctory_Server_Twice_Same_Port()
         {
-            var firstOutput = new StringWriter();
-            Console.SetOut(firstOutput);
+            var mockPrinter = new MockPrinter();
             var correctOutput = new StringBuilder();
 
             string[] args = {"-p", "8765", "-d", "C:\\"};
-            var serverMade = Program.MakeServer(args);
+            var serverMade = Program.MakeServer(args, mockPrinter);
             Assert.NotNull(serverMade);
 
-            var serverMadeInvaild = Program.MakeServer(args);
+            var serverMadeInvaild = Program.MakeServer(args, mockPrinter);
             Assert.Null(serverMadeInvaild);
-            Assert.Equal("Another Server is running on that port\r\n", firstOutput.ToString());
+            mockPrinter.VerifyPrint("Another Server is running on that port");
         }
 
         [Fact]
         public void Make_Dirctory_Server_Correct_Arg_Backwords()
         {
+            var mockPrinter = new MockPrinter();
             string[] args = {"-d", "C:\\", "-p", "2020"};
-            var serverMade = Program.MakeServer(args);
+            var serverMade = Program.MakeServer(args, mockPrinter);
             Assert.NotNull(serverMade);
         }
 
         [Fact]
         public void Make_Dirctory_Server_Inncorect_Correct_Not_Dir()
         {
-            var output = new StringWriter();
-            Console.SetOut(output);
+            var mockPrinter = new MockPrinter();
             var correctOutput = new StringBuilder();
 
             string[] args = {"-d", "Hello", "-p", "3258"};
-            var serverMade = Program.MakeServer(args);
+            var serverMade = Program.MakeServer(args, mockPrinter);
             Assert.Null(serverMade);
 
-            Assert.Equal("Not a vaild directory\r\n", output.ToString());
+            mockPrinter.VerifyPrint("Not a vaild directory");
         }
 
         [Fact]
         public void Make_Dirctory_Server_Inncorect_Correct_Not_Port()
         {
-            var firstOutput = new StringWriter();
-            Console.SetOut(firstOutput);
+            var mockPrinter = new MockPrinter();
             var correctOutput = new StringBuilder();
             correctOutput.Append("Invaild Port Detected.");
             correctOutput.Append("Vaild Ports 2000 - 65000");
 
             string[] args = {"-d", "C:\\", "-p", "hello"};
-            var serverMade = Program.MakeServer(args);
+            var serverMade = Program.MakeServer(args, mockPrinter);
             Assert.Null(serverMade);
-            Assert.Equal(correctOutput.ToString(), firstOutput.ToString());
-            firstOutput.Close();
+            mockPrinter.VerifyPrint(correctOutput.ToString());
         }
 
-        [Fact]
-        public void Make_Dirctory_Server_Inncorect_Correct_Not_Dir_Option()
-        {
-            var output = new StringWriter();
-            Console.SetOut(output);
-            var correctOutput = new StringBuilder();
-            correctOutput.Append("Invaild Input Detected.\n");
-            correctOutput.Append("Can only be -p\n");
-            correctOutput.Append("or -p -d\n");
-            correctOutput.Append("Examples:\n");
-            correctOutput.Append("Server.exe -p 8080 -d C:/\n");
-            correctOutput.Append("Server.exe -d C:/HelloWorld -p 5555\n");
-            correctOutput.Append("Server.exe -p 9999\r\n");
+        
 
-            string[] args = {"-s", "C:\\", "-p", "9999"};
-            var serverMade = Program.MakeServer(args);
-            Assert.Null(serverMade);
-            Assert.Equal(correctOutput.ToString(), output.ToString());
-        }
-
-        [Fact]
-        public void Make_Dirctory_Server_Inncorect_Correct_Not_Port_Option()
-        {
-            var output = new StringWriter();
-            Console.SetOut(output);
-            var correctOutput = new StringBuilder();
-            correctOutput.Append("Invaild Input Detected.\n");
-            correctOutput.Append("Can only be -p\n");
-            correctOutput.Append("or -p -d\n");
-            correctOutput.Append("Examples:\n");
-            correctOutput.Append("Server.exe -p 8080 -d C:/\n");
-            correctOutput.Append("Server.exe -d C:/HelloWorld -p 5555\n");
-            correctOutput.Append("Server.exe -p 9999\r\n");
-
-            string[] args = {"-d", "C:\\", "-s", "9999"};
-            var serverMade = Program.MakeServer(args);
-            Assert.Null(serverMade);
-            Assert.Equal(correctOutput.ToString(), output.ToString());
-        }
 
         [Fact]
         public void Make_Dirctory_Server_Inncorect_Correct()
         {
-            var output = new StringWriter();
-            Console.SetOut(output);
+            var mockPrinter = new MockPrinter();
             var correctOutput = new StringBuilder();
 
             string[] args = {"-p", "32000", "-d", "-d"};
-            var serverMade = Program.MakeServer(args);
+            var serverMade = Program.MakeServer(args, mockPrinter);
             Assert.Null(serverMade);
 
-            Assert.Equal("Not a vaild directory\r\n", output.ToString());
+            mockPrinter.VerifyPrint("Not a vaild directory");
         }
 
-        [Fact]
-        public void Make_Dirctory_Server_Inncorect_Correct_3_Settings()
-        {
-            var output = new StringWriter();
-            Console.SetOut(output);
-            var correctOutput = new StringBuilder();
-            correctOutput.Append("Invaild Number of Arguments.\n");
-            correctOutput.Append("Can only be -p PORT\n");
-            correctOutput.Append("or -p PORT -d DIRECTORY\n");
-            correctOutput.Append("Examples:\n");
-            correctOutput.Append("Server.exe -p 8080 -d C:/\n");
-            correctOutput.Append("Server.exe -d C:/HelloWorld -p 5555\n");
-            correctOutput.Append("Server.exe -p 9999\r\n");
-
-
-            string[] args = {"-p", "32000", "-d"};
-            var serverMade = Program.MakeServer(args);
-            Assert.Null(serverMade);
-            Assert.Equal(correctOutput.ToString(), output.ToString());
-        }
+        
 
         [Fact]
         public void Make_Hello_World_Server_Correct()
         {
+            var mockPrinter = new MockPrinter();
             string[] args = {"-p", "9560"};
-            var serverMade = Program.MakeServer(args);
+            var serverMade = Program.MakeServer(args, mockPrinter);
             Assert.NotNull(serverMade);
         }
 
         [Fact]
         public void Make_Hello_World_Incorrect_Correct()
         {
+            var mockPrinter = new MockPrinter();
             string[] args = {"2750", "-p"};
-            var serverMade = Program.MakeServer(args);
+            var serverMade = Program.MakeServer(args, mockPrinter);
             Assert.Null(serverMade);
         }
 
         [Fact]
         public void Make_Hello_World_Incorrect_Correct_No_Port()
         {
+            var mockPrinter = new MockPrinter();
             string[] args = {"-p", "-p"};
-            var serverMade = Program.MakeServer(args);
+            var serverMade = Program.MakeServer(args, mockPrinter);
             Assert.Null(serverMade);
         }
 
         [Fact]
         public void Make_Server_Inncorect_NoArgs()
         {
-            var output = new StringWriter();
-            Console.SetOut(output);
+            var mockPrinter = new MockPrinter();
             var correctOutput = new StringBuilder();
             correctOutput.Append("Invaild Number of Arguments.\n");
             correctOutput.Append("Can only be -p PORT\n");
@@ -221,36 +154,17 @@ namespace Server.Test
             correctOutput.Append("Examples:\n");
             correctOutput.Append("Server.exe -p 8080 -d C:/\n");
             correctOutput.Append("Server.exe -d C:/HelloWorld -p 5555\n");
-            correctOutput.Append("Server.exe -p 9999\r\n");
+            correctOutput.Append("Server.exe -p 9999");
 
-            var args = new string[1];
-            var serverMade = Program.MakeServer(args);
+            var args = new string[] {"-s"};
+            var serverMade = Program.MakeServer(args, mockPrinter);
             Assert.Null(serverMade);
-            Assert.Equal(correctOutput.ToString(), output.ToString());
-        }
-
-        [Fact]
-        public void Make_Server_Inncorect_Wrong_Args()
-        {
-            var firstOutput = new StringWriter();
-            Console.SetOut(firstOutput);
-            var correctOutput = new StringBuilder();
-            correctOutput.Append("Invaild Port Detected.");
-            correctOutput.Append("Vaild Ports 2000 - 65000");
-
-            string[] args = {"-p", "-b", "-d", "C:/Directory"};
-            var serverMade = Program.MakeServer(args);
-            Assert.Null(serverMade);
-
-            Assert.Equal(correctOutput.ToString(), firstOutput.ToString());
-            firstOutput.Close();
+            mockPrinter.VerifyPrint(correctOutput.ToString());
         }
 
         [Fact]
         public void Main_Starting_Program()
         {
-            var output = new StringWriter();
-            Console.SetOut(output);
             string[] args = {};
             Assert.Equal(0, Program.Main(args));
         }
@@ -258,31 +172,21 @@ namespace Server.Test
         [Fact]
         public void Test_Running_Of_Server()
         {
-            var output = new StringWriter();
-            Console.SetOut(output);
             var mockServer = new MockMainServer().StubAcceptingNewConn();
             Program.RunServer(mockServer);
             mockServer.VerifyRun();
             mockServer.VerifyAcceptingNewConn();
-            output.Close();
         }
 
-        public void Test_User_Inputs_Invaild_Settings_Dump_Error()
+        [Fact]
+        public void Make_Log_File()
         {
-            var output = new StringWriter();
-            Console.SetOut(output);
-            var correctOutput = new StringBuilder();
-            correctOutput.Append("Invaild Input Detected.\n");
-            correctOutput.Append("Server.exe may already be running on port\n");
-            correctOutput.Append("must be Server.Core.exe -p PORT -d directory\n");
-            correctOutput.Append("Vaild Ports 2000 - 65000\n");
-            correctOutput.Append("Examples:\n");
-            correctOutput.Append("Server.exe -p 8080 -d C:/\n");
-            correctOutput.Append("Server.exe -d C:/HelloWorld -p 5555\n");
-            correctOutput.Append("Server.exe -p 9999\n\r\n\r\n");
+            var mockPrinter = new MockPrinter();
 
-            Program.RunServer(null);
-            Assert.Equal(correctOutput.ToString(), output.ToString());
+            string[] args = { "-p", "10560", "-l", "c:/TestLog" };
+            var serverMade = Program.MakeServer(args, mockPrinter);
+            Assert.Equal("c:/TestLog", mockPrinter.Log);
+            Assert.NotNull(serverMade);
         }
     }
 }
