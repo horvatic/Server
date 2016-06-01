@@ -22,5 +22,14 @@ namespace Server.Test
             io.Print("Hello");
             Assert.Equal("Hello\r\n", consoleOutput.ToString());
         }
+
+        [Fact]
+        public void Output_Given_Input_Log()
+        {
+            var consoleOutput = new StringWriter();
+            Console.SetOut(consoleOutput);
+            var io = new Printer {Log = "c:/testFile.txt"};
+            io.Print("Hello");
+        }
     }
 }

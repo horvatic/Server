@@ -9,9 +9,10 @@ namespace Server.Core
 
         public void Print(string output)
         {
-            if (Log != null)
+            lock (this)
             {
-                try
+
+                if (Log != null)
                 {
                     var ostrm = new FileStream(Log, FileMode.Append, FileAccess.Write);
                     var writer = new StreamWriter(ostrm);
@@ -19,16 +20,12 @@ namespace Server.Core
                     Console.WriteLine(output);
                     writer.Close();
                     ostrm.Close();
+
                 }
-                catch (Exception e)
+                else
                 {
-                    Console.WriteLine("Cannot open Redirect.txt for writing");
-                    Console.WriteLine(e.Message);
+                    Console.WriteLine(output);
                 }
-            }
-            else
-            {
-                Console.WriteLine(output);
             }
 
         }
