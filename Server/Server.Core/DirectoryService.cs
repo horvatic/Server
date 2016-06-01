@@ -11,7 +11,8 @@ namespace Server.Core
         {
             var requestItem = CleanRequest(request);
             var configManager = ConfigurationManager.AppSettings;
-            if (configManager.AllKeys.Any(key => requestItem.EndsWith(configManager[key])))
+            if (configManager.AllKeys.Any(key => requestItem.EndsWith(configManager[key]))
+                || request.Contains("POST /"))
             {
                 return false;
             }

@@ -71,6 +71,11 @@ namespace Server.Test
             _mock.Verify(m => m.Receive(), Times.Once);
         }
 
+        public void VerifyManyReceive(int callNumberOfTimes)
+        {
+            _mock.Verify(m => m.Receive(), Times.Exactly(callNumberOfTimes));
+        }
+
         public MockZSocket StubSentToReturn(int value)
         {
             _mock.Setup(m => m.Send(It.IsAny<string>())).Returns(value);
