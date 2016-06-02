@@ -149,7 +149,7 @@ namespace Server.Test
             request.Append("Content-Type: image/png\r\n\r\n?PNG\r\n");
             request.Append(
                 "Hello");
-            request.Append("\r\n------WebKitFormBoundaryVfPQpsTmmlrqQLLg--");
+            request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg--\r\n");
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(false);
             var io = new MockPrinter();

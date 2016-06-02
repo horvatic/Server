@@ -17,7 +17,7 @@ namespace Server.Core
         public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
             ServerProperties serverProperties)
         {
-            return request.Contains("GET /")
+            return request.Contains("GET /") && request.IndexOf("GET /", StringComparison.Ordinal) == 0
                 ? GetRequest(request, httpResponse)
                 : PostRequest(request, httpResponse, serverProperties);
         }
@@ -33,8 +33,8 @@ namespace Server.Core
                     return httpResponse;
                 }
                 _webKitFormBoundary = request.Substring(0, request.IndexOf("Content-Disposition: form-data;"
-                    , StringComparison.Ordinal));
-                if (data.Contains("\r\n" + _webKitFormBoundary + "--"))
+                    , StringComparison.Ordinal)).Replace("\r\n", "");
+                if (data.Contains(_webKitFormBoundary + "--\r\n"))
                 {
                     data = request.Substring(data.IndexOf("Content-Type: "
                         , StringComparison.Ordinal));
@@ -42,15 +42,15 @@ namespace Server.Core
                         , StringComparison.Ordinal) + 4);
                     data = data.Substring(data.IndexOf("\r\n"
                         , StringComparison.Ordinal) + 2);
-                    data = data.Replace("\r\n" + _webKitFormBoundary + "--", "");
+                    data = data.Replace(_webKitFormBoundary + "--\r\n", "");
                     serverProperties.Io.PrintToFile(data, _writingPath);
                 }
             }
             else
             {
-                if (data.Contains("\r\n" + _webKitFormBoundary + "--"))
+                if (data.Contains(_webKitFormBoundary + "--\r\n"))
                 {
-                    data = data.Replace("\r\n" + _webKitFormBoundary + "--", "");
+                    data = data.Replace(_webKitFormBoundary + "--\r\n", "");
                 }
                 serverProperties.Io.PrintToFile(data, _writingPath);
             }

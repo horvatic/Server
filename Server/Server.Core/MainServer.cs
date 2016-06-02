@@ -81,9 +81,24 @@ namespace Server.Core
             while (_numberOfThreads != 0) ;
         }
 
+        private string GetPacketSplit(string request)
+        {
+            var packetSplit = request.Substring(request.IndexOf("boundary=----"
+                , StringComparison.Ordinal) + 13);
+            packetSplit = packetSplit.Remove(packetSplit.IndexOf("\r\n"
+                , StringComparison.Ordinal));
+            return packetSplit;
+        }
+
         private void RequestWithMultiPart(Guid id, string request, IZSocket handler, int packageSize)
         {
-            var requestPacket = handler.Receive();
+            string requestPacket;
+            var packetSplit = GetPacketSplit(request);
+            if (!request.EndsWith($"------{packetSplit}--\r\n"))
+                requestPacket = handler.Receive();
+            else
+                requestPacket = request.Substring(request.IndexOf($"------{packetSplit}"
+                    , StringComparison.Ordinal));
             var processedBits = 8192;
             var httpResponce = _properties.DefaultResponse.Clone();
             var processor = _serviceFactory.GetService(request, Assembly.GetExecutingAssembly(), "Server.Core",
@@ -97,7 +112,6 @@ namespace Server.Core
 
             while (processedBits < packageSize)
             {
-                
                 requestPacket = handler.Receive();
                 httpResponce = processor.ProcessRequest(requestPacket, httpResponce, _properties);
                 processedBits += 8192;

@@ -320,5 +320,81 @@ namespace Server.Test
 
             zSocket.VerifyManyReceive(2);
         }
+
+        [Fact]
+        public void Handles_Request_Less_Than_8192_Bytes_All_Given()
+        {
+            var request = GetRequest();
+
+
+            var mockRead = new MockDirectoryProcessor();
+            var mockFileReader = new MockFileProcessor();
+            var zSocket = new MockZSocket().StubReceive(request)
+                .StubSentToReturn(10)
+                .StubConnect(true);
+            zSocket = zSocket.StubAcceptObject(zSocket);
+            var properties = new ServerProperties(@"Home", mockRead,
+                mockFileReader, 8080, new HttpResponse(), new ServerTime(), new MockPrinter());
+            var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
+            server.RunningProcess(zSocket, Guid.NewGuid());
+
+            zSocket.VerifyManyReceive(1);
+        }
+
+        public string GetRequest()
+        {
+            return @"POST /sfs HTTP/1.1
+Host: localhost:8080
+Connection: keep-alive
+Content-Length: 495
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Origin: http://localhost:8080
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryzOQ1PthdpYfXFgbU
+Referer: http://localhost:8080/upload
+Accept-Encoding: gzip, deflate
+Accept-Language: en-US,en;q=0.8
+
+------WebKitFormBoundaryzOQ1PthdpYfXFgbU
+Content-Disposition: form-data; name=""saveLocation""
+
+c:/ZZZ
+------WebKitFormBoundaryzOQ1PthdpYfXFgbU
+Content-Disposition: form-data; name=""fileToUpload""; filename=""testFile.txt""
+Content-Type: text/plain
+
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+
+------WebKitFormBoundaryzOQ1PthdpYfXFgbU--" + "\r\n";
+        }
     }
 }
