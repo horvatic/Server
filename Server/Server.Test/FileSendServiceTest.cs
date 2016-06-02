@@ -20,7 +20,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
             var fileSendService = new FileSendService();
 
             Assert.True(fileSendService.CanProcessRequest(getRequest, properties));
@@ -35,7 +35,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
             var fileSendService = new FileSendService();
 
             Assert.False(fileSendService.CanProcessRequest(getRequest, properties));
@@ -47,7 +47,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
             var fileSendService = new FileSendService();
 
             var httpResponces = fileSendService.ProcessRequest("GET /hello.exe HTTP/1.1", new HttpResponse(), properties);
@@ -65,7 +65,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
             var fileSendService = new FileSendService();
             var correctOutput = new StringBuilder();
             correctOutput.Append(@"<!DOCTYPE html>");

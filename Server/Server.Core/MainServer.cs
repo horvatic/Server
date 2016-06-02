@@ -8,19 +8,17 @@ namespace Server.Core
     public class MainServer : IMainServer
     {
         private static int _numberOfThreads;
-        private readonly IPrinter _io;
         private readonly ServerProperties _properties;
         private readonly HttpServiceFactory _serviceFactory;
         private readonly IZSocket _socket;
 
-        public MainServer(IZSocket socket, ServerProperties properties, HttpServiceFactory serviceFactory, IPrinter io)
+        public MainServer(IZSocket socket, ServerProperties properties, HttpServiceFactory serviceFactory)
         {
             _numberOfThreads = 0;
             AcceptingNewConn = true;
             _socket = socket;
             _properties = properties;
             _serviceFactory = serviceFactory;
-            _io = io;
         }
 
         public bool AcceptingNewConn { get; private set; }
@@ -48,23 +46,21 @@ namespace Server.Core
                 if (request.Length == 0) return;
 
                 var log = request.IndexOf("\r\n", StringComparison.Ordinal) == -1
-                ? request
-                : request.Substring(0, request.IndexOf("\r\n", StringComparison.Ordinal));
-                _io.Print("[" + _properties.Time.GetTime() + "] [<" + id + ">] " + log);
+                    ? request
+                    : request.Substring(0, request.IndexOf("\r\n", StringComparison.Ordinal));
 
-                if (request.Contains("Content-Length: "))
+                _properties.Io.Print("[" + _properties.Time.GetTime() + "] [<" + id + ">] " + log);
+
+                if (request.Contains("Content-Type: multipart/form-data;"))
                 {
                     var contentLength = request
                         .Substring(request.IndexOf("Content-Length: ", StringComparison.Ordinal));
                     var packageSize = int.Parse(contentLength
                         .Substring(16, contentLength.IndexOf("\r\n", StringComparison.Ordinal) - 16));
-                    if (packageSize < 8192)
-                        RequestSmallerThan8192Bytes(id, request, handler);
-                    else
-                        RequestLargerThan8192Bytes(id, request, handler, packageSize);
+                    RequestWithMultiPart(id, request, handler, packageSize);
                 }
                 else
-                    RequestSmallerThan8192Bytes(id, request, handler);
+                    NoMultiPart(id, request, handler);
             }
             catch (Exception)
             {
@@ -85,32 +81,39 @@ namespace Server.Core
             while (_numberOfThreads != 0) ;
         }
 
-        private void RequestLargerThan8192Bytes(Guid id, string request, IZSocket handler, int packageSize)
+        private void RequestWithMultiPart(Guid id, string request, IZSocket handler, int packageSize)
         {
-            var processedBits = 0;
+            var requestPacket = handler.Receive();
+            var processedBits = 8192;
             var httpResponce = _properties.DefaultResponse.Clone();
             var processor = _serviceFactory.GetService(request, Assembly.GetExecutingAssembly(), "Server.Core",
                 _properties);
-            do
+            httpResponce = processor.ProcessRequest(requestPacket, httpResponce, _properties);
+            if (httpResponce.HttpStatusCode != "200 OK" && httpResponce.HttpStatusCode != "201 Created")
             {
-                var requestPacket = handler.Receive();
+                SendResponce(handler, httpResponce, id);
+                return;
+            }
+
+            while (processedBits < packageSize)
+            {
+                
+                requestPacket = handler.Receive();
                 httpResponce = processor.ProcessRequest(requestPacket, httpResponce, _properties);
                 processedBits += 8192;
-            } while (processedBits < packageSize);
+            }
 
             SendResponce(handler, httpResponce, id);
-           
         }
 
-        private void RequestSmallerThan8192Bytes(Guid id, string request, IZSocket handler)
+        private void NoMultiPart(Guid id, string request, IZSocket handler)
         {
-
             var processor = _serviceFactory.GetService(request, Assembly.GetExecutingAssembly(), "Server.Core",
                 _properties);
             var httpResponce = processor.ProcessRequest(request, _properties.DefaultResponse.Clone(), _properties);
             SendResponce(handler, httpResponce, id);
         }
-        
+
 
         private void SendResponce(IZSocket handler, IHttpResponse httpResponce, Guid id)
         {
@@ -132,7 +135,7 @@ namespace Server.Core
                              "\r\n\r\n");
                 handler.Send(httpResponce.Body);
             }
-            _io.Print("[" + _properties.Time.GetTime() + "] [<" + id + ">] " + httpResponce.HttpStatusCode);
+            _properties.Io.Print("[" + _properties.Time.GetTime() + "] [<" + id + ">] " + httpResponce.HttpStatusCode);
         }
     }
 }

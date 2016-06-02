@@ -26,10 +26,25 @@ namespace Server.Test
         [Fact]
         public void Output_Given_Input_Log()
         {
+            var gid = Guid.NewGuid();
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-            var io = new Printer {Log = "c:/testFile.txt"};
+            var io = new Printer {Log = "c:/" + gid + ".txt" };
             io.Print("Hello");
+            Assert.True(File.Exists("c:/" + gid + ".txt"));
+            File.Delete("c:/" + gid + ".txt");
+
+        }
+
+        [Fact]
+        public void Print_To_File()
+        {
+            var gid = Guid.NewGuid();
+            var io = new Printer();
+            io.PrintToFile("Hello", "c:/" + gid + ".txt");
+            Assert.True(File.Exists("c:/" + gid + ".txt"));
+            File.Delete("c:/" + gid + ".txt");
+
         }
     }
 }

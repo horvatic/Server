@@ -1,5 +1,6 @@
 ﻿using Server.Core;
 using Xunit;
+
 namespace Server.Test
 {
     public class ServerPropertiesTest
@@ -7,7 +8,7 @@ namespace Server.Test
         [Fact]
         public void Make_Server_Properties_Not_Null()
         {
-            var properties = new ServerProperties(null, null, null, 0, new HttpResponse(), null);
+            var properties = new ServerProperties(null, null, null, 0, new HttpResponse(), null, null);
             Assert.NotNull(properties);
         }
 
@@ -19,13 +20,18 @@ namespace Server.Test
             var currentDir = "Hello/";
             var port = 5555;
             var time = new MockServerTime();
-            var properties = new ServerProperties(currentDir, mockDirReader, mockFileReader, port, new HttpResponse(), time);
+            var io = new MockPrinter();
+            var httpResponse = new HttpResponse();
+            var properties = new ServerProperties(currentDir, mockDirReader,
+                mockFileReader, port, httpResponse, time, io);
             Assert.NotNull(properties);
             Assert.Equal(mockFileReader, properties.FileReader);
             Assert.Equal(mockDirReader, properties.DirReader);
             Assert.Equal(currentDir, properties.CurrentDir);
             Assert.Equal(port, properties.Port);
             Assert.Equal(time, properties.Time);
+            Assert.Equal(io, properties.Io);
+            Assert.Equal(httpResponse, properties.DefaultResponse);
         }
 
         [Fact]
@@ -34,9 +40,11 @@ namespace Server.Test
             var mockFileReader = new MockFileProcessor();
             var mockDirReader = new MockDirectoryProcessor();
             var port = 5555;
-            var properties = new ServerProperties(null, mockDirReader, mockFileReader, port, new HttpResponse(), new MockServerTime());
+            var properties = new ServerProperties(null, mockDirReader, mockFileReader, port, new HttpResponse(),
+                new MockServerTime(), new MockPrinter());
             Assert.Equal(null, properties.CurrentDir);
         }
+
         [Fact]
         public void Make_Server_Properties_Current_No_Slash()
         {
@@ -44,7 +52,8 @@ namespace Server.Test
             var mockDirReader = new MockDirectoryProcessor();
             var port = 5555;
             var currentDir = "Hello";
-            var properties = new ServerProperties(currentDir, mockDirReader, mockFileReader, port, new HttpResponse(), new MockServerTime());
+            var properties = new ServerProperties(currentDir, mockDirReader, mockFileReader, port, new HttpResponse(),
+                new MockServerTime(), new MockPrinter());
             Assert.Equal(currentDir + "/", properties.CurrentDir);
         }
     }

@@ -10,5 +10,7 @@ namespace Server.Core
     {
         string Log { get; set; }
         void Print(string output);
+
+        void PrintToFile(string output, string path);
     }
 }

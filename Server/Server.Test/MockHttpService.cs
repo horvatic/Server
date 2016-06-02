@@ -18,9 +18,18 @@ namespace Server.Test
             return _mock.Object.CanProcessRequest(request, serverProperties);
         }
 
-        public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse, ServerProperties serverProperties)
+        public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
+            ServerProperties serverProperties)
         {
             return _mock.Object.ProcessRequest(request, httpResponse, serverProperties);
+        }
+
+        public MockHttpService StubProcessRequest(IHttpResponse response)
+        {
+            _mock.Setup(
+                m => m.ProcessRequest(It.IsAny<string>(), It.IsAny<IHttpResponse>(),
+                    It.IsAny<ServerProperties>())).Returns(response);
+            return this;
         }
     }
 }
