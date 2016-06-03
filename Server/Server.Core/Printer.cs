@@ -11,15 +11,15 @@ namespace Server.Core
         public void PrintToFile(string output, string path)
         {
             var write = new FileStream(path, FileMode.Append, FileAccess.Write);
-            var outputConverted = Encoding.ASCII.GetBytes(output);
-            write.Write(outputConverted, 0 , outputConverted.Length);
+            var outputConverted = Encoding.Default.GetBytes(output);
+            write.Write(outputConverted, 0, outputConverted.Length);
             write.Close();
         }
+
         public void Print(string output)
         {
             lock (this)
             {
-
                 if (Log != null)
                 {
                     var ostrm = new FileStream(Log, FileMode.Append, FileAccess.Write);
@@ -28,14 +28,12 @@ namespace Server.Core
                     Console.WriteLine(output);
                     writer.Close();
                     ostrm.Close();
-
                 }
                 else
                 {
                     Console.WriteLine(output);
                 }
             }
-
         }
     }
 }

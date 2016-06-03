@@ -1,4 +1,6 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Sockets;
 using Moq;
 using Server.Core;
 
@@ -7,10 +9,11 @@ namespace Server.Test
     public class MockZSocket : IZSocket
     {
         private readonly Mock<IZSocket> _mock;
-
+        private Queue<string> _message; 
         public MockZSocket()
         {
             _mock = new Mock<IZSocket>();
+            _message = null;
         }
 
         public bool Connected()
@@ -29,7 +32,9 @@ namespace Server.Test
 
         public string Receive()
         {
-            return _mock.Object.Receive();
+            var returnVal = _mock.Object.Receive();
+            if(_message != null) _mock.Setup(m => m.Receive()).Returns(_message.Dequeue);
+            return returnVal;
         }
 
         public int Send(string message)
@@ -102,6 +107,13 @@ namespace Server.Test
         public MockZSocket StubReceive(string message)
         {
             _mock.Setup(m => m.Receive()).Returns(message);
+            return this;
+        }
+
+        public MockZSocket StubReceiveWithQueue(Queue<string> message)
+        {
+            _message = message;
+            _mock.Setup(m => m.Receive()).Returns(_message.Dequeue);
             return this;
         }
     }

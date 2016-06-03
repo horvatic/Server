@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Server.Core;
 using Xunit;
@@ -222,9 +224,11 @@ namespace Server.Test
             printLog.VerifyPrint("[10am] [<" + gid + ">] 200 OK");
         }
 
+      
         [Fact]
         public void Handles_Request_Larger_Than_8192_Bytes()
         {
+            var message = new Queue<string>();
             var request = "POST /iuiuh HTTP/1.1\r\n" +
                           "Host: localhost: 8080\r\n" +
                           "Connection: keep-alive\r\n" +
@@ -238,11 +242,22 @@ namespace Server.Test
                           "Referer: http://localhost:8080/upload" +
                           "Accept-Encoding: gzip, deflate" +
                           "Accept-Language: en-US,en;q=0.8";
+            message.Enqueue(request);
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n");
 
 
             var mockRead = new MockDirectoryProcessor();
             var mockFileReader = new MockFileProcessor();
-            var zSocket = new MockZSocket().StubReceive(request)
+            var zSocket = new MockZSocket().StubReceiveWithQueue(message)
                 .StubSentToReturn(10)
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
@@ -258,7 +273,8 @@ namespace Server.Test
         [Fact]
         public void Handles_Request_Larger_Than_8192_Bytes_Error_With_Service()
         {
-            var request = "POST /ioujo HTTP/1.1\r\n" +
+            var message = new Queue<string>();
+            var request = "POST /iuiuh HTTP/1.1\r\n" +
                           "Host: localhost: 8080\r\n" +
                           "Connection: keep-alive\r\n" +
                           "Content-Length: 79841\r\n" +
@@ -271,11 +287,22 @@ namespace Server.Test
                           "Referer: http://localhost:8080/upload" +
                           "Accept-Encoding: gzip, deflate" +
                           "Accept-Language: en-US,en;q=0.8";
+            message.Enqueue(request);
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n");
 
 
             var mockRead = new MockDirectoryProcessor();
             var mockFileReader = new MockFileProcessor();
-            var zSocket = new MockZSocket().StubReceive(request)
+            var zSocket = new MockZSocket().StubReceiveWithQueue(message)
                 .StubSentToReturn(10)
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
@@ -286,16 +313,17 @@ namespace Server.Test
                     new MockHttpService().StubProcessRequest(new HttpResponse {HttpStatusCode = "404"})));
             server.RunningProcess(zSocket, Guid.NewGuid());
 
-            zSocket.VerifyManyReceive(2);
+            zSocket.VerifyManyReceive(11);
         }
 
         [Fact]
         public void Handles_Request_Less_Than_8192_Bytes()
         {
-            var request = "POST /upload HTTP/1.1\r\n" +
+            var message = new Queue<string>();
+            var request = "POST /iuiuh HTTP/1.1\r\n" +
                           "Host: localhost: 8080\r\n" +
                           "Connection: keep-alive\r\n" +
-                          "Content-Length: 100\r\n" +
+                          "Content-Length: 79841\r\n" +
                           "Cache-Control: max-age = 0\r\n" +
                           "Accept: text/html,application/xhtml+xml,application/xml; q=0.9,image/webp,*/*;q=0.8\r\n" +
                           "Origin: http://localhost:8080\r\n" +
@@ -305,11 +333,13 @@ namespace Server.Test
                           "Referer: http://localhost:8080/upload" +
                           "Accept-Encoding: gzip, deflate" +
                           "Accept-Language: en-US,en;q=0.8";
+            message.Enqueue(request);
+            message.Enqueue("------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n");
 
 
             var mockRead = new MockDirectoryProcessor();
             var mockFileReader = new MockFileProcessor();
-            var zSocket = new MockZSocket().StubReceive(request)
+            var zSocket = new MockZSocket().StubReceiveWithQueue(message)
                 .StubSentToReturn(10)
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);

@@ -92,31 +92,25 @@ namespace Server.Core
 
         private void RequestWithMultiPart(Guid id, string request, IZSocket handler, int packageSize)
         {
-            string requestPacket;
+            var requestPacket = "";
             var packetSplit = GetPacketSplit(request);
             if (!request.EndsWith($"------{packetSplit}--\r\n"))
-                requestPacket = handler.Receive();
+                requestPacket += handler.Receive();
             else
-                requestPacket = request.Substring(request.IndexOf($"------{packetSplit}"
+                requestPacket += request.Substring(request.IndexOf($"------{packetSplit}"
                     , StringComparison.Ordinal));
-            var processedBits = 8192;
             var httpResponce = _properties.DefaultResponse.Clone();
             var processor = _serviceFactory.GetService(request, Assembly.GetExecutingAssembly(), "Server.Core",
                 _properties);
+
+            _properties.Io.Print(requestPacket);
+            while (!requestPacket.EndsWith($"------{packetSplit}--\r\n"))
+            {
+                var packet = handler.Receive();
+                requestPacket += packet;
+                _properties.Io.Print(packet);
+            }
             httpResponce = processor.ProcessRequest(requestPacket, httpResponce, _properties);
-            if (httpResponce.HttpStatusCode != "200 OK" && httpResponce.HttpStatusCode != "201 Created")
-            {
-                SendResponce(handler, httpResponce, id);
-                return;
-            }
-
-            while (processedBits < packageSize)
-            {
-                requestPacket = handler.Receive();
-                httpResponce = processor.ProcessRequest(requestPacket, httpResponce, _properties);
-                processedBits += 8192;
-            }
-
             SendResponce(handler, httpResponce, id);
         }
 
