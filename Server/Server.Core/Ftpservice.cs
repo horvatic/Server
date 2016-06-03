@@ -6,7 +6,7 @@ namespace Server.Core
     public class Ftpservice : IHttpServiceProcessor
     {
         private string _webKitFormBoundary;
-        private string _writingPath;
+        private string _writingPath = "";
 
         public bool CanProcessRequest(string request, ServerProperties serverProperties)
         {
@@ -27,24 +27,22 @@ namespace Server.Core
             var data = request;
             if (request.Contains("name=\"saveLocation\""))
             {
-                if (GetPath(request, serverProperties))
+                if (SetPath(request, serverProperties))
                 {
                     httpResponse.HttpStatusCode = "409 Conflict";
                     return httpResponse;
                 }
                 _webKitFormBoundary = request.Substring(0, request.IndexOf("Content-Disposition: form-data;"
                     , StringComparison.Ordinal)).Replace("\r\n", "");
-                if (data.Contains(_webKitFormBoundary + "--\r\n"))
-                {
                     data = request.Substring(data.IndexOf("Content-Type: "
                         , StringComparison.Ordinal));
                     data = data.Substring(data.IndexOf("\r\n\r\n"
                         , StringComparison.Ordinal) + 4);
-                    data = data.Substring(data.IndexOf("\r\n"
-                        , StringComparison.Ordinal) + 2);
+                if (data.Contains(_webKitFormBoundary + "--\r\n"))
+                {
                     data = data.Replace(_webKitFormBoundary + "--\r\n", "");
-                    serverProperties.Io.PrintToFile(data, _writingPath);
                 }
+                serverProperties.Io.PrintToFile(data, _writingPath);
             }
             else
             {
@@ -58,7 +56,7 @@ namespace Server.Core
             return httpResponse;
         }
 
-        private bool GetPath(string request, ServerProperties serverProperties)
+        private bool SetPath(string request, ServerProperties serverProperties)
         {
             var directory = CleanPost(request, "name=\"saveLocation\"\r\n\r\n", "\r\n");
             if (!directory.EndsWith("/"))

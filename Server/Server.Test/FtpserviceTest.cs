@@ -121,7 +121,7 @@ namespace Server.Test
             request.Append("Content-Type: image/png\r\n\r\n?PNG\r\n");
             data.Append(
                 "Hello");
-            data.Append("\r\n------WebKitFormBoundaryVfPQpsTmmlrqQLLg--");
+            data.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg--\r\n");
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(false);
             var io = new MockPrinter();
@@ -132,6 +132,7 @@ namespace Server.Test
             ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
             var httpResponces = ftpservice.ProcessRequest(data.ToString(), new HttpResponse(), properties);
             Assert.Equal("201 Created", httpResponces.HttpStatusCode);
+            io.VerifyPrintToFile("?PNG\r\n", "c:/" + gid + ".txt");
             io.VerifyPrintToFile("Hello", "c:/" + gid + ".txt");
         }
 
@@ -139,7 +140,6 @@ namespace Server.Test
         public void Send_Data_Post_Request_Save_File_Small_Request()
         {
             var request = new StringBuilder();
-            var data = new StringBuilder();
             var gid = Guid.NewGuid();
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             request.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
@@ -157,10 +157,9 @@ namespace Server.Test
                 new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), io);
             var ftpservice = new Ftpservice();
 
-            ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
-            var httpResponces = ftpservice.ProcessRequest(data.ToString(), new HttpResponse(), properties);
+            var httpResponces = ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
             Assert.Equal("201 Created", httpResponces.HttpStatusCode);
-            io.VerifyPrintToFile("Hello", "c:/" + gid + ".txt");
+            io.VerifyPrintToFile("?PNG\r\nHello", "c:/" + gid + ".txt");
         }
     }
 }
