@@ -5,8 +5,8 @@ namespace Server.Core
 {
     public class Ftpservice : IHttpServiceProcessor
     {
-        private string _webKitFormBoundary;
-        private string _writingPath = "";
+        private string WebKitFormBoundary { get; set; }
+        private string WritingPath { get; set; }
 
         public bool CanProcessRequest(string request, ServerProperties serverProperties)
         {
@@ -27,44 +27,40 @@ namespace Server.Core
             var data = request;
             if (request.Contains("name=\"saveLocation\""))
             {
-                if (SetPath(request, serverProperties))
+                var directory = CleanPost(request, "name=\"saveLocation\"\r\n\r\n", "\r\n");
+                if (!directory.EndsWith("/"))
+                    directory += "/";
+                var file = CleanPost(request, "filename=\"", "\"\r\n");
+                WritingPath = directory + file;
+                if (serverProperties.FileReader.Exists(WritingPath))
                 {
                     httpResponse.HttpStatusCode = "409 Conflict";
                     return httpResponse;
                 }
-                _webKitFormBoundary = request.Substring(0, request.IndexOf("Content-Disposition: form-data;"
+                WebKitFormBoundary = request.Substring(0, request.IndexOf("Content-Disposition: form-data;"
                     , StringComparison.Ordinal)).Replace("\r\n", "");
                     data = request.Substring(data.IndexOf("Content-Type: "
                         , StringComparison.Ordinal));
                     data = data.Substring(data.IndexOf("\r\n\r\n"
                         , StringComparison.Ordinal) + 4);
-                if (data.Contains(_webKitFormBoundary + "--\r\n"))
+                if (data.Contains(WebKitFormBoundary + "--\r\n"))
                 {
-                    data = data.Replace(_webKitFormBoundary + "--\r\n", "");
+                    data = data.Replace(WebKitFormBoundary + "--\r\n", "");
                 }
-                serverProperties.Io.PrintToFile(data, _writingPath);
+                serverProperties.Io.PrintToFile(data, WritingPath);
             }
             else
             {
-                if (data.Contains(_webKitFormBoundary + "--\r\n"))
+                if (data.Contains(WebKitFormBoundary + "--\r\n"))
                 {
-                    data = data.Replace(_webKitFormBoundary + "--\r\n", "");
+                    data = data.Replace(WebKitFormBoundary + "--\r\n", "");
                 }
-                serverProperties.Io.PrintToFile(data, _writingPath);
+                serverProperties.Io.PrintToFile(data, WritingPath);
             }
             httpResponse.HttpStatusCode = "201 Created";
             return httpResponse;
         }
 
-        private bool SetPath(string request, ServerProperties serverProperties)
-        {
-            var directory = CleanPost(request, "name=\"saveLocation\"\r\n\r\n", "\r\n");
-            if (!directory.EndsWith("/"))
-                directory += "/";
-            var file = CleanPost(request, "filename=\"", "\"\r\n");
-            _writingPath = directory + file;
-            return serverProperties.FileReader.Exists(_writingPath);
-        }
 
         private string CleanPost(string request, string head, string tail)
         {
