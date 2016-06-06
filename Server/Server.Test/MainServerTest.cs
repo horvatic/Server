@@ -24,6 +24,21 @@ namespace Server.Test
         }
 
         [Fact]
+        public void Get_Empty_Request_With_Other_Name_Space()
+        {
+            var mockRead = new MockDirectoryProcessor();
+            var zSocket = new MockZSocket()
+                .StubSentToReturn(10)
+                .StubReceive("")
+                .StubConnect(true);
+            zSocket = zSocket.StubAcceptObject(zSocket);
+            var properties = new ServerProperties("", new MockDirectoryProcessor(),
+                new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+            var dirServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()), new List<string> {"Space"});
+            dirServer.Run();
+        }
+
+        [Fact]
         public void Web_Server_No_Longer_Taking_Request()
         {
             var mockRead = new MockDirectoryProcessor()

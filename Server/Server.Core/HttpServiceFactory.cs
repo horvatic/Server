@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -13,19 +14,26 @@ namespace Server.Core
             _defaultService = defaultService;
         }
 
-        public IHttpServiceProcessor GetService(string canProcess, Assembly currentAssembly, string currentNameSpace,
+        public IHttpServiceProcessor GetService(string canProcess, Assembly currentAssembly, List<string> nameSpaces,
             ServerProperties serverProperties)
         {
-            var typelist = GetTypesInNamespace(currentAssembly, currentNameSpace);
-            return
-                typelist.Where(t => t.GetInterface("IHttpServiceProcessor", true) != null)
+            foreach (var processingService in from currentNameSpace in nameSpaces
+                let typelist = GetTypesInNamespace(currentAssembly, currentNameSpace)
+                select typelist.Where(t => t.GetInterface("IHttpServiceProcessor", true) 
+                != null)
                     .Select(
                         t =>
                             (IHttpServiceProcessor)
                                 Activator.CreateInstance(currentAssembly.ToString(),
                                     currentNameSpace + "." + t.Name).Unwrap())
-                    .FirstOrDefault(service => service.CanProcessRequest(canProcess, serverProperties)) ??
-                _defaultService;
+                    .FirstOrDefault(service => service.CanProcessRequest(canProcess, serverProperties))
+                into processingService
+                where processingService != null
+                select processingService)
+            {
+                return processingService;
+            }
+            return _defaultService;
         }
 
         private Type[] GetTypesInNamespace(Assembly assembly, string nameSpace)
