@@ -92,7 +92,7 @@ namespace Server.Core
 
         private void RequestWithMultiPart(Guid id, string request, IZSocket handler, int packageSize)
         {
-            var requestPacket = "";
+            var requestPacket = request;
             var packetSplit = GetPacketSplit(request);
             if (!request.EndsWith($"------{packetSplit}--\r\n"))
                 requestPacket += handler.Receive();
@@ -103,12 +103,10 @@ namespace Server.Core
             var processor = _serviceFactory.GetService(request, Assembly.GetExecutingAssembly(), "Server.Core",
                 _properties);
 
-            _properties.Io.Print(requestPacket);
             while (!requestPacket.EndsWith($"------{packetSplit}--\r\n"))
             {
                 var packet = handler.Receive();
                 requestPacket += packet;
-                _properties.Io.Print(packet);
             }
             httpResponce = processor.ProcessRequest(requestPacket, httpResponce, _properties);
             SendResponce(handler, httpResponce, id);

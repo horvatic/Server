@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Text;
 using Server.Core;
 using Xunit;
@@ -24,7 +23,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var ftpservice = new Ftpservice();
 
             Assert.True(ftpservice.CanProcessRequest(getRequest, properties));
@@ -36,7 +36,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var ftpservice = new Ftpservice();
 
             var httpResponces = ftpservice.ProcessRequest("GET /upload HTTP/1.1", new HttpResponse(), properties);
@@ -75,7 +76,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(false);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var ftpservice = new Ftpservice();
 
             var httpResponces = ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
@@ -99,7 +101,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var ftpservice = new Ftpservice();
 
             var httpResponces = ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
@@ -127,17 +130,30 @@ namespace Server.Test
             var properties = new ServerProperties(@"c:/",
                 new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), io);
             var ftpservice = new Ftpservice();
-            
+
             var httpResponces = ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
             Assert.Equal("201 Created", httpResponces.HttpStatusCode);
             io.VerifyPrintToFile("?PNG\r\nHello", "c:/" + gid + ".txt");
         }
 
         [Fact]
-        public void Send_Data_Post_Request_Save_File_Small_Request()
+        public void Send_Data_Post_Request_Save_File_With_Header()
         {
             var request = new StringBuilder();
             var gid = Guid.NewGuid();
+            request.Append("POST /upload HTTP/1.1\r\n" +
+                           "Host: localhost: 8080\r\n" +
+                           "Connection: keep-alive\r\n" +
+                           "Content-Length: 79841\r\n" +
+                           "Cache-Control: max-age = 0\r\n" +
+                           "Accept: text/html,application/xhtml+xml,application/xml; q=0.9,image/webp,*/*;q=0.8\r\n" +
+                           "Origin: http://localhost:8080\r\n" +
+                           "Upgrade-Insecure-Requests: 1\r\n" +
+                           "User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36\r\n" +
+                           "Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n" +
+                           "Referer: http://localhost:8080/upload" +
+                           "Accept-Encoding: gzip, deflate" +
+                           "Accept-Language: en-US,en;q=0.8\r\n\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             request.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
             request.Append("c:/\r\n");

@@ -317,6 +317,53 @@ namespace Server.Test
         }
 
         [Fact]
+        public void Handles_Request_Split_Half_InHeader()
+        {
+            var gid = Guid.NewGuid();
+            var message = new Queue<string>();
+            var request = "POST /upload HTTP/1.1\r\n" +
+                          "Host: localhost: 8080\r\n" +
+                          "Connection: keep-alive\r\n" +
+                          "Content-Length: 79841\r\n" +
+                          "Cache-Control: max-age = 0\r\n" +
+                          "Accept: text/html,application/xhtml+xml,application/xml; q=0.9,image/webp,*/*;q=0.8\r\n" +
+                          "Origin: http://localhost:8080\r\n" +
+                          "Upgrade-Insecure-Requests: 1\r\n" +
+                          "User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36\r\n" +
+                          "Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryGeqPPReAkwpcPO8e\r\n" +
+                          "Referer: http://localhost:8080/upload" +
+                          "Accept-Encoding: gzip, deflate" +
+                          "Accept-Language: en-US,en;q=0.8\r\n\r\n" +
+                          "------WebKitFormBoundaryGeqPPReAkwpcPO8e\r\n" +
+                          @"Content-Disposition: form-data; name=""saveLocation""" + "\r\n\r\n" +
+                          "c:/\r\n" +
+                          "------WebKitFormBoundaryGeqPPReAkwpcPO8e\r\n" +
+                          @"Content-Disposition: form-data; name=""fileToUpload""; filename="""+gid+".txt\"" + "\r\n" +
+                          "Content-Type: plan/txt\r\n\r\n";
+            message.Enqueue(request);
+            var packet = "Hello\r\n" + "------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n";
+            message.Enqueue(packet);
+
+
+
+
+            var mockRead = new MockDirectoryProcessor();
+            var mockFileReader = new MockFileProcessor();
+            var zSocket = new MockZSocket().StubReceiveWithQueue(message)
+                .StubSentToReturn(10)
+                .StubConnect(true);
+            zSocket = zSocket.StubAcceptObject(zSocket);
+            var printer = new MockPrinter();
+            var properties = new ServerProperties(@"Home", mockRead,
+                mockFileReader, 8080, new HttpResponse(), new ServerTime(), printer);
+            var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
+            server.RunningProcess(zSocket, gid);
+
+            printer.VerifyPrintToFile("Hello\r\n", "c:/" + gid + ".txt");
+            zSocket.VerifyManyReceive(2);
+        }
+
+        [Fact]
         public void Handles_Request_Less_Than_8192_Bytes()
         {
             var message = new Queue<string>();
