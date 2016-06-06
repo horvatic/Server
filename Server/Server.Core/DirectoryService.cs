@@ -17,7 +17,7 @@ namespace Server.Core
                 return false;
             }
             return serverProperties.CurrentDir != null &&
-                   serverProperties.DirReader.Exists(serverProperties.CurrentDir + requestItem);
+                   serverProperties.DirReader.Exists(serverProperties.CurrentDir + requestItem.Substring(1));
         }
 
         public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
@@ -35,10 +35,10 @@ namespace Server.Core
         private string CleanRequest(string request)
         {
             if (request.Contains("HTTP/1.1"))
-                return request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
+                return "/" + request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
                     request.IndexOf(" HTTP/1.1", StringComparison.Ordinal) - 5)
                     .Replace("%20", " ");
-            return request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
+            return "/" + request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
                 request.IndexOf(" HTTP/1.0", StringComparison.Ordinal) - 5)
                 .Replace("%20", " ");
         }
