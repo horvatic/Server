@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using Server.Core;
 using Xunit;
@@ -34,7 +35,10 @@ namespace Server.Test
             zSocket = zSocket.StubAcceptObject(zSocket);
             var properties = new ServerProperties("", new MockDirectoryProcessor(),
                 new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
-            var dirServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()), new List<string> {"Space"});
+            var dirServer = new MainServer(zSocket, properties, 
+                new HttpServiceFactory(new Service404()), 
+                new List<string> {"Space"},
+                new List<Assembly>() {Assembly.GetAssembly(typeof(MainServer))});
             dirServer.Run();
         }
 
