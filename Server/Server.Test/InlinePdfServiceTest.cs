@@ -18,7 +18,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var inlinePdfService = new InlinePdfService();
 
             Assert.True(inlinePdfService.CanProcessRequest(getRequest, properties));
@@ -32,7 +33,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var inlinePdfService = new InlinePdfService();
 
             Assert.False(inlinePdfService.CanProcessRequest(getRequest, properties));
@@ -45,10 +47,12 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor().StubReadAllBytes(largeBtyeArray);
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var inlinePdfService = new InlinePdfService();
 
-            var httpResponces = inlinePdfService.ProcessRequest("GET /hello.pdf HTTP/1.1", new HttpResponse(), properties);
+            var httpResponces = inlinePdfService.ProcessRequest("GET /hello.pdf HTTP/1.1", new HttpResponse(),
+                properties);
 
             Assert.Equal(httpResponces.FilePath, "c:/" + "hello.pdf");
             Assert.Equal(httpResponces.ContentDisposition, "inline");
@@ -63,16 +67,17 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor().StubReadAllBytes(largeBtyeArray);
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var inlinePdfService = new InlinePdfService();
 
-            var httpResponces = inlinePdfService.ProcessRequest("GET /hello.pdf HTTP/1.1", new HttpResponse(), properties);
+            var httpResponces = inlinePdfService.ProcessRequest("GET /hello.pdf HTTP/1.1", new HttpResponse(),
+                properties);
 
             Assert.Equal(httpResponces.FilePath, "c:/" + "hello.pdf");
             Assert.Equal(httpResponces.ContentDisposition, "attachment");
             Assert.Equal(httpResponces.Filename, "hello.pdf");
             Assert.Equal(httpResponces.ContentType, "application/octet-stream");
         }
-
     }
 }

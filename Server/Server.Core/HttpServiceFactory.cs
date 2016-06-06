@@ -7,6 +7,7 @@ namespace Server.Core
     public class HttpServiceFactory
     {
         private readonly IHttpServiceProcessor _defaultService;
+
         public HttpServiceFactory(IHttpServiceProcessor defaultService)
         {
             _defaultService = defaultService;
@@ -23,7 +24,8 @@ namespace Server.Core
                             (IHttpServiceProcessor)
                                 Activator.CreateInstance(currentAssembly.ToString(),
                                     currentNameSpace + "." + t.Name).Unwrap())
-                    .FirstOrDefault(service => service.CanProcessRequest(canProcess, serverProperties)) ?? _defaultService;
+                    .FirstOrDefault(service => service.CanProcessRequest(canProcess, serverProperties)) ??
+                _defaultService;
         }
 
         private Type[] GetTypesInNamespace(Assembly assembly, string nameSpace)

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Server.Core
 {
@@ -16,7 +12,8 @@ namespace Server.Core
                    requestItem.EndsWith(".pdf");
         }
 
-        public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse, ServerProperties serverProperties)
+        public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
+            ServerProperties serverProperties)
         {
             var requestItem = CleanRequest(request);
             httpResponse.HttpStatusCode = "200 OK";

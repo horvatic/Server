@@ -23,7 +23,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(),
                 new MockPrinter());
             var ftpservice = new Ftpservice();
 
@@ -36,7 +37,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(),
                 new MockPrinter());
             var ftpservice = new Ftpservice();
 
@@ -76,7 +78,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(false);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(),
                 new MockPrinter());
             var ftpservice = new Ftpservice();
 
@@ -101,7 +104,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(),
                 new MockPrinter());
             var ftpservice = new Ftpservice();
 
@@ -142,7 +146,8 @@ namespace Server.Test
             mockFileSearch.StubExists(false);
             var io = new MockPrinter();
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), io);
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(), io);
             var ftpservice = new Ftpservice();
 
             var httpResponces = ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
@@ -181,7 +186,8 @@ namespace Server.Test
             mockFileSearch.StubExists(false);
             var io = new MockPrinter();
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), io);
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(), io);
             var ftpservice = new Ftpservice();
 
             var httpResponces = ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
@@ -221,7 +227,8 @@ namespace Server.Test
             mockFileSearch.StubExists(false);
             var io = new MockPrinter();
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), io);
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(), io);
             var ftpservice = new Ftpservice();
 
             ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
@@ -262,7 +269,8 @@ namespace Server.Test
             mockFileSearch.StubExists(false);
             var io = new MockPrinter();
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), io);
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(), io);
             var ftpservice = new Ftpservice();
 
             ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
@@ -304,7 +312,8 @@ namespace Server.Test
             mockFileSearch.StubExists(false);
             var io = new MockPrinter();
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), io);
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(), io);
             var ftpservice = new Ftpservice();
 
             ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
@@ -345,7 +354,8 @@ namespace Server.Test
             mockFileSearch.StubExists(false);
             var io = new MockPrinter();
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), io);
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(), io);
             var ftpservice = new Ftpservice();
 
             ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
@@ -386,7 +396,8 @@ namespace Server.Test
             mockFileSearch.StubExists(false);
             var io = new MockPrinter();
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), io);
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(), io);
             var ftpservice = new Ftpservice();
 
             ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
@@ -424,7 +435,7 @@ namespace Server.Test
             request.Append("Hello\r\n------WebKitFormBoundaryVfPQpsTmmlrqQLLg--\r\n");
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(false);
-            var mockDirectoySearch = new MockDirectoryProcessor().StubExists(false); 
+            var mockDirectoySearch = new MockDirectoryProcessor().StubExists(false);
             var io = new MockPrinter();
             var properties = new ServerProperties(@"c:/",
                 mockDirectoySearch, mockFileSearch, 5555, new HttpResponse(), new ServerTime(), io);

@@ -1,5 +1,4 @@
-﻿using System;
-using Moq;
+﻿using Moq;
 using Server.Core;
 
 namespace Server.Test
@@ -35,10 +34,12 @@ namespace Server.Test
         {
             _mock.Verify(m => m.Run(), Times.Once);
         }
+
         public void VerifyAcceptingNewConn()
         {
             _mock.Verify(m => m.AcceptingNewConn, Times.AtLeastOnce);
         }
+
         public void VerifyStopNewConnAndCleanUp()
         {
             _mock.Verify(m => m.StopNewConnAndCleanUp(), Times.AtLeastOnce);

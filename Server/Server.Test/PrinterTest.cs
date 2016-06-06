@@ -2,6 +2,7 @@
 using System.IO;
 using Server.Core;
 using Xunit;
+
 namespace Server.Test
 {
     public class PrinterTest
@@ -29,11 +30,10 @@ namespace Server.Test
             var gid = Guid.NewGuid();
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-            var io = new Printer {Log = "c:/" + gid + ".txt" };
+            var io = new Printer {Log = "c:/" + gid + ".txt"};
             io.Print("Hello");
             Assert.True(File.Exists("c:/" + gid + ".txt"));
             File.Delete("c:/" + gid + ".txt");
-
         }
 
         [Fact]
@@ -44,7 +44,6 @@ namespace Server.Test
             io.PrintToFile("Hello", "c:/" + gid + ".txt");
             Assert.True(File.Exists("c:/" + gid + ".txt"));
             File.Delete("c:/" + gid + ".txt");
-
         }
     }
 }

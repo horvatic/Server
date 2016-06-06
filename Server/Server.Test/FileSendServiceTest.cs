@@ -20,7 +20,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var fileSendService = new FileSendService();
 
             Assert.True(fileSendService.CanProcessRequest(getRequest, properties));
@@ -35,7 +36,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var fileSendService = new FileSendService();
 
             Assert.False(fileSendService.CanProcessRequest(getRequest, properties));
@@ -47,7 +49,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var fileSendService = new FileSendService();
 
             var httpResponces = fileSendService.ProcessRequest("GET /hello.exe HTTP/1.1", new HttpResponse(), properties);
@@ -65,7 +68,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var fileSendService = new FileSendService();
             var correctOutput = new StringBuilder();
             correctOutput.Append(@"<!DOCTYPE html>");
@@ -75,7 +79,8 @@ namespace Server.Test
             correctOutput.Append(@"<h1>403 Forbidden, Can not process request on port 5555</h1>");
             correctOutput.Append(@"</body>");
             correctOutput.Append(@"</html>");
-            var httpResponces = fileSendService.ProcessRequest("GET /pagefile.sys HTTP/1.1", new HttpResponse(), properties);
+            var httpResponces = fileSendService.ProcessRequest("GET /pagefile.sys HTTP/1.1", new HttpResponse(),
+                properties);
 
             Assert.Equal(correctOutput.ToString(), httpResponces.Body);
             Assert.Equal("403 Forbidden", httpResponces.HttpStatusCode);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Server.Core;
 using Xunit;
@@ -224,7 +223,7 @@ namespace Server.Test
             printLog.VerifyPrint("[10am] [<" + gid + ">] 200 OK");
         }
 
-      
+
         [Fact]
         public void Handles_Request_Larger_Than_8192_Bytes()
         {
@@ -338,13 +337,12 @@ namespace Server.Test
                           @"Content-Disposition: form-data; name=""saveLocation""" + "\r\n\r\n" +
                           "c:/\r\n" +
                           "------WebKitFormBoundaryGeqPPReAkwpcPO8e\r\n" +
-                          @"Content-Disposition: form-data; name=""fileToUpload""; filename="""+gid+".txt\"" + "\r\n" +
+                          @"Content-Disposition: form-data; name=""fileToUpload""; filename=""" + gid + ".txt\"" +
+                          "\r\n" +
                           "Content-Type: plan/txt\r\n\r\n";
             message.Enqueue(request);
             var packet = "Hello\r\n" + "------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n";
             message.Enqueue(packet);
-
-
 
 
             var mockRead = new MockDirectoryProcessor().StubExists(true);
@@ -417,7 +415,6 @@ namespace Server.Test
 
             zSocket.VerifyManyReceive(1);
         }
-
 
 
         public string GetRequest()

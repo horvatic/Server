@@ -70,7 +70,7 @@ namespace Server.Test
             var endPoint = new IPEndPoint((IPAddress.Loopback), 50321);
             var zSocket = new ZSocket(endPoint);
             var properties = new ServerProperties("c:/", new DirectoryProcessor(),
-               new FileProcessor(), 50321, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new FileProcessor(), 50321, new HttpResponse(), new ServerTime(), new MockPrinter());
             var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
             new Thread(() => RunServerNoUntilEndRequest(testingServer)).Start();
 
@@ -87,7 +87,7 @@ namespace Server.Test
             var endPoint = new IPEndPoint((IPAddress.Loopback), 45418);
             var zSocket = new ZSocket(endPoint);
             var properties = new ServerProperties("c:/", new DirectoryProcessor(),
-               new FileProcessor(), 45418, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new FileProcessor(), 45418, new HttpResponse(), new ServerTime(), new MockPrinter());
             var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
             var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));
             testServerThread.Start();
