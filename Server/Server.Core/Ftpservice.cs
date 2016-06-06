@@ -12,7 +12,7 @@ namespace Server.Core
         public bool CanProcessRequest(string request, ServerProperties serverProperties)
         {
             var requestItem = CleanRequest(request);
-            return requestItem == "upload";
+            return requestItem == "/upload";
         }
 
         public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
@@ -191,10 +191,10 @@ namespace Server.Core
             var parseVaulue = request.Contains("GET") ? "GET" : "POST";
             var offsets = request.Contains("GET") ? 5 : 6;
             if (request.Contains("HTTP/1.1"))
-                return request.Substring(request.IndexOf(parseVaulue + " /", StringComparison.Ordinal) + offsets,
+                return "/" + request.Substring(request.IndexOf(parseVaulue + " /", StringComparison.Ordinal) + offsets,
                     request.IndexOf(" HTTP/1.1", StringComparison.Ordinal) - offsets)
                     .Replace("%20", " ");
-            return request.Substring(request.IndexOf(parseVaulue + " /", StringComparison.Ordinal) + offsets,
+            return "/" + request.Substring(request.IndexOf(parseVaulue + " /", StringComparison.Ordinal) + offsets,
                 request.IndexOf(" HTTP/1.0", StringComparison.Ordinal) - offsets)
                 .Replace("%20", " ");
         }
