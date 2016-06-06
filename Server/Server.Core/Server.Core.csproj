@@ -59,6 +59,7 @@
     <Compile Include="InlineTextDocService.cs" />
     <Compile Include="IPrinter.cs" />
     <Compile Include="IServerTime.cs" />
+    <Compile Include="PoolDataForRequest.cs" />
     <Compile Include="Printer.cs" />
     <Compile Include="ServerProperties.cs" />
     <Compile Include="ServerTime.cs" />

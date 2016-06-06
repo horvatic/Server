@@ -19,6 +19,7 @@ namespace Server.Core
             _socket = socket;
             _properties = properties;
             _serviceFactory = serviceFactory;
+            ThreadPool.SetMaxThreads(100, 100);
         }
 
         public bool AcceptingNewConn { get; private set; }
@@ -29,7 +30,8 @@ namespace Server.Core
             {
                 if (!AcceptingNewConn) return;
                 var handler = _socket.Accept();
-                new Thread(() => RunningProcess(handler, Guid.NewGuid())).Start();
+                ThreadPool.QueueUserWorkItem(RunningProcess,
+                    new PoolDataForRequest(handler, Guid.NewGuid()));
             }
             catch (Exception)
             {
@@ -37,8 +39,10 @@ namespace Server.Core
             }
         }
 
-        public void RunningProcess(IZSocket handler, Guid id)
+        public void RunningProcess(object poolIdAndSocket)
         {
+            var handler = ((PoolDataForRequest) poolIdAndSocket).Handler;
+            var id = ((PoolDataForRequest) poolIdAndSocket).Id;
             Interlocked.Increment(ref _numberOfThreads);
             try
             {
@@ -103,7 +107,7 @@ namespace Server.Core
             while (!requestPacket.EndsWith($"------{packetSplit}--\r\n"))
             {
                 requestPacket = handler.Receive();
-                if(httpResponce.HttpStatusCode != "409 Conflict")
+                if (httpResponce.HttpStatusCode != "409 Conflict")
                     httpResponce = processor.ProcessRequest(requestPacket, httpResponce, _properties);
             }
             SendResponce(handler, httpResponce, id);

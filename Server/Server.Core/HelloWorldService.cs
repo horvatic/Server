@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Configuration;
+using System.Linq;
 using System.Text;
 
 namespace Server.Core
@@ -7,6 +9,12 @@ namespace Server.Core
     {
         public bool CanProcessRequest(string request, ServerProperties serverProperties)
         {
+            var requestItem = CleanRequest(request);
+            var configManager = ConfigurationManager.AppSettings;
+            if (configManager.AllKeys.Any(key => requestItem.EndsWith(configManager[key])))
+            {
+                return false;
+            }
             return ((request.Contains("GET / HTTP/1.1") || request.Contains("GET / HTTP/1.0")) && serverProperties.CurrentDir == null);
         }
 
@@ -22,6 +30,17 @@ namespace Server.Core
             helloWorldHtml.Append(@"</html>");
             httpResponse.Body = helloWorldHtml.ToString();
             return httpResponse;
+        }
+
+        private string CleanRequest(string request)
+        {
+            if (request.Contains("HTTP/1.1"))
+                return request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
+                    request.IndexOf(" HTTP/1.1", StringComparison.Ordinal) - 5)
+                    .Replace("%20", " ");
+            return request.Substring(request.IndexOf("GET /", StringComparison.Ordinal) + 5,
+                request.IndexOf(" HTTP/1.0", StringComparison.Ordinal) - 5)
+                .Replace("%20", " ");
         }
     }
 }

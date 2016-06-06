@@ -89,7 +89,7 @@ namespace Server.Test
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
             var server = new MainServer(zSocket, serverProperties, new HttpServiceFactory(new Service404()));
-            server.RunningProcess(zSocket, Guid.NewGuid());
+            server.RunningProcess(new PoolDataForRequest(zSocket, Guid.NewGuid()));
             zSocket.VerifyReceive();
             zSocket.VerifySend("HTTP/1.1 200 OK\r\n");
             zSocket.VerifySend("Content-Type: text/html\r\n");
@@ -118,7 +118,7 @@ namespace Server.Test
             var serverProperties = new ServerProperties(null, new MockDirectoryProcessor(), new FileProcessor(), 5555,
                 new HttpResponse(), new ServerTime(), new MockPrinter());
             var server = new MainServer(zSocket, serverProperties, new HttpServiceFactory(new Service404()));
-            server.RunningProcess(zSocket, Guid.NewGuid());
+            server.RunningProcess(new PoolDataForRequest(zSocket, Guid.NewGuid()));
             zSocket.VerifyReceive();
             zSocket.VerifySend("HTTP/1.1 404 Not Found\r\n");
             zSocket.VerifySend("Content-Type: text/html\r\n");
@@ -145,7 +145,7 @@ namespace Server.Test
             var properties = new ServerProperties(@"Home", mockRead,
                 new MockFileProcessor(), 8080, new HttpResponse(), new ServerTime(), new MockPrinter());
             var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
-            server.RunningProcess(zSocket, Guid.NewGuid());
+            server.RunningProcess(new PoolDataForRequest(zSocket, Guid.NewGuid()));
 
             var correctOutput = new StringBuilder();
             correctOutput.Append(@"<!DOCTYPE html>");
@@ -186,7 +186,7 @@ namespace Server.Test
             var properties = new ServerProperties(@"Home", mockRead,
                 mockFileReader, 8080, new HttpResponse(), new ServerTime(), new MockPrinter());
             var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
-            server.RunningProcess(zSocket, Guid.NewGuid());
+            server.RunningProcess(new PoolDataForRequest(zSocket, Guid.NewGuid()));
             mockFileReader.VerifyReadAllBytes("Home/NotHome");
             zSocket.VerifyReceive();
             zSocket.VerifySend("HTTP/1.1 200 OK\r\n");
@@ -219,7 +219,7 @@ namespace Server.Test
                 mockFileReader, 8080, new HttpResponse(), mockTime, printLog);
             var server = new MainServer(zSocket, properties,
                 new HttpServiceFactory(new MockHttpService().StubProcessRequest(new HttpResponse())));
-            server.RunningProcess(zSocket, gid);
+            server.RunningProcess(new PoolDataForRequest(zSocket, gid));
             printLog.VerifyPrint("[10am] [<" + gid + ">] GET /NotHome HTTP/1.1");
             printLog.VerifyPrint("[10am] [<" + gid + ">] 200 OK");
         }
@@ -265,7 +265,7 @@ namespace Server.Test
                 mockFileReader, 8080, new HttpResponse(), new ServerTime(), new MockPrinter());
             var server = new MainServer(zSocket, properties,
                 new HttpServiceFactory(new MockHttpService().StubProcessRequest(new HttpResponse())));
-            server.RunningProcess(zSocket, Guid.NewGuid());
+            server.RunningProcess(new PoolDataForRequest(zSocket, Guid.NewGuid()));
 
             zSocket.VerifyManyReceive(11);
         }
@@ -311,7 +311,7 @@ namespace Server.Test
             var server = new MainServer(zSocket, properties,
                 new HttpServiceFactory(
                     new MockHttpService().StubProcessRequest(new HttpResponse {HttpStatusCode = "404"})));
-            server.RunningProcess(zSocket, Guid.NewGuid());
+            server.RunningProcess(new PoolDataForRequest(zSocket, Guid.NewGuid()));
 
             zSocket.VerifyManyReceive(11);
         }
@@ -357,7 +357,7 @@ namespace Server.Test
             var properties = new ServerProperties(@"Home", mockRead,
                 mockFileReader, 8080, new HttpResponse(), new ServerTime(), printer);
             var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
-            server.RunningProcess(zSocket, gid);
+            server.RunningProcess(new PoolDataForRequest(zSocket, gid));
 
             printer.VerifyPrintToFile("Hello", "c:/" + gid + ".txt");
             zSocket.VerifyManyReceive(2);
@@ -393,7 +393,7 @@ namespace Server.Test
             var properties = new ServerProperties(@"Home", mockRead,
                 mockFileReader, 8080, new HttpResponse(), new ServerTime(), new MockPrinter());
             var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
-            server.RunningProcess(zSocket, Guid.NewGuid());
+            server.RunningProcess(new PoolDataForRequest(zSocket, Guid.NewGuid()));
 
             zSocket.VerifyManyReceive(2);
         }
@@ -413,7 +413,7 @@ namespace Server.Test
             var properties = new ServerProperties(@"Home", mockRead,
                 mockFileReader, 8080, new HttpResponse(), new ServerTime(), new MockPrinter());
             var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
-            server.RunningProcess(zSocket, Guid.NewGuid());
+            server.RunningProcess(new PoolDataForRequest(zSocket, Guid.NewGuid()));
 
             zSocket.VerifyManyReceive(1);
         }

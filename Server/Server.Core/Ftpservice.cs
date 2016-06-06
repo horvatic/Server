@@ -5,10 +5,9 @@ namespace Server.Core
 {
     public class Ftpservice : IHttpServiceProcessor
     {
-        private string _packetBound;
         private string _directory;
         private string _file;
-        private bool _removedContentType = false;
+        private string _packetBound;
 
         public bool CanProcessRequest(string request, ServerProperties serverProperties)
         {
@@ -61,37 +60,36 @@ namespace Server.Core
             SetDirectoryAndFile(data);
             if (_directory != null && _file != null
                 && (!serverProperties.DirReader.Exists(_directory)
-                || serverProperties.FileReader.Exists(_directory + _file))
+                    || serverProperties.FileReader.Exists(_directory + _file))
                 )
             {
                 httpResponse.HttpStatusCode = "409 Conflict";
                 httpResponse.Body = PostWebPage("Could not make item");
                 return httpResponse;
             }
-            if(_directory != null && _file != null
+            if (_directory != null && _file != null
                 && data.Contains("Content-Type: "))
                 return ProcessData(data, httpResponse,
-                        serverProperties);
+                    serverProperties);
             return httpResponse;
         }
-        
+
 
         private string RemoveContentDisposition(string data)
         {
             var processedData = data;
             processedData = processedData
                 .Substring(processedData.IndexOf("Content-Disposition: form-data;"
-                + @" name=""fileToUpload"""
+                                                 + @" name=""fileToUpload"""
                     , StringComparison.Ordinal));
             processedData = processedData.Substring(processedData.IndexOf("\r\n"
-                    , StringComparison.Ordinal) + 2 );
+                , StringComparison.Ordinal) + 2);
             return processedData;
         }
 
         private string RemoveContentType(string data)
         {
             var processedData = data;
-            _removedContentType = true;
             processedData = processedData.Substring(data.IndexOf("Content-Type: "
                 , StringComparison.Ordinal));
             processedData = processedData.Substring(data.IndexOf("\r\n\r\n"
@@ -105,7 +103,7 @@ namespace Server.Core
             var processedData = data;
             processedData = RemoveContentDisposition(processedData);
             processedData = RemoveContentType(processedData);
-            
+
             return SaveFile(processedData, httpResponse,
                 serverProperties);
         }
@@ -122,7 +120,7 @@ namespace Server.Core
             var sendData = data;
             if (sendData.EndsWith("\r\n------" + _packetBound + "--\r\n"))
                 sendData = sendData.Replace("\r\n------" + _packetBound + "--\r\n", "");
-            serverProperties.Io.PrintToFile(sendData,_directory + _file);
+            serverProperties.Io.PrintToFile(sendData, _directory + _file);
             httpResponse.HttpStatusCode = "201 Created";
             httpResponse.Body = PostWebPage("Item Made");
             return httpResponse;
@@ -130,20 +128,18 @@ namespace Server.Core
 
         private IHttpResponse PostRequest(string request, IHttpResponse httpResponse, ServerProperties serverProperties)
         {
-            var data = request.Contains("POST /upload HTTP/1.1\r\n") 
-                && _directory == null && _file == null
+            var data = request.Contains("POST /upload HTTP/1.1\r\n")
+                       && _directory == null && _file == null
                 ? RemoveHeaderAndSetPacketBound(request)
                 : request;
             if (data == "")
                 return httpResponse;
-            else if((data.Contains(@"Content-Disposition: form-data; name=""saveLocation""") 
-                || data.Contains(@"Content-Disposition: form-data; name=""fileToUpload"""))
-                && ( _directory == null || _file == null))
+            if ((data.Contains(@"Content-Disposition: form-data; name=""saveLocation""")
+                 || data.Contains(@"Content-Disposition: form-data; name=""fileToUpload"""))
+                && (_directory == null || _file == null))
                 return ProcessRequestWithPath(data, httpResponse, serverProperties);
-            else
-                return SaveFile(data, httpResponse,
+            return SaveFile(data, httpResponse,
                 serverProperties);
-
         }
 
 
@@ -224,7 +220,6 @@ namespace Server.Core
         private string PostWebPage(string message)
         {
             return HtmlHeader() + message + "<br>" + UploadPage() + HtmlTail();
-
         }
     }
 }
