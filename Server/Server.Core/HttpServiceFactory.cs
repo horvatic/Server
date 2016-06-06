@@ -14,13 +14,14 @@ namespace Server.Core
             _defaultService = defaultService;
         }
 
-        public IHttpServiceProcessor GetService(string canProcess, Assembly currentAssembly, List<string> nameSpaces,
+        public IHttpServiceProcessor GetService(string canProcess,
+            List<string> nameSpaces, List<Assembly> assemblies,
             ServerProperties serverProperties)
         {
-            foreach (var processingService in from currentNameSpace in nameSpaces
+            foreach (var processingService in assemblies.SelectMany(currentAssembly => (from currentNameSpace in nameSpaces
                 let typelist = GetTypesInNamespace(currentAssembly, currentNameSpace)
                 select typelist.Where(t => t.GetInterface("IHttpServiceProcessor", true) 
-                != null)
+                                           != null)
                     .Select(
                         t =>
                             (IHttpServiceProcessor)
@@ -29,7 +30,7 @@ namespace Server.Core
                     .FirstOrDefault(service => service.CanProcessRequest(canProcess, serverProperties))
                 into processingService
                 where processingService != null
-                select processingService)
+                select processingService)))
             {
                 return processingService;
             }

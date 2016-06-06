@@ -21,8 +21,10 @@ namespace Server.Test
             var serverProperties = new ServerProperties(null, null, null, 5555, new HttpResponse(), new ServerTime(),
                 new MockPrinter());
             var httpFactory = new HttpServiceFactory(new Service404());
-            var gotMockedHttpService = httpFactory.GetService("GET / HTTP/1.1", Assembly.GetExecutingAssembly(),
-                new List<string>() {"Server.Test"}, serverProperties);
+            var gotMockedHttpService = httpFactory.GetService("GET / HTTP/1.1",
+                new List<string>() {"Server.Test"}, 
+                new List<Assembly>() { Assembly.GetExecutingAssembly() },
+                serverProperties);
             Assert.NotNull(gotMockedHttpService);
         }
 
@@ -32,8 +34,10 @@ namespace Server.Test
             var serverProperties = new ServerProperties(null, null, null, 5555, new HttpResponse(), new ServerTime(),
                 new MockPrinter());
             var httpFactory = new HttpServiceFactory(new Service404());
-            var gotMockedHttpService = httpFactory.GetService("GET /upload HTTP/1.1", Assembly.GetAssembly(typeof(Ftpservice)),
-                new List<string>() { "Server.Core", "Server.Test" }, serverProperties);
+            var gotMockedHttpService = httpFactory.GetService("GET /upload HTTP/1.1",
+                new List<string>() { "Server.Core", "Server.Test" }, 
+                new List<Assembly>() { Assembly.GetAssembly(typeof(Ftpservice)), Assembly.GetExecutingAssembly()}, 
+                serverProperties);
             Assert.IsType(typeof(Ftpservice), gotMockedHttpService);
         }
     }

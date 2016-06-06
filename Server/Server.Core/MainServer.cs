@@ -13,9 +13,11 @@ namespace Server.Core
         private readonly HttpServiceFactory _serviceFactory;
         private readonly IZSocket _socket;
         private readonly List<string> _namespaces;
+        private readonly List<Assembly> _assembly;
 
         public MainServer(IZSocket socket, ServerProperties properties, 
-            HttpServiceFactory serviceFactory, List<string> namespaces = null)
+            HttpServiceFactory serviceFactory, List<string> namespaces = null,
+            List<Assembly> assembly = null)
         {
             _numberOfThreads = 0;
             AcceptingNewConn = true;
@@ -23,13 +25,16 @@ namespace Server.Core
             _properties = properties;
             _serviceFactory = serviceFactory;
             ThreadPool.SetMaxThreads(100, 100);
-            if (namespaces != null)
+            if (namespaces != null && assembly != null)
             {
                 namespaces.Add("Server.Core");
                 _namespaces = new List<string>(namespaces);
+                assembly.Add(Assembly.GetExecutingAssembly());
+                _assembly =  new List<Assembly>(assembly);
             }
             else
             {
+                _assembly = new List<Assembly>() {Assembly.GetExecutingAssembly()};
                 _namespaces = new List<string> {"Server.Core"};
             }
         }
@@ -111,7 +116,7 @@ namespace Server.Core
             var requestPacket = request;
             var packetSplit = GetPacketSplit(request);
             var httpResponce = _properties.DefaultResponse.Clone();
-            var processor = _serviceFactory.GetService(request, Assembly.GetExecutingAssembly(), _namespaces,
+            var processor = _serviceFactory.GetService(request, _namespaces, _assembly,
                 _properties);
 
             httpResponce = processor.ProcessRequest(requestPacket, httpResponce, _properties);
@@ -127,7 +132,7 @@ namespace Server.Core
 
         private void NoMultiPart(Guid id, string request, IZSocket handler)
         {
-            var processor = _serviceFactory.GetService(request, Assembly.GetExecutingAssembly(), _namespaces,
+            var processor = _serviceFactory.GetService(request, _namespaces, _assembly,
                 _properties);
             var httpResponce = processor.ProcessRequest(request, _properties.DefaultResponse.Clone(), _properties);
             SendResponce(handler, httpResponce, id);
