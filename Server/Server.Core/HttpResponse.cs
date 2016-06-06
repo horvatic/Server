@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Server.Core
+﻿namespace Server.Core
 {
     public class HttpResponse : IHttpResponse
     {

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
+﻿using System.Collections.Generic;
 using Moq;
 using Server.Core;
 
@@ -9,7 +7,8 @@ namespace Server.Test
     public class MockZSocket : IZSocket
     {
         private readonly Mock<IZSocket> _mock;
-        private Queue<string> _message; 
+        private Queue<string> _message;
+
         public MockZSocket()
         {
             _mock = new Mock<IZSocket>();
@@ -25,6 +24,7 @@ namespace Server.Test
         {
             return _mock.Object.Accept();
         }
+
         public void Close()
         {
             _mock.Object.Close();
@@ -33,7 +33,7 @@ namespace Server.Test
         public string Receive()
         {
             var returnVal = _mock.Object.Receive();
-            if(_message != null) _mock.Setup(m => m.Receive()).Returns(_message.Dequeue);
+            if (_message != null) _mock.Setup(m => m.Receive()).Returns(_message.Dequeue);
             return returnVal;
         }
 
@@ -61,6 +61,7 @@ namespace Server.Test
         {
             _mock.Verify(m => m.Accept(), Times.Never);
         }
+
         public void VerifyAccept()
         {
             _mock.Verify(m => m.Accept(), Times.Once);
@@ -86,6 +87,7 @@ namespace Server.Test
             _mock.Setup(m => m.Send(It.IsAny<string>())).Returns(value);
             return this;
         }
+
         public MockZSocket StubIsBound(bool value)
         {
             _mock.Setup(m => m.Connected()).Returns(value);

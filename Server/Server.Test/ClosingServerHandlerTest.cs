@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using Server.Core;
+﻿using Server.Core;
 using Xunit;
 
 namespace Server.Test
@@ -25,8 +23,6 @@ namespace Server.Test
             closeProcessor.ShutdownProcess(null, null);
             testServer.StopNewConnAndCleanUp();
             //output.Close();
-
-
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Server.Test
         {
             _mock = new Mock<IServerTime>();
         }
+
         public string GetTime()
         {
             return _mock.Object.GetTime();

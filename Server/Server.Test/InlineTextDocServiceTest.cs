@@ -19,7 +19,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var inlineTextDocService = new InlineTextDocService();
 
             Assert.True(inlineTextDocService.CanProcessRequest(getRequest, properties));
@@ -33,7 +34,8 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var inlineTextDocService = new InlineTextDocService();
 
             Assert.False(inlineTextDocService.CanProcessRequest(getRequest, properties));
@@ -45,16 +47,17 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var inlineTextDocService = new InlineTextDocService();
 
-            var httpResponces = inlineTextDocService.ProcessRequest("GET /hello.txt HTTP/1.1", new HttpResponse(), properties);
+            var httpResponces = inlineTextDocService.ProcessRequest("GET /hello.txt HTTP/1.1", new HttpResponse(),
+                properties);
 
             Assert.Equal(httpResponces.FilePath, "c:/" + "hello.txt");
             Assert.Equal(httpResponces.ContentDisposition, "inline");
             Assert.Equal(httpResponces.Filename, "hello.txt");
             Assert.Equal(httpResponces.ContentType, "text/plain");
         }
-
     }
 }

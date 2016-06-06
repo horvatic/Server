@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using Moq;
+﻿using Moq;
 using Server.Core;
 
 namespace Server.Test
@@ -29,6 +28,7 @@ namespace Server.Test
         {
             _mock.Verify(m => m.Print(output), Times.AtLeastOnce);
         }
+
         public void VerifyPrintToFile(string output, string path)
         {
             _mock.Verify(m => m.PrintToFile(output, path), Times.AtLeastOnce);

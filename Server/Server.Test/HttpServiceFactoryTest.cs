@@ -16,9 +16,11 @@ namespace Server.Test
         [Fact]
         public void Make_Mock_Http_Processor_Factory()
         {
-            var serverProperties = new ServerProperties(null, null, null, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+            var serverProperties = new ServerProperties(null, null, null, 5555, new HttpResponse(), new ServerTime(),
+                new MockPrinter());
             var httpFactory = new HttpServiceFactory(new Service404());
-            var gotMockedHttpService = httpFactory.GetService("GET / HTTP/1.1", Assembly.GetExecutingAssembly(), "Server.Test", serverProperties);
+            var gotMockedHttpService = httpFactory.GetService("GET / HTTP/1.1", Assembly.GetExecutingAssembly(),
+                "Server.Test", serverProperties);
             Assert.NotNull(gotMockedHttpService);
         }
     }

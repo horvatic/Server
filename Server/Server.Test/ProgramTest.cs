@@ -98,8 +98,6 @@ namespace Server.Test
             mockPrinter.VerifyPrint(correctOutput.ToString());
         }
 
-        
-
 
         [Fact]
         public void Make_Dirctory_Server_Inncorect_Correct()
@@ -114,7 +112,6 @@ namespace Server.Test
             mockPrinter.VerifyPrint("Not a vaild directory");
         }
 
-        
 
         [Fact]
         public void Make_Hello_World_Server_Correct()
@@ -156,7 +153,7 @@ namespace Server.Test
             correctOutput.Append("Server.exe -d C:/HelloWorld -p 5555\n");
             correctOutput.Append("Server.exe -p 9999");
 
-            var args = new string[] {"-s"};
+            var args = new[] {"-s"};
             var serverMade = Program.MakeServer(args, mockPrinter);
             Assert.Null(serverMade);
             mockPrinter.VerifyPrint(correctOutput.ToString());
@@ -183,7 +180,7 @@ namespace Server.Test
         {
             var mockPrinter = new MockPrinter();
 
-            string[] args = { "-p", "10560", "-l", "c:/TestLog" };
+            string[] args = {"-p", "10560", "-l", "c:/TestLog"};
             var serverMade = Program.MakeServer(args, mockPrinter);
             Assert.Equal("c:/TestLog", mockPrinter.Log);
             Assert.NotNull(serverMade);

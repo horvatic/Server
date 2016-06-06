@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Management.Instrumentation;
 using Server.Core;
 using Xunit;
 

@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System;
+using Moq;
 using Server.Core;
 
 namespace Server.Test
@@ -21,7 +22,7 @@ namespace Server.Test
         {
             if (path == "c:/pagefile.sys")
             {
-                throw new System.Exception();
+                throw new Exception();
             }
             return _mock.Object.ReadAllBytes(path);
         }

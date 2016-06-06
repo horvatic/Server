@@ -1,5 +1,6 @@
-﻿using Xunit;
-using Server.Core;
+﻿using Server.Core;
+using Xunit;
+
 namespace Server.Test
 {
     public class HttpResponseTest
@@ -22,7 +23,6 @@ namespace Server.Test
             Assert.Equal(null, respone.Filename);
             Assert.Equal(null, respone.FilePath);
             Assert.Equal("", respone.Body);
-
         }
 
         [Fact]
@@ -45,7 +45,6 @@ namespace Server.Test
             Assert.Equal("Hello", respone.Filename);
             Assert.Equal("C:/Hello", respone.FilePath);
             Assert.Equal("<p>Hello</p>", respone.Body);
-
         }
     }
 }

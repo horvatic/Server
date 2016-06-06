@@ -9,7 +9,8 @@ namespace Server.Core
             return false;
         }
 
-        public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse, ServerProperties serverProperties)
+        public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
+            ServerProperties serverProperties)
         {
             httpResponse.HttpStatusCode = "404 Not Found";
             httpResponse.CacheControl = "no-cache";
@@ -19,13 +20,12 @@ namespace Server.Core
             errorPage.Append(@"<html>");
             errorPage.Append(@"<head><title>Vatic Server 404 Error Page</title></head>");
             errorPage.Append(@"<body>");
-            errorPage.Append(@"<h1>404, Can not process request on port "+ serverProperties.Port + "</h1>");
+            errorPage.Append(@"<h1>404, Can not process request on port " + serverProperties.Port + "</h1>");
             errorPage.Append(@"</body>");
             errorPage.Append(@"</html>");
             httpResponse.Body = errorPage.ToString();
 
             return httpResponse;
-
         }
     }
 }
