@@ -15,12 +15,13 @@ namespace Server.Core
             {
                 return false;
             }
-            
+
             return serverProperties.CurrentDir != null &&
                    serverProperties.FileReader.Exists(serverProperties.CurrentDir + requestItem);
         }
 
-        public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse, ServerProperties serverProperties)
+        public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
+            ServerProperties serverProperties)
         {
             var requestItem = CleanRequest(request);
             try
@@ -44,12 +45,12 @@ namespace Server.Core
                 errorPage.Append(@"<html>");
                 errorPage.Append(@"<head><title>Vatic Server 403 Error Page</title></head>");
                 errorPage.Append(@"<body>");
-                errorPage.Append(@"<h1>403 Forbidden, Can not process request on port " + serverProperties.Port + "</h1>");
+                errorPage.Append(@"<h1>403 Forbidden, Can not process request on port " + serverProperties.Port +
+                                 "</h1>");
                 errorPage.Append(@"</body>");
                 errorPage.Append(@"</html>");
                 httpResponse.Body = errorPage.ToString();
                 return httpResponse;
-
             }
         }
 

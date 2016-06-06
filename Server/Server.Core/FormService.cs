@@ -12,7 +12,8 @@ namespace Server.Core
             return requestItem == "form";
         }
 
-        public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse, ServerProperties serverProperties)
+        public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
+            ServerProperties serverProperties)
         {
             return request.Contains("GET /form") ? GetRequest(httpResponse) : PostRequest(request, httpResponse);
         }
@@ -35,7 +36,7 @@ namespace Server.Core
             httpResponse.HttpStatusCode = "200 OK";
             httpResponse.CacheControl = "no-cache";
             httpResponse.ContentType = "text/html";
-            httpResponse.Body = HtmlHeader() + formPage.ToString() + HtmlTail();
+            httpResponse.Body = HtmlHeader() + formPage + HtmlTail();
             return httpResponse;
         }
 
@@ -52,7 +53,7 @@ namespace Server.Core
             httpResponse.HttpStatusCode = "200 OK";
             httpResponse.CacheControl = "no-cache";
             httpResponse.ContentType = "text/html";
-            httpResponse.Body = HtmlHeader() + formPage.ToString() + HtmlTail();
+            httpResponse.Body = HtmlHeader() + formPage + HtmlTail();
             return httpResponse;
         }
 
@@ -68,6 +69,7 @@ namespace Server.Core
                 request.IndexOf(" HTTP/1.0", StringComparison.Ordinal) - offsets)
                 .Replace("%20", " ");
         }
+
         private string HtmlHeader()
         {
             var header = new StringBuilder();
