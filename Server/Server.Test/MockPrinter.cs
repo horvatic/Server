@@ -20,9 +20,18 @@ namespace Server.Test
             _mock.Object.Print(output);
         }
 
+        public void PrintToFile(string output, string path)
+        {
+            _mock.Object.PrintToFile(output, path);
+        }
+
         public void VerifyPrint(string output)
         {
             _mock.Verify(m => m.Print(output), Times.AtLeastOnce);
+        }
+        public void VerifyPrintToFile(string output, string path)
+        {
+            _mock.Verify(m => m.PrintToFile(output, path), Times.AtLeastOnce);
         }
     }
 }

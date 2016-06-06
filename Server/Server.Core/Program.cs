@@ -86,8 +86,8 @@ namespace Server.Core
             var endPoint = new IPEndPoint((IPAddress.Loopback), port);
             var zSocket = new ZSocket(endPoint);
             var properties = new ServerProperties(cleanHomeDir, new DirectoryProcessor(), new FileProcessor(), port,
-                new HttpResponse(), new ServerTime());
-            return new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()), io);
+                new HttpResponse(), new ServerTime(), io);
+            return new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
         }
 
         public static IMainServer HelloWorldServer(string port, IPrinter io)
@@ -97,8 +97,8 @@ namespace Server.Core
             var endPoint = new IPEndPoint((IPAddress.Loopback), portConverted);
             var zSocket = new ZSocket(endPoint);
             var properties = new ServerProperties(null, new DirectoryProcessor(), new FileProcessor(), portConverted,
-                new HttpResponse(), new ServerTime());
-            return new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()), io);
+                new HttpResponse(), new ServerTime(), io);
+            return new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
         }
 
         private static bool VaildDrive(string dir, IPrinter io)

@@ -20,7 +20,7 @@ namespace Server.Test
             var mockDirSearch = new MockDirectoryProcessor();
             mockDirSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/", mockDirSearch, 
-               new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime());
+               new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
             var directoryServer = new DirectoryService();
 
             Assert.True(directoryServer.CanProcessRequest(getRequest, properties));
@@ -34,7 +34,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
             var directoryServer = new DirectoryService();
 
             Assert.False(directoryServer.CanProcessRequest(getRequest, properties));
@@ -48,7 +48,7 @@ namespace Server.Test
             var mockDirSearch = new MockDirectoryProcessor();
             mockDirSearch.StubExists(false);
             var properties = new ServerProperties(null, mockDirSearch,
-               new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime());
+               new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
             var directoryServer = new DirectoryService();
 
             Assert.False(directoryServer.CanProcessRequest(getRequest, properties));
@@ -70,7 +70,7 @@ namespace Server.Test
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
             var properties = new ServerProperties(@"Home", mockRead,
-               new MockFileProcessor(), 8080, new HttpResponse(), new ServerTime());
+               new MockFileProcessor(), 8080, new HttpResponse(), new ServerTime(), new MockPrinter());
             var directoryServer = new DirectoryService();
             var httpResponse = directoryServer.ProcessRequest(getRequest, properties.DefaultResponse.Clone(), properties);
 

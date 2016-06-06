@@ -19,7 +19,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
             var inlinePngService = new InlinePngService();
 
             Assert.True(inlinePngService.CanProcessRequest(getRequest, properties));
@@ -33,7 +33,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
             var inlinePngService = new InlinePngService();
 
             Assert.False(inlinePngService.CanProcessRequest(getRequest, properties));
@@ -45,7 +45,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
-                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime());
+                new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
             var inlinePngService = new InlinePngService();
 
             var httpResponces = inlinePngService.ProcessRequest("GET /hello.png HTTP/1.1", new HttpResponse(), properties);

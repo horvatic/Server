@@ -48,9 +48,9 @@ namespace Server.Core
 
         public string Receive()
         {
-            var readData = new byte[8192];
+            var readData = new byte[1024];
             var lengthRead = _tcpSocket.Receive(readData);
-            return (Encoding.ASCII.GetString(readData).Substring(0, lengthRead));
+            return (Encoding.Default.GetString(readData).Substring(0, lengthRead));
         }
     }
 }
