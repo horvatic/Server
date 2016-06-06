@@ -7,7 +7,7 @@ namespace Server.Core
         bool AcceptingNewConn { get; }
         void StopNewConnAndCleanUp();
 
-        void RunningProcess(IZSocket handler, Guid id);
+        void RunningProcess(object poolIdAndSocket);
 
         void Run();
     }
