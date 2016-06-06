@@ -94,21 +94,18 @@ namespace Server.Core
         {
             var requestPacket = request;
             var packetSplit = GetPacketSplit(request);
-            if (!request.EndsWith($"------{packetSplit}--\r\n"))
-                requestPacket += handler.Receive();
-            else
-                requestPacket += request.Substring(request.IndexOf($"------{packetSplit}"
-                    , StringComparison.Ordinal));
             var httpResponce = _properties.DefaultResponse.Clone();
             var processor = _serviceFactory.GetService(request, Assembly.GetExecutingAssembly(), "Server.Core",
                 _properties);
 
+            httpResponce = processor.ProcessRequest(requestPacket, httpResponce, _properties);
+
             while (!requestPacket.EndsWith($"------{packetSplit}--\r\n"))
             {
-                var packet = handler.Receive();
-                requestPacket += packet;
+                requestPacket = handler.Receive();
+                if(httpResponce.HttpStatusCode != "409 Conflict")
+                    httpResponce = processor.ProcessRequest(requestPacket, httpResponce, _properties);
             }
-            httpResponce = processor.ProcessRequest(requestPacket, httpResponce, _properties);
             SendResponce(handler, httpResponce, id);
         }
 

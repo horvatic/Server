@@ -297,7 +297,7 @@ namespace Server.Test
             message.Enqueue("A");
             message.Enqueue("A");
             message.Enqueue("A");
-            message.Enqueue("------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n");
+            message.Enqueue("\r\n------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n");
 
 
             var mockRead = new MockDirectoryProcessor();
@@ -347,8 +347,8 @@ namespace Server.Test
 
 
 
-            var mockRead = new MockDirectoryProcessor();
-            var mockFileReader = new MockFileProcessor();
+            var mockRead = new MockDirectoryProcessor().StubExists(true);
+            var mockFileReader = new MockFileProcessor().StubExists(false);
             var zSocket = new MockZSocket().StubReceiveWithQueue(message)
                 .StubSentToReturn(10)
                 .StubConnect(true);
@@ -359,7 +359,7 @@ namespace Server.Test
             var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
             server.RunningProcess(zSocket, gid);
 
-            printer.VerifyPrintToFile("Hello\r\n", "c:/" + gid + ".txt");
+            printer.VerifyPrintToFile("Hello", "c:/" + gid + ".txt");
             zSocket.VerifyManyReceive(2);
         }
 
@@ -417,6 +417,8 @@ namespace Server.Test
 
             zSocket.VerifyManyReceive(1);
         }
+
+
 
         public string GetRequest()
         {
