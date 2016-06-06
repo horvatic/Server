@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Server.Core;
 using Xunit;
@@ -17,9 +19,8 @@ namespace Server.Test
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
             var properties = new ServerProperties("", new MockDirectoryProcessor(),
-                new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime());
-            var dirServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()),
-                new MockPrinter());
+                new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+            var dirServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
             dirServer.Run();
         }
 
@@ -35,9 +36,8 @@ namespace Server.Test
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
             var properties = new ServerProperties("", new MockDirectoryProcessor(),
-                new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime());
-            var dirServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()),
-                new MockPrinter());
+                new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+            var dirServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
             dirServer.StopNewConnAndCleanUp();
             dirServer.Run();
             zSocket.VerifyNoAccept();
@@ -46,7 +46,7 @@ namespace Server.Test
         [Fact]
         public void Active_Catch_When_Server_Is_Shuting_Down()
         {
-            var server = new MainServer(null, null, null, new MockPrinter());
+            var server = new MainServer(null, null, null);
             server.Run();
         }
 
@@ -55,9 +55,8 @@ namespace Server.Test
         {
             var mockZSocket = new MockZSocket();
             var properties = new ServerProperties(null, new MockDirectoryProcessor(),
-                new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime());
-            Assert.NotNull(new MainServer(mockZSocket, properties, new HttpServiceFactory(new Service404()),
-                new MockPrinter()));
+                new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+            Assert.NotNull(new MainServer(mockZSocket, properties, new HttpServiceFactory(new Service404())));
         }
 
         [Fact]
@@ -65,9 +64,8 @@ namespace Server.Test
         {
             var mockZSocket = new MockZSocket();
             var properties = new ServerProperties("", new MockDirectoryProcessor(),
-                new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime());
-            var dirServer = new MainServer(mockZSocket, properties, new HttpServiceFactory(new Service404()),
-                new MockPrinter());
+                new MockFileProcessor(), 5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+            var dirServer = new MainServer(mockZSocket, properties, new HttpServiceFactory(new Service404()));
             Assert.Equal(true, dirServer.AcceptingNewConn);
         }
 
@@ -83,15 +81,14 @@ namespace Server.Test
             correctOutput.Append(@"</body>");
             correctOutput.Append(@"</html>");
             var serverProperties = new ServerProperties(null, new MockDirectoryProcessor(), new FileProcessor(), 5555,
-                new HttpResponse(), new ServerTime());
+                new HttpResponse(), new ServerTime(), new MockPrinter());
 
             var zSocket = new MockZSocket()
                 .StubSentToReturn(10)
                 .StubReceive("GET / HTTP/1.1")
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
-            var server = new MainServer(zSocket, serverProperties, new HttpServiceFactory(new Service404()),
-                new MockPrinter());
+            var server = new MainServer(zSocket, serverProperties, new HttpServiceFactory(new Service404()));
             server.RunningProcess(zSocket, Guid.NewGuid());
             zSocket.VerifyReceive();
             zSocket.VerifySend("HTTP/1.1 200 OK\r\n");
@@ -119,9 +116,8 @@ namespace Server.Test
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
             var serverProperties = new ServerProperties(null, new MockDirectoryProcessor(), new FileProcessor(), 5555,
-                new HttpResponse(), new ServerTime());
-            var server = new MainServer(zSocket, serverProperties, new HttpServiceFactory(new Service404()),
-                new MockPrinter());
+                new HttpResponse(), new ServerTime(), new MockPrinter());
+            var server = new MainServer(zSocket, serverProperties, new HttpServiceFactory(new Service404()));
             server.RunningProcess(zSocket, Guid.NewGuid());
             zSocket.VerifyReceive();
             zSocket.VerifySend("HTTP/1.1 404 Not Found\r\n");
@@ -147,8 +143,8 @@ namespace Server.Test
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
             var properties = new ServerProperties(@"Home", mockRead,
-                new MockFileProcessor(), 8080, new HttpResponse(), new ServerTime());
-            var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()), new MockPrinter());
+                new MockFileProcessor(), 8080, new HttpResponse(), new ServerTime(), new MockPrinter());
+            var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
             server.RunningProcess(zSocket, Guid.NewGuid());
 
             var correctOutput = new StringBuilder();
@@ -188,8 +184,8 @@ namespace Server.Test
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
             var properties = new ServerProperties(@"Home", mockRead,
-                mockFileReader, 8080, new HttpResponse(), new ServerTime());
-            var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()), new MockPrinter());
+                mockFileReader, 8080, new HttpResponse(), new ServerTime(), new MockPrinter());
+            var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
             server.RunningProcess(zSocket, Guid.NewGuid());
             mockFileReader.VerifyReadAllBytes("Home/NotHome");
             zSocket.VerifyReceive();
@@ -220,11 +216,264 @@ namespace Server.Test
             zSocket = zSocket.StubAcceptObject(zSocket);
             var mockTime = new MockServerTime().StubTime("10am");
             var properties = new ServerProperties(@"Home", mockRead,
-                mockFileReader, 8080, new HttpResponse(), mockTime);
-            var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()), printLog);
+                mockFileReader, 8080, new HttpResponse(), mockTime, printLog);
+            var server = new MainServer(zSocket, properties,
+                new HttpServiceFactory(new MockHttpService().StubProcessRequest(new HttpResponse())));
             server.RunningProcess(zSocket, gid);
             printLog.VerifyPrint("[10am] [<" + gid + ">] GET /NotHome HTTP/1.1");
             printLog.VerifyPrint("[10am] [<" + gid + ">] 200 OK");
+        }
+
+      
+        [Fact]
+        public void Handles_Request_Larger_Than_8192_Bytes()
+        {
+            var message = new Queue<string>();
+            var request = "POST /iuiuh HTTP/1.1\r\n" +
+                          "Host: localhost: 8080\r\n" +
+                          "Connection: keep-alive\r\n" +
+                          "Content-Length: 79841\r\n" +
+                          "Cache-Control: max-age = 0\r\n" +
+                          "Accept: text/html,application/xhtml+xml,application/xml; q=0.9,image/webp,*/*;q=0.8\r\n" +
+                          "Origin: http://localhost:8080\r\n" +
+                          "Upgrade-Insecure-Requests: 1\r\n" +
+                          "User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36\r\n" +
+                          "Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryGeqPPReAkwpcPO8e\r\n\r\n" +
+                          "Referer: http://localhost:8080/upload" +
+                          "Accept-Encoding: gzip, deflate" +
+                          "Accept-Language: en-US,en;q=0.8";
+            message.Enqueue(request);
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n");
+
+
+            var mockRead = new MockDirectoryProcessor();
+            var mockFileReader = new MockFileProcessor();
+            var zSocket = new MockZSocket().StubReceiveWithQueue(message)
+                .StubSentToReturn(10)
+                .StubConnect(true);
+            zSocket = zSocket.StubAcceptObject(zSocket);
+            var properties = new ServerProperties(@"Home", mockRead,
+                mockFileReader, 8080, new HttpResponse(), new ServerTime(), new MockPrinter());
+            var server = new MainServer(zSocket, properties,
+                new HttpServiceFactory(new MockHttpService().StubProcessRequest(new HttpResponse())));
+            server.RunningProcess(zSocket, Guid.NewGuid());
+
+            zSocket.VerifyManyReceive(11);
+        }
+
+        [Fact]
+        public void Handles_Request_Larger_Than_8192_Bytes_Error_With_Service()
+        {
+            var message = new Queue<string>();
+            var request = "POST /iuiuh HTTP/1.1\r\n" +
+                          "Host: localhost: 8080\r\n" +
+                          "Connection: keep-alive\r\n" +
+                          "Content-Length: 79841\r\n" +
+                          "Cache-Control: max-age = 0\r\n" +
+                          "Accept: text/html,application/xhtml+xml,application/xml; q=0.9,image/webp,*/*;q=0.8\r\n" +
+                          "Origin: http://localhost:8080\r\n" +
+                          "Upgrade-Insecure-Requests: 1\r\n" +
+                          "User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36\r\n" +
+                          "Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryGeqPPReAkwpcPO8e\r\n\r\n" +
+                          "Referer: http://localhost:8080/upload" +
+                          "Accept-Encoding: gzip, deflate" +
+                          "Accept-Language: en-US,en;q=0.8";
+            message.Enqueue(request);
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("A");
+            message.Enqueue("\r\n------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n");
+
+
+            var mockRead = new MockDirectoryProcessor();
+            var mockFileReader = new MockFileProcessor();
+            var zSocket = new MockZSocket().StubReceiveWithQueue(message)
+                .StubSentToReturn(10)
+                .StubConnect(true);
+            zSocket = zSocket.StubAcceptObject(zSocket);
+            var properties = new ServerProperties(@"Home", mockRead,
+                mockFileReader, 8080, new HttpResponse(), new ServerTime(), new MockPrinter());
+            var server = new MainServer(zSocket, properties,
+                new HttpServiceFactory(
+                    new MockHttpService().StubProcessRequest(new HttpResponse {HttpStatusCode = "404"})));
+            server.RunningProcess(zSocket, Guid.NewGuid());
+
+            zSocket.VerifyManyReceive(11);
+        }
+
+        [Fact]
+        public void Handles_Request_Split_Half_InHeader()
+        {
+            var gid = Guid.NewGuid();
+            var message = new Queue<string>();
+            var request = "POST /upload HTTP/1.1\r\n" +
+                          "Host: localhost: 8080\r\n" +
+                          "Connection: keep-alive\r\n" +
+                          "Content-Length: 79841\r\n" +
+                          "Cache-Control: max-age = 0\r\n" +
+                          "Accept: text/html,application/xhtml+xml,application/xml; q=0.9,image/webp,*/*;q=0.8\r\n" +
+                          "Origin: http://localhost:8080\r\n" +
+                          "Upgrade-Insecure-Requests: 1\r\n" +
+                          "User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36\r\n" +
+                          "Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryGeqPPReAkwpcPO8e\r\n" +
+                          "Referer: http://localhost:8080/upload" +
+                          "Accept-Encoding: gzip, deflate" +
+                          "Accept-Language: en-US,en;q=0.8\r\n\r\n" +
+                          "------WebKitFormBoundaryGeqPPReAkwpcPO8e\r\n" +
+                          @"Content-Disposition: form-data; name=""saveLocation""" + "\r\n\r\n" +
+                          "c:/\r\n" +
+                          "------WebKitFormBoundaryGeqPPReAkwpcPO8e\r\n" +
+                          @"Content-Disposition: form-data; name=""fileToUpload""; filename="""+gid+".txt\"" + "\r\n" +
+                          "Content-Type: plan/txt\r\n\r\n";
+            message.Enqueue(request);
+            var packet = "Hello\r\n" + "------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n";
+            message.Enqueue(packet);
+
+
+
+
+            var mockRead = new MockDirectoryProcessor().StubExists(true);
+            var mockFileReader = new MockFileProcessor().StubExists(false);
+            var zSocket = new MockZSocket().StubReceiveWithQueue(message)
+                .StubSentToReturn(10)
+                .StubConnect(true);
+            zSocket = zSocket.StubAcceptObject(zSocket);
+            var printer = new MockPrinter();
+            var properties = new ServerProperties(@"Home", mockRead,
+                mockFileReader, 8080, new HttpResponse(), new ServerTime(), printer);
+            var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
+            server.RunningProcess(zSocket, gid);
+
+            printer.VerifyPrintToFile("Hello", "c:/" + gid + ".txt");
+            zSocket.VerifyManyReceive(2);
+        }
+
+        [Fact]
+        public void Handles_Request_Less_Than_8192_Bytes()
+        {
+            var message = new Queue<string>();
+            var request = "POST /iuiuh HTTP/1.1\r\n" +
+                          "Host: localhost: 8080\r\n" +
+                          "Connection: keep-alive\r\n" +
+                          "Content-Length: 79841\r\n" +
+                          "Cache-Control: max-age = 0\r\n" +
+                          "Accept: text/html,application/xhtml+xml,application/xml; q=0.9,image/webp,*/*;q=0.8\r\n" +
+                          "Origin: http://localhost:8080\r\n" +
+                          "Upgrade-Insecure-Requests: 1\r\n" +
+                          "User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36\r\n" +
+                          "Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryGeqPPReAkwpcPO8e\r\n\r\n" +
+                          "Referer: http://localhost:8080/upload" +
+                          "Accept-Encoding: gzip, deflate" +
+                          "Accept-Language: en-US,en;q=0.8";
+            message.Enqueue(request);
+            message.Enqueue("------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n");
+
+
+            var mockRead = new MockDirectoryProcessor();
+            var mockFileReader = new MockFileProcessor();
+            var zSocket = new MockZSocket().StubReceiveWithQueue(message)
+                .StubSentToReturn(10)
+                .StubConnect(true);
+            zSocket = zSocket.StubAcceptObject(zSocket);
+            var properties = new ServerProperties(@"Home", mockRead,
+                mockFileReader, 8080, new HttpResponse(), new ServerTime(), new MockPrinter());
+            var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
+            server.RunningProcess(zSocket, Guid.NewGuid());
+
+            zSocket.VerifyManyReceive(2);
+        }
+
+        [Fact]
+        public void Handles_Request_Less_Than_8192_Bytes_All_Given()
+        {
+            var request = GetRequest();
+
+
+            var mockRead = new MockDirectoryProcessor();
+            var mockFileReader = new MockFileProcessor();
+            var zSocket = new MockZSocket().StubReceive(request)
+                .StubSentToReturn(10)
+                .StubConnect(true);
+            zSocket = zSocket.StubAcceptObject(zSocket);
+            var properties = new ServerProperties(@"Home", mockRead,
+                mockFileReader, 8080, new HttpResponse(), new ServerTime(), new MockPrinter());
+            var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
+            server.RunningProcess(zSocket, Guid.NewGuid());
+
+            zSocket.VerifyManyReceive(1);
+        }
+
+
+
+        public string GetRequest()
+        {
+            return @"POST /sfs HTTP/1.1
+Host: localhost:8080
+Connection: keep-alive
+Content-Length: 495
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+Origin: http://localhost:8080
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryzOQ1PthdpYfXFgbU
+Referer: http://localhost:8080/upload
+Accept-Encoding: gzip, deflate
+Accept-Language: en-US,en;q=0.8
+
+------WebKitFormBoundaryzOQ1PthdpYfXFgbU
+Content-Disposition: form-data; name=""saveLocation""
+
+c:/ZZZ
+------WebKitFormBoundaryzOQ1PthdpYfXFgbU
+Content-Disposition: form-data; name=""fileToUpload""; filename=""testFile.txt""
+Content-Type: text/plain
+
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+Hello
+
+------WebKitFormBoundaryzOQ1PthdpYfXFgbU--" + "\r\n";
         }
     }
 }

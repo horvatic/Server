@@ -3,7 +3,7 @@
     public class ServerProperties
     {
         public ServerProperties(string currentDir, IDirectoryProcessor dirReader, IFileProcessor fileReader, int port,
-            IHttpResponse defaultResponse, IServerTime time)
+            IHttpResponse defaultResponse, IServerTime time, IPrinter io)
         {
             if (currentDir == null)
                 CurrentDir = null;
@@ -14,6 +14,7 @@
             Port = port;
             DefaultResponse = defaultResponse;
             Time = time;
+            Io = io;
         }
 
         public string CurrentDir { get; }
@@ -23,5 +24,7 @@
         public IHttpResponse DefaultResponse { get; }
 
         public IServerTime Time { get; }
+
+        public IPrinter Io { get; }
     }
 }

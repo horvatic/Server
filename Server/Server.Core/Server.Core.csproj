@@ -48,6 +48,7 @@
     <Compile Include="DirectoryService.cs" />
     <Compile Include="FileSendService.cs" />
     <Compile Include="FormService.cs" />
+    <Compile Include="Ftpservice.cs" />
     <Compile Include="HelloWorldService.cs" />
     <Compile Include="HttpResponse.cs" />
     <Compile Include="HttpServiceFactory.cs" />
