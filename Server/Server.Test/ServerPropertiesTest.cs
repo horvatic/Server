@@ -56,5 +56,19 @@ namespace Server.Test
                 new MockServerTime(), new MockPrinter());
             Assert.Equal(currentDir + "/", properties.CurrentDir);
         }
+
+        [Fact]
+        public void Make_Server_Properties_Persistent_Data()
+        {
+            var testObject = new ServerPropertiesTest();
+            
+            var mockFileReader = new MockFileProcessor();
+            var mockDirReader = new MockDirectoryProcessor();
+            var port = 5555;
+            var currentDir = "Hello";
+            var properties = new ServerProperties(currentDir, mockDirReader, mockFileReader, port, new HttpResponse(),
+                new MockServerTime(), new MockPrinter(), testObject);
+            Assert.Equal(testObject, properties.PersistentData);
+        }
     }
 }
