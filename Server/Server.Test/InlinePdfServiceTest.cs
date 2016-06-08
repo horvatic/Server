@@ -74,10 +74,10 @@ namespace Server.Test
             var httpResponces = inlinePdfService.ProcessRequest("GET /hello.pdf HTTP/1.1", new HttpResponse(),
                 properties);
 
-            Assert.Equal(httpResponces.FilePath, "c:/" + "hello.pdf");
-            Assert.Equal(httpResponces.ContentDisposition, "attachment");
-            Assert.Equal(httpResponces.Filename, "hello.pdf");
-            Assert.Equal(httpResponces.ContentType, "application/octet-stream");
+            Assert.Equal("c:/" + "hello.pdf", httpResponces.FilePath);
+            Assert.Equal("attachment", httpResponces.ContentDisposition);
+            Assert.Equal("hello.pdf", httpResponces.Filename);
+            Assert.Equal("application/octet-stream", httpResponces.ContentType);
         }
     }
 }

@@ -74,6 +74,7 @@
     <Compile Include="ServerProperties.cs" />
     <Compile Include="ServerTime.cs" />
     <Compile Include="Service404.cs" />
+    <Compile Include="VideoStreamingService.cs" />
     <Compile Include="ZSocket.cs" />
     <Compile Include="DirectoryProcessor.cs" />
     <Compile Include="MainServer.cs" />
