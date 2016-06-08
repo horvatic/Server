@@ -24,6 +24,7 @@ namespace Server.Core
             ServerProperties serverProperties)
         {
             var requestItem = CleanRequest(request);
+            requestItem = requestItem.Substring(1);
             httpResponse.HttpStatusCode = "200 OK";
             httpResponse.CacheControl = "no-cache";
             httpResponse.ContentType = "text/html";
