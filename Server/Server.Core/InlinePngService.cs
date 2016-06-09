@@ -9,7 +9,8 @@ namespace Server.Core
             var requestItem = CleanRequest(request);
             return serverProperties.CurrentDir != null &&
                    serverProperties.FileReader.Exists(serverProperties.CurrentDir + requestItem) &&
-                   requestItem.EndsWith(".png");
+                   requestItem.EndsWith(".png")
+                   && request.Contains("GET /");
         }
 
         public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,

@@ -15,7 +15,8 @@ namespace Server.Core
                                                         serverProperties.FileReader.Exists(serverProperties.CurrentDir
                                                                                            +
                                                                                            requestItem.Replace(
-                                                                                               ".vaticToMp4", "")));
+                                                                                               ".vaticToMp4", ""))
+                                                                                               && request.Contains("GET /"));
         }
 
         public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
