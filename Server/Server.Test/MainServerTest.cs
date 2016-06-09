@@ -354,7 +354,7 @@ namespace Server.Test
                           "Accept-Language: en-US,en;q=0.8\r\n\r\n" +
                           "------WebKitFormBoundaryGeqPPReAkwpcPO8e\r\n" +
                           @"Content-Disposition: form-data; name=""saveLocation""" + "\r\n\r\n" +
-                          "c:/\r\n" +
+                          "ZZZ\r\n" +
                           "------WebKitFormBoundaryGeqPPReAkwpcPO8e\r\n" +
                           @"Content-Disposition: form-data; name=""fileToUpload""; filename=""" + gid + ".txt\"" +
                           "\r\n" +
@@ -376,7 +376,7 @@ namespace Server.Test
             var server = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
             server.RunningProcess(new PoolDataForRequest(zSocket, gid));
 
-            printer.VerifyPrintToFile("Hello", "c:/" + gid + ".txt");
+            printer.VerifyPrintToFile("Hello", "Home/ZZZ/" + gid + ".txt");
             zSocket.VerifyManyReceive(2);
         }
 

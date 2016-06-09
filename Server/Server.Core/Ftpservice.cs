@@ -63,11 +63,14 @@ namespace Server.Core
             return packetSplit;
         }
 
-        private void SetDirectoryAndFile(string request)
+        private void SetDirectoryAndFile(string request, ServerProperties serverProperties)
         {
             if (request.Contains("name=\"saveLocation\"\r\n\r\n") && _directory == null)
             {
-                _directory = CleanPost(request, "name=\"saveLocation\"\r\n\r\n", "\r\n");
+                _directory = serverProperties.CurrentDir.EndsWith("/")
+                    ? serverProperties.CurrentDir
+                    : serverProperties.CurrentDir + "/";
+                _directory += CleanPost(request, "name=\"saveLocation\"\r\n\r\n", "\r\n");
                 if (!_directory.EndsWith("/"))
                     _directory += "/";
             }
@@ -89,7 +92,7 @@ namespace Server.Core
         private IHttpResponse ProcessRequestWithPath(string data, IHttpResponse httpResponse,
             ServerProperties serverProperties)
         {
-            SetDirectoryAndFile(data);
+            SetDirectoryAndFile(data, serverProperties);
             if (_directory != null && _file != null
                 && (!serverProperties.DirReader.Exists(_directory)
                     || serverProperties.FileReader.Exists(_directory + _file))

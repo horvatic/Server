@@ -154,7 +154,7 @@ namespace Server.Test
                            "Accept-Language: en-US,en;q=0.8\r\n\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             request.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
-            request.Append("c:/\r\n");
+            request.Append("ZZZ\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
             request.Append("Content-Disposition: form-data; name=\"fileToUpload\"; filename=\"" + gid + ".txt\"\r\n");
             request.Append("Content-Type: image/png\r\n\r\n?PNG\r\n");
@@ -171,7 +171,7 @@ namespace Server.Test
 
             var httpResponces = ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
             Assert.Equal("201 Created", httpResponces.HttpStatusCode);
-            io.VerifyPrintToFile("?PNG\r\nHello", "c:/" + gid + ".txt");
+            io.VerifyPrintToFile("?PNG\r\nHello", "c:/ZZZ/" + gid + ".txt");
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace Server.Test
                            "Accept-Language: en-US,en;q=0.8\r\n\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             request.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
-            request.Append("c:/\r\n");
+            request.Append("ZZZ\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
             request.Append("Content-Disposition: form-data; name=\"fileToUpload\"; filename=\"" + gid + ".txt\"\r\n");
             request.Append("Content-Type: image/png\r\n\r\n?PNG\r\n");
@@ -211,7 +211,7 @@ namespace Server.Test
 
             var httpResponces = ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
             Assert.Equal("201 Created", httpResponces.HttpStatusCode);
-            io.VerifyPrintToFile("?PNG\r\nHello", "c:/" + gid + ".txt");
+            io.VerifyPrintToFile("?PNG\r\nHello", "c:/ZZZ/" + gid + ".txt");
         }
 
         [Fact]
@@ -235,7 +235,7 @@ namespace Server.Test
                            "Accept-Language: en-US,en;q=0.8\r\n\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             request.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
-            request.Append("c:/\r\n");
+            request.Append("ZZZ\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
             request.Append("Content-Disposition: form-data; name=\"fileToUpload\"; filename=\"" + gid + ".txt\"\r\n");
             request.Append("Content-Type: image/png\r\n\r\n");
@@ -253,7 +253,7 @@ namespace Server.Test
             ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
             var httpResponces = ftpservice.ProcessRequest(body.ToString(), new HttpResponse(), properties);
             Assert.Equal("201 Created", httpResponces.HttpStatusCode);
-            io.VerifyPrintToFile("?PNG\r\nHello", "c:/" + gid + ".txt");
+            io.VerifyPrintToFile("?PNG\r\nHello", "c:/ZZZ/" + gid + ".txt");
         }
 
         [Fact]
@@ -277,7 +277,7 @@ namespace Server.Test
                            "Accept-Language: en-US,en;q=0.8\r\n\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             request.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
-            request.Append("c:/\r\n");
+            request.Append("ZZZ\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
             request.Append("Content-Disposition: form-data; name=\"fileToUpload\"; filename=\"" + gid + ".txt\"\r\n");
             request.Append("Content-Type: image/png\r\n\r\n");
@@ -295,8 +295,8 @@ namespace Server.Test
             ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
             var httpResponces = ftpservice.ProcessRequest(body.ToString(), new HttpResponse(), properties);
             Assert.Equal("201 Created", httpResponces.HttpStatusCode);
-            io.VerifyPrintToFile("?PNG\r\n", "c:/" + gid + ".txt");
-            io.VerifyPrintToFile("Hello", "c:/" + gid + ".txt");
+            io.VerifyPrintToFile("?PNG\r\n", "c:/ZZZ/" + gid + ".txt");
+            io.VerifyPrintToFile("Hello", "c:/ZZZ/" + gid + ".txt");
         }
 
         [Fact]
@@ -320,7 +320,7 @@ namespace Server.Test
                            "Accept-Language: en-US,en;q=0.8\r\n\r\n");
             body.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             body.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
-            body.Append("c:/\r\n");
+            body.Append("ZZZ\r\n");
             body.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
             body.Append("Content-Disposition: form-data; name=\"fileToUpload\"; filename=\"" + gid + ".txt\"\r\n");
             body.Append("Content-Type: image/png\r\n\r\n");
@@ -338,7 +338,7 @@ namespace Server.Test
             ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
             var httpResponces = ftpservice.ProcessRequest(body.ToString(), new HttpResponse(), properties);
             Assert.Equal("201 Created", httpResponces.HttpStatusCode);
-            io.VerifyPrintToFile("?PNG\r\nHello", "c:/" + gid + ".txt");
+            io.VerifyPrintToFile("?PNG\r\nHello", "c:/ZZZ/" + gid + ".txt");
         }
 
         [Fact]
@@ -362,7 +362,7 @@ namespace Server.Test
                            "Accept-Language: en-US,en;q=0.8\r\n\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             request.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
-            request.Append("c:/\r\n");
+            request.Append("ZZZ\r\n");
             body.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
             body.Append("Content-Disposition: form-data; name=\"fileToUpload\"; filename=\"" + gid + ".txt\"\r\n");
             body.Append("Content-Type: image/png\r\n\r\n");
@@ -380,7 +380,7 @@ namespace Server.Test
             ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
             var httpResponces = ftpservice.ProcessRequest(body.ToString(), new HttpResponse(), properties);
             Assert.Equal("201 Created", httpResponces.HttpStatusCode);
-            io.VerifyPrintToFile("?PNG\r\nContent-Type: image/png", "c:/" + gid + ".txt");
+            io.VerifyPrintToFile("?PNG\r\nContent-Type: image/png", "c:/ZZZ/" + gid + ".txt");
         }
 
         [Fact]
@@ -404,7 +404,7 @@ namespace Server.Test
                            "Accept-Language: en-US,en;q=0.8\r\n\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             request.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
-            request.Append("c:/\r\n");
+            request.Append("ZZZ/\r\n");
             body.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
             body.Append("Content-Disposition: form-data; name=\"fileToUpload\"; filename=\"" + gid + ".txt\"\r\n");
             body.Append("Content-Type: image/png\r\n\r\n");
@@ -422,7 +422,7 @@ namespace Server.Test
             ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
             var httpResponces = ftpservice.ProcessRequest(body.ToString(), new HttpResponse(), properties);
             Assert.Equal("201 Created", httpResponces.HttpStatusCode);
-            io.VerifyPrintToFile("?PNG\r\nHello", "c:/" + gid + ".txt");
+            io.VerifyPrintToFile("?PNG\r\nHello", "c:/ZZZ/" + gid + ".txt");
         }
 
         [Fact]
@@ -445,7 +445,7 @@ namespace Server.Test
                            "Accept-Language: en-US,en;q=0.8\r\n\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             request.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
-            request.Append("c:/\r\n");
+            request.Append("ZZZ/\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
             request.Append("Content-Disposition: form-data; name=\"fileToUpload\"; filename=\"" + gid + ".txt\"\r\n");
             request.Append("Content-Type: image/png\r\n\r\n");
@@ -485,7 +485,7 @@ namespace Server.Test
                            "Accept-Language: en-US,en;q=0.8\r\n\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             request.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
-            request.Append("c:/\r\n");
+            request.Append("ZZZ/\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
             request.Append("Content-Disposition: form-data; name=\"fileToUpload\"; filename=\"\"\r\n");
             request.Append("Content-Type: application/octet-stream\r\n\r\n");
@@ -522,7 +522,7 @@ namespace Server.Test
                            "Accept-Language: en-US,en;q=0.8\r\n\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             request.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
-            request.Append("c:/\r\n");
+            request.Append("ZZZ/\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
             request.Append("Content-Disposition: form-data; name=\"fileToUpload\"; filename=\"\"\r\n");
             request.Append("Content-Type: application/octet-stream\r\n\r\n");
