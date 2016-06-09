@@ -40,6 +40,8 @@ namespace Server.Core
             {
                 return false;
             }
+            if (!request.Contains("POST /"))
+                return false;
             var fullpath
                 = (serverProperties.CurrentDir + requestItem.Substring(1));
             _file = fullpath.Substring(fullpath
