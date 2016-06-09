@@ -204,7 +204,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(false);
             var io = new MockPrinter();
-            var properties = new ServerProperties(@"c:/",
+            var properties = new ServerProperties(@"c:",
                 new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
                 new ServerTime(), io);
             var ftpservice = new Ftpservice();
@@ -235,7 +235,7 @@ namespace Server.Test
                            "Accept-Language: en-US,en;q=0.8\r\n\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             request.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
-            request.Append("ZZZ\r\n");
+            request.Append("ZZZ/\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
             request.Append("Content-Disposition: form-data; name=\"fileToUpload\"; filename=\"" + gid + ".txt\"\r\n");
             request.Append("Content-Type: image/png\r\n\r\n");
@@ -245,7 +245,7 @@ namespace Server.Test
             var mockFileSearch = new MockFileProcessor();
             mockFileSearch.StubExists(false);
             var io = new MockPrinter();
-            var properties = new ServerProperties(@"c:/",
+            var properties = new ServerProperties(@"c:",
                 new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
                 new ServerTime(), io);
             var ftpservice = new Ftpservice();
@@ -277,7 +277,7 @@ namespace Server.Test
                            "Accept-Language: en-US,en;q=0.8\r\n\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg");
             request.Append("Content-Disposition: form-data; name=\"saveLocation\"\r\n\r\n");
-            request.Append("ZZZ\r\n");
+            request.Append("ZZZ/\r\n");
             request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
             request.Append("Content-Disposition: form-data; name=\"fileToUpload\"; filename=\"" + gid + ".txt\"\r\n");
             request.Append("Content-Type: image/png\r\n\r\n");
