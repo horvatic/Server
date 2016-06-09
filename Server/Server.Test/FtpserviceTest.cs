@@ -36,6 +36,7 @@ namespace Server.Test
         [Theory]
         [InlineData("GET /ThisNeedsToBeUpLoaded.png HTTP/1.0")]
         [InlineData("GET /ThisNeedsToBeUpLoaded.png HTTP/1.1")]
+        [InlineData("GET /upload/ HTTP/1.1")]
         public void Cant_Process(string getRequest)
         {
             var mockFileSearch = new MockFileProcessor();
