@@ -67,9 +67,7 @@ namespace Server.Core
         {
             if (request.Contains("name=\"saveLocation\"\r\n\r\n") && _directory == null)
             {
-                _directory = serverProperties.CurrentDir.EndsWith("/")
-                    ? serverProperties.CurrentDir
-                    : serverProperties.CurrentDir + "/";
+                _directory = serverProperties.CurrentDir;
                 _directory += CleanPost(request, "name=\"saveLocation\"\r\n\r\n", "\r\n");
                 if (!_directory.EndsWith("/"))
                     _directory += "/";
