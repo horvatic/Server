@@ -18,10 +18,12 @@ namespace Server.Test
         [InlineData("GET /upload HTTP/1.0")]
         [InlineData("POST /upload HTTP/1.1")]
         [InlineData("POST /upload HTTP/1.0")]
+        [InlineData("POST /ThisNeedsToBeUpLoaded.png HTTP/1.0")]
+        [InlineData("POST /ThisNeedsToBeUpLoaded.png HTTP/1.1")]
         public void Can_Process(string getRequest)
         {
             var mockFileSearch = new MockFileProcessor();
-            mockFileSearch.StubExists(true);
+            mockFileSearch.StubExists(false);
             var properties = new ServerProperties(@"c:/",
                 new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
                 new ServerTime(),
@@ -29,6 +31,22 @@ namespace Server.Test
             var ftpservice = new Ftpservice();
 
             Assert.True(ftpservice.CanProcessRequest(getRequest, properties));
+        }
+
+        [Theory]
+        [InlineData("GET /ThisNeedsToBeUpLoaded.png HTTP/1.0")]
+        [InlineData("GET /ThisNeedsToBeUpLoaded.png HTTP/1.1")]
+        public void Cant_Process(string getRequest)
+        {
+            var mockFileSearch = new MockFileProcessor();
+            mockFileSearch.StubExists(false);
+            var properties = new ServerProperties(@"c:/",
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(),
+                new MockPrinter());
+            var ftpservice = new Ftpservice();
+
+            Assert.False(ftpservice.CanProcessRequest(getRequest, properties));
         }
 
         [Fact]
@@ -518,6 +536,64 @@ namespace Server.Test
 
             var httpResponces = ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
             Assert.Equal("409 Conflict", httpResponces.HttpStatusCode);
+        }
+
+        [Fact]
+        public void Send_Data_Post_Request_Save_File_Bound()
+        {
+            var request = new StringBuilder();
+            var gid = Guid.NewGuid();
+            request.Append("POST /ZZZ/testFile.txt HTTP/1.1\r\n" +
+                           "Host: localhost: 8080\r\n" +
+                           "Content-Length: 386\r\n" +
+                           "Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryVfPQpsTmmlrqQLLg" +
+                           "\r\n\r\n");
+            request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
+            request.Append("Content-Disposition: form-data; name=\"file\"; filename=\"" + gid + ".txt\"\r\n");
+            request.Append("Content-Type: image/png\r\n\r\n?PNG\r\n");
+            request.Append(
+                "Hello");
+            request.Append("\r\n------WebKitFormBoundaryVfPQpsTmmlrqQLLg--\r\n");
+            var mockFileSearch = new MockFileProcessor();
+            mockFileSearch.StubExists(false);
+            var io = new MockPrinter();
+            var properties = new ServerProperties(@"c:/",
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(), io);
+            var ftpservice = new Ftpservice();
+            ftpservice.CanProcessRequest(request.ToString(), properties);
+            var httpResponces = ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
+            Assert.Equal("201 Created", httpResponces.HttpStatusCode);
+            io.VerifyPrintToFile("?PNG\r\nHello", "c:/ZZZ/testFile.txt");
+        }
+
+        [Fact]
+        public void Send_Data_Post_Request_Save_File_Bound_Blank_Data()
+        {
+            var request = new StringBuilder();
+            var gid = Guid.NewGuid();
+            request.Append("POST /ZZZ/testFile.txt HTTP/1.1\r\n" +
+                           "Host: localhost: 8080\r\n" +
+                           "Content-Length: 386\r\n" +
+                           "Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryVfPQpsTmmlrqQLLg" +
+                           "\r\n\r\n");
+            request.Append("------WebKitFormBoundaryVfPQpsTmmlrqQLLg\r\n");
+            request.Append("Content-Disposition: form-data; name=\"file\"; filename=\"" + gid + ".txt\"\r\n");
+            request.Append("Content-Type: image/png\r\n\r\n?PNG\r\n");
+            request.Append(
+                "Hello");
+            request.Append("\r\n------WebKitFormBoundaryVfPQpsTmmlrqQLLg--\r\n");
+            var mockFileSearch = new MockFileProcessor();
+            mockFileSearch.StubExists(false);
+            var io = new MockPrinter();
+            var properties = new ServerProperties(@"c:/",
+                new MockDirectoryProcessor().StubExists(true), mockFileSearch, 5555, new HttpResponse(),
+                new ServerTime(), io);
+            var ftpservice = new Ftpservice();
+            ftpservice.CanProcessRequest(request.ToString(), properties);
+            ftpservice.ProcessRequest(request.ToString(), new HttpResponse(), properties);
+            var httpResponces = ftpservice.ProcessRequest("", new HttpResponse(), properties);
+            Assert.Equal("201 Created", httpResponces.HttpStatusCode);
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Configuration;
+using System.Linq;
 using System.Text;
 
 namespace Server.Core
@@ -6,13 +8,19 @@ namespace Server.Core
     public class Ftpservice : IHttpServiceProcessor
     {
         private string _directory;
+        private bool _directRequest;
         private string _file;
+        private bool _headerRemoved;
         private string _packetBound;
 
         public bool CanProcessRequest(string request, ServerProperties serverProperties)
         {
             var requestItem = CleanRequest(request);
-            return requestItem == "/upload";
+            if (requestItem != "/upload")
+                return serverProperties.CurrentDir != null
+                       && IsDirect(request, serverProperties);
+            _directRequest = false;
+            return true;
         }
 
         public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
@@ -21,6 +29,27 @@ namespace Server.Core
             return request.Contains("GET /") && request.IndexOf("GET /", StringComparison.Ordinal) == 0
                 ? GetRequest(request, httpResponse)
                 : PostRequest(request, httpResponse, serverProperties);
+        }
+
+        private bool IsDirect(string request, ServerProperties serverProperties)
+        {
+            var requestItem = CleanRequest(request);
+            var configManager = ConfigurationManager.AppSettings;
+            if (configManager.AllKeys.Any(key => requestItem.EndsWith(configManager[key]))
+                && !request.Contains("POST /"))
+            {
+                return false;
+            }
+            var fullpath
+                = (serverProperties.CurrentDir + requestItem.Substring(1));
+            _file = fullpath.Substring(fullpath
+                .LastIndexOf("/", StringComparison.Ordinal) + 1);
+            var copyDistance =
+                _directory = fullpath.Substring(0, fullpath
+                    .LastIndexOf("/", StringComparison.Ordinal) + 1);
+            _directRequest = true;
+            _headerRemoved = false;
+            return true;
         }
 
         private string GetPacketBound(string request)
@@ -48,6 +77,7 @@ namespace Server.Core
 
         private string RemoveHeaderAndSetPacketBound(string request)
         {
+            _headerRemoved = true;
             _packetBound = GetPacketBound(request);
             return request.Substring(request.IndexOf("\r\n\r\n"
                 , StringComparison.Ordinal) + 4);
@@ -78,12 +108,23 @@ namespace Server.Core
         private string RemoveContentDisposition(string data)
         {
             var processedData = data;
-            processedData = processedData
-                .Substring(processedData.IndexOf("Content-Disposition: form-data;"
-                                                 + @" name=""fileToUpload"""
-                    , StringComparison.Ordinal));
-            processedData = processedData.Substring(processedData.IndexOf("\r\n"
-                , StringComparison.Ordinal) + 2);
+            if (!_directRequest)
+            {
+                processedData = processedData
+                    .Substring(processedData.IndexOf("Content-Disposition: form-data;"
+                                                     + @" name=""fileToUpload"""
+                        , StringComparison.Ordinal));
+                processedData = processedData.Substring(processedData.IndexOf("\r\n"
+                    , StringComparison.Ordinal) + 2);
+            }
+            else
+            {
+                processedData = processedData
+                    .Substring(processedData.IndexOf("Content-Disposition: form-data;"
+                        , StringComparison.Ordinal));
+                processedData = processedData.Substring(processedData.IndexOf("\r\n"
+                    , StringComparison.Ordinal) + 2);
+            }
             return processedData;
         }
 
@@ -126,14 +167,46 @@ namespace Server.Core
             return httpResponse;
         }
 
-        private IHttpResponse PostRequest(string request, IHttpResponse httpResponse, ServerProperties serverProperties)
+        private IHttpResponse PostRequest(string request,
+            IHttpResponse httpResponse, ServerProperties serverProperties)
+        {
+            if (!_directRequest)
+                return UsedUpLoad(request,
+                    httpResponse, serverProperties);
+            return DirectRequest(request,
+                httpResponse, serverProperties);
+        }
+
+        private IHttpResponse DirectRequest(string request,
+            IHttpResponse httpResponse, ServerProperties serverProperties)
+        {
+            var data = request.Contains("POST /") && !_headerRemoved
+                ? RemoveHeaderAndSetPacketBound(request)
+                : request;
+            if (data == "")
+            {
+                httpResponse.HttpStatusCode = "201 Created";
+                return httpResponse;
+            }
+            if (data.Contains(@"Content-Disposition: form-data; name=""file""")
+                || data.Contains(@"Content-Disposition: form-data; name=""fileToUpload"""))
+                return ProcessRequestWithPath(data, httpResponse, serverProperties);
+            return SaveFile(data, httpResponse,
+                serverProperties);
+        }
+
+        private IHttpResponse UsedUpLoad(string request,
+            IHttpResponse httpResponse, ServerProperties serverProperties)
         {
             var data = request.Contains("POST /upload HTTP/1.1\r\n")
                        && _directory == null && _file == null
                 ? RemoveHeaderAndSetPacketBound(request)
                 : request;
             if (data == "")
+            {
+                httpResponse.HttpStatusCode = "201 Created";
                 return httpResponse;
+            }
             if ((data.Contains(@"Content-Disposition: form-data; name=""saveLocation""")
                  || data.Contains(@"Content-Disposition: form-data; name=""fileToUpload"""))
                 && (_directory == null || _file == null))
@@ -141,7 +214,6 @@ namespace Server.Core
             return SaveFile(data, httpResponse,
                 serverProperties);
         }
-
 
         private string CleanPost(string request, string head, string tail)
         {

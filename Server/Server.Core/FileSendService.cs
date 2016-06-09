@@ -17,7 +17,9 @@ namespace Server.Core
             }
 
             return serverProperties.CurrentDir != null &&
-                   serverProperties.FileReader.Exists(serverProperties.CurrentDir + requestItem.Substring(1));
+                   serverProperties.FileReader
+                   .Exists(serverProperties.CurrentDir + requestItem.Substring(1))
+                   && request.Contains("GET /");
         }
 
         public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
