@@ -28,7 +28,7 @@ namespace Server.Core
             var requestItem = CleanRequest(request).Substring(1);
             try
             {
-                serverProperties.FileReader.ReadAllBytes(serverProperties.CurrentDir + requestItem);
+                serverProperties.FileReader.FileSize(serverProperties.CurrentDir + requestItem);
                 httpResponse.HttpStatusCode = "200 OK";
                 httpResponse.CacheControl = "no-cache";
                 httpResponse.FilePath = serverProperties.CurrentDir + requestItem;

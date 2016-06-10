@@ -8,13 +8,14 @@ namespace Server.Test
 {
     public class IntergrationTests
     {
+
         public static bool GotRequest;
 
         private static async void WebPageHit()
         {
             var getUrl =
                 WebRequest.Create(
-                    @"http://localhost:55999/ShawnDocs/Apprenticeships/week6/LargePDFs/Greater10/aemm0a00.pdf");
+                    @"http://localhost:54949/ShawnDocs/Apprenticeships/week6/LargePDFs/Greater10/aemm0a00.pdf");
             getUrl.CachePolicy = new HttpRequestCachePolicy(HttpRequestCacheLevel.NoCacheNoStore);
             var responce = getUrl.GetResponseAsync();
             await responce;
@@ -29,10 +30,10 @@ namespace Server.Test
         [Fact]
         public void Live_User_Presses_CTRL_C_Finsh_Request_No_New_Request()
         {
-            var endPoint = new IPEndPoint((IPAddress.Loopback), 55999);
+            var endPoint = new IPEndPoint((IPAddress.Loopback), 54949);
             var zSocket = new ZSocket(endPoint);
             var properties = new ServerProperties("c:/", new DirectoryProcessor(),
-                new FileProcessor(), 55999, new HttpResponse(), new ServerTime(), new MockPrinter());
+                new FileProcessor(), 54949, new HttpResponse(), new ServerTime(), new MockPrinter());
             var testingServer = new MainServer(zSocket, properties, new HttpServiceFactory(new Service404()));
             var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));
             testServerThread.Start();
@@ -44,9 +45,10 @@ namespace Server.Test
 
             var wrFailurl =
                 WebRequest.Create(
-                    @"http://localhost:55999//ShawnDocs/Apprenticeships/week6/LargePDFs/Greater10/h2450081.pdf");
+                    @"http://localhost:54949//ShawnDocs/Apprenticeships/week6/LargePDFs/Greater10/h2450081.pdf");
             Assert.Throws<WebException>(() => (wrFailurl.GetResponse()));
         }
+
 
         [Fact]
         public void Make_Web_Request()

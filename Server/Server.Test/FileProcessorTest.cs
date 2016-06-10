@@ -17,14 +17,14 @@ namespace Server.Test
         public void File_Read()
         {
             var fileProx = new FileProcessor();
-            Assert.NotEmpty(fileProx.ReadAllBytes(@"C:\Program Files (x86)\Internet Explorer\ie9props.propdesc"));
+            Assert.NotEqual(0, fileProx.FileSize(@"C:\Program Files (x86)\Internet Explorer\ie9props.propdesc"));
         }
 
         [Fact]
         public void File_Not_Read()
         {
             var fileProx = new FileProcessor();
-            Assert.Throws<FileNotFoundException>(() => (fileProx.ReadAllBytes("wefefwefwefwefwefwefwef")));
+            Assert.Throws<FileNotFoundException>(() => (fileProx.FileSize("wefefwefwefwefwefwefwef")));
         }
     }
 }
