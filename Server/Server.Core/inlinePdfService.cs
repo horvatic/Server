@@ -22,7 +22,7 @@ namespace Server.Core
             httpResponse.FilePath = serverProperties.CurrentDir + requestItem;
             httpResponse.Filename = requestItem.Remove(0, requestItem.LastIndexOf('/') + 1);
 
-            if (serverProperties.FileReader.ReadAllBytes(httpResponse.FilePath).Length > 1000000)
+            if (serverProperties.FileReader.FileSize(httpResponse.FilePath) > 1000000)
             {
                 httpResponse.ContentType = "application/octet-stream";
                 httpResponse.ContentDisposition = "attachment";

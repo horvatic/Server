@@ -43,8 +43,7 @@ namespace Server.Test
         [Fact]
         public void Send_Data_Small_Pdf()
         {
-            var largeBtyeArray = new byte[1];
-            var mockFileSearch = new MockFileProcessor().StubReadAllBytes(largeBtyeArray);
+            var mockFileSearch = new MockFileProcessor().StubFileSize(1);
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
                 new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),
@@ -63,8 +62,7 @@ namespace Server.Test
         [Fact]
         public void Send_Data_Large_Pdf()
         {
-            var largeBtyeArray = new byte[10000001];
-            var mockFileSearch = new MockFileProcessor().StubReadAllBytes(largeBtyeArray);
+            var mockFileSearch = new MockFileProcessor().StubFileSize(10000001);
             mockFileSearch.StubExists(true);
             var properties = new ServerProperties(@"c:/",
                 new MockDirectoryProcessor(), mockFileSearch, 5555, new HttpResponse(), new ServerTime(),

@@ -195,7 +195,8 @@ namespace Server.Test
                 .StubGetDirectories(new[] {"dir1", "dir2"})
                 .StubGetFiles(new[] {"file1", "file2", "file3"})
                 .StubExists(false);
-            var mockFileReader = new MockFileProcessor().StubExists(true).StubReadAllBytes(new byte[] {1, 2});
+            var mockFileReader = new MockFileProcessor().StubExists(true)
+                .StubFileSize(2);
             var zSocket = new MockZSocket()
                 .StubSentToReturn(10)
                 .StubReceive("GET /NotHome HTTP/1.1")
@@ -210,7 +211,7 @@ namespace Server.Test
             zSocket.VerifySend("HTTP/1.1 200 OK\r\n");
             zSocket.VerifySend("Content-Type: application/octet-stream\r\n");
             zSocket.VerifySend("Content-Disposition: attachment; filename = NotHome\r\n");
-            zSocket.VerifySend("Content-Length: " + mockFileReader.ReadAllBytes("Home/NotHome").Length +
+            zSocket.VerifySend("Content-Length: " + mockFileReader.FileSize("Home/NotHome") +
                                "\r\n\r\n");
             zSocket.VerifySendFile("Home/NotHome");
             zSocket.VerifyClose();
@@ -226,7 +227,8 @@ namespace Server.Test
                 .StubGetDirectories(new[] {"dir1", "dir2"})
                 .StubGetFiles(new[] {"file1", "file2", "file3"})
                 .StubExists(false);
-            var mockFileReader = new MockFileProcessor().StubExists(true).StubReadAllBytes(new byte[] {1, 2});
+            var mockFileReader = new MockFileProcessor().StubExists(true)
+                .StubFileSize(2);
             var zSocket = new MockZSocket()
                 .StubSentToReturn(10)
                 .StubReceive("GET /NotHome HTTP/1.1")

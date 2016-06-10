@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.IO;
+using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -43,7 +45,18 @@ namespace Server.Core
 
         public void SendFile(string message)
         {
-            _tcpSocket.SendFile(message);
+            using (var fileStream = File.Open(message, 
+                FileMode.Open, 
+                FileAccess.Read, 
+                FileShare.Read))
+            {
+                var buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    _tcpSocket.Send(buffer, bytesRead, SocketFlags.None);
+                }
+            }
         }
 
         public string Receive()

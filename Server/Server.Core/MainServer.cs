@@ -149,7 +149,7 @@ namespace Server.Core
                 handler.Send("Content-Disposition: " + httpResponce.ContentDisposition + "; filename = "
                              + httpResponce.Filename +
                              "\r\n");
-                handler.Send("Content-Length: " + _properties.FileReader.ReadAllBytes(httpResponce.FilePath).Length +
+                handler.Send("Content-Length: " + _properties.FileReader.FileSize(httpResponce.FilePath) +
                              "\r\n\r\n");
                 handler.SendFile(httpResponce.FilePath);
             }

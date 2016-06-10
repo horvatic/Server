@@ -4,10 +4,15 @@ namespace Server.Core
 {
     public class FileProcessor : IFileProcessor
     {
-        public byte[] ReadAllBytes(string path)
+        public long FileSize(string path)
         {
-            return File.ReadAllBytes(path);
+            return (new FileInfo(path)).Length;
         }
+
+        //public byte[] ReadAllBytes(string path)
+        //{
+        //    return File.ReadAllBytes(path);
+        //}
 
         public bool Exists(string path)
         {
