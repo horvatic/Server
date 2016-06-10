@@ -8,7 +8,6 @@ namespace Server.Test
 {
     public class IntergrationTests
     {
-
         public static bool GotRequest;
 
         private static async void WebPageHit()
@@ -63,7 +62,7 @@ namespace Server.Test
 
             var wrGeturl = WebRequest.Create("http://localhost:4321");
 
-            wrGeturl.GetResponse();
+            wrGeturl.GetResponse().GetResponseStream();
         }
 
         [Fact]
@@ -80,7 +79,7 @@ namespace Server.Test
                 WebRequest.Create(
                     @"http://localhost:50321/Program%20Files%20(x86)/Internet%20Explorer/ie9props.propdesc");
 
-            wrGeturl.GetResponse();
+            wrGeturl.GetResponse().GetResponseStream();
         }
 
         [Fact]
@@ -94,7 +93,7 @@ namespace Server.Test
             var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));
             testServerThread.Start();
             var wrGeturl = WebRequest.Create(@"http://localhost:45418/");
-            wrGeturl.GetResponse();
+            wrGeturl.GetResponse().GetResponseStream();
             testingServer.StopNewConnAndCleanUp();
             var wrFailurl = WebRequest.Create(@"http://localhost:45418/");
             Assert.Throws<WebException>(() => (wrFailurl.GetResponse()));
