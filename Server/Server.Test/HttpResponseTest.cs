@@ -46,5 +46,59 @@ namespace Server.Test
             Assert.Equal("C:/Hello", respone.FilePath);
             Assert.Equal("<p>Hello</p>", respone.Body);
         }
+
+        [Fact]
+        public void Http_Copy()
+        {
+            var respone = new HttpResponse
+            {
+                HttpStatusCode = "404 Not Found",
+                CacheControl = "no-store",
+                ContentType = "application/octet-stream",
+                Filename = "Hello",
+                FilePath = "C:/Hello",
+                ContentDisposition = "inline",
+                Body = "<p>Hello</p>",
+                ContentLength = 100
+           };
+
+            var copy = new HttpResponse(respone);
+
+            Assert.Equal("404 Not Found", copy.HttpStatusCode);
+            Assert.Equal("no-store", copy.CacheControl);
+            Assert.Equal("application/octet-stream", copy.ContentType);
+            Assert.Equal("inline", copy.ContentDisposition);
+            Assert.Equal("Hello", copy.Filename);
+            Assert.Equal("C:/Hello", copy.FilePath);
+            Assert.Equal("<p>Hello</p>", copy.Body);
+            Assert.Equal(100, copy.ContentLength);
+        }
+
+        [Fact]
+        public void Http_Clone()
+        {
+            var respone = new HttpResponse
+            {
+                HttpStatusCode = "404 Not Found",
+                CacheControl = "no-store",
+                ContentType = "application/octet-stream",
+                Filename = "Hello",
+                FilePath = "C:/Hello",
+                ContentDisposition = "inline",
+                Body = "<p>Hello</p>",
+                ContentLength = 100
+            };
+
+            var copy = respone.Clone();
+
+            Assert.Equal("404 Not Found", copy.HttpStatusCode);
+            Assert.Equal("no-store", copy.CacheControl);
+            Assert.Equal("application/octet-stream", copy.ContentType);
+            Assert.Equal("inline", copy.ContentDisposition);
+            Assert.Equal("Hello", copy.Filename);
+            Assert.Equal("C:/Hello", copy.FilePath);
+            Assert.Equal("<p>Hello</p>", copy.Body);
+            Assert.Equal(100, copy.ContentLength);
+        }
     }
 }

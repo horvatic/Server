@@ -66,10 +66,9 @@ namespace Server.Test
         {
             _mock.Verify(m => m.Accept(), Times.Once);
         }
-
-        public void VerifyClose()
+        public void VerifyCloseN(int closed)
         {
-            _mock.Verify(m => m.Close(), Times.Once);
+            _mock.Verify(m => m.Close(), Times.Exactly(closed));
         }
 
         public void VerifyReceive()

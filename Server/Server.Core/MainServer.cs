@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 
 namespace Server.Core
@@ -9,15 +8,21 @@ namespace Server.Core
     public class MainServer : IMainServer
     {
         private static int _numberOfThreads;
+        private readonly List<Assembly> _assembly;
+        private readonly List<string> _namespaces;
         private readonly ServerProperties _properties;
+        private readonly IRequestProcessor _requestProcessor;
+        private readonly ISend _sender;
         private readonly HttpServiceFactory _serviceFactory;
         private readonly IZSocket _socket;
-        private readonly List<string> _namespaces;
-        private readonly List<Assembly> _assembly;
 
-        public MainServer(IZSocket socket, ServerProperties properties, 
-            HttpServiceFactory serviceFactory, List<string> namespaces = null,
-            List<Assembly> assembly = null)
+        public MainServer(IZSocket socket,
+            ServerProperties properties,
+            HttpServiceFactory serviceFactory,
+            IRequestProcessor requestProcessor,
+            ISend sender,
+            List<string> namespaces,
+            List<Assembly> assembly)
         {
             _numberOfThreads = 0;
             AcceptingNewConn = true;
@@ -25,18 +30,10 @@ namespace Server.Core
             _properties = properties;
             _serviceFactory = serviceFactory;
             ThreadPool.SetMaxThreads(100, 100);
-            if (namespaces != null && assembly != null)
-            {
-                namespaces.Add("Server.Core");
-                _namespaces = new List<string>(namespaces);
-                assembly.Add(Assembly.GetExecutingAssembly());
-                _assembly =  new List<Assembly>(assembly);
-            }
-            else
-            {
-                _assembly = new List<Assembly>() {Assembly.GetExecutingAssembly()};
-                _namespaces = new List<string> {"Server.Core"};
-            }
+            _namespaces = namespaces;
+            _assembly = assembly;
+            _requestProcessor = requestProcessor;
+            _sender = sender;
         }
 
         public bool AcceptingNewConn { get; private set; }
@@ -61,27 +58,27 @@ namespace Server.Core
             var handler = ((PoolDataForRequest) poolIdAndSocket).Handler;
             var id = ((PoolDataForRequest) poolIdAndSocket).Id;
             Interlocked.Increment(ref _numberOfThreads);
+            var returnCode = "";
             try
             {
                 var request = handler.Receive();
                 if (request.Length == 0) return;
 
-                var log = request.IndexOf("\r\n", StringComparison.Ordinal) == -1
-                    ? request
-                    : request.Substring(0, request.IndexOf("\r\n", StringComparison.Ordinal));
+
+                var log =
+                    request
+                        .Substring(0, request.IndexOf("\r\n",
+                            StringComparison.Ordinal));
 
                 _properties.Io.Print("[" + _properties.Time.GetTime() + "] [<" + id + ">] " + log);
 
-                if (request.Contains("Content-Type: multipart/form-data;"))
-                {
-                    var contentLength = request
-                        .Substring(request.IndexOf("Content-Length: ", StringComparison.Ordinal));
-                    var packageSize = int.Parse(contentLength
-                        .Substring(16, contentLength.IndexOf("\r\n", StringComparison.Ordinal) - 16));
-                    RequestWithMultiPart(id, request, handler, packageSize);
-                }
-                else
-                    NoMultiPart(id, request, handler);
+                var processor = _serviceFactory.GetService(request,
+                    _namespaces, _assembly,
+                    _properties);
+
+                returnCode
+                    = _requestProcessor.HandleRequest(request,
+                        handler, _sender, processor);
             }
             catch (Exception)
             {
@@ -92,6 +89,9 @@ namespace Server.Core
                 if (handler.Connected())
                     handler.Close();
                 Interlocked.Decrement(ref _numberOfThreads);
+                _properties.Io.Print("[" + _properties.Time.GetTime()
+                                     + "] [<" + id + ">] "
+                                     + returnCode);
             }
         }
 
@@ -100,66 +100,6 @@ namespace Server.Core
             AcceptingNewConn = false;
             _socket.Close();
             while (_numberOfThreads != 0) ;
-        }
-
-        private string GetPacketSplit(string request)
-        {
-            var packetSplit = request.Substring(request.IndexOf("boundary=----"
-                , StringComparison.Ordinal) + 13);
-            packetSplit = packetSplit.Remove(packetSplit.IndexOf("\r\n"
-                , StringComparison.Ordinal));
-            return packetSplit;
-        }
-
-        private void RequestWithMultiPart(Guid id, string request, IZSocket handler, int packageSize)
-        {
-            var requestPacket = request;
-            var packetSplit = GetPacketSplit(request);
-            var httpResponce = _properties.DefaultResponse.Clone();
-            var processor = _serviceFactory.GetService(request, _namespaces, _assembly,
-                _properties);
-
-            httpResponce = processor.ProcessRequest(requestPacket, httpResponce, _properties);
-
-            while (!requestPacket.EndsWith($"------{packetSplit}--\r\n"))
-            {
-                requestPacket = handler.Receive();
-                if (httpResponce.HttpStatusCode != "409 Conflict")
-                    httpResponce = processor.ProcessRequest(requestPacket, httpResponce, _properties);
-            }
-            SendResponce(handler, httpResponce, id);
-        }
-
-        private void NoMultiPart(Guid id, string request, IZSocket handler)
-        {
-            var processor = _serviceFactory.GetService(request, _namespaces, _assembly,
-                _properties);
-            var httpResponce = processor.ProcessRequest(request, _properties.DefaultResponse.Clone(), _properties);
-            SendResponce(handler, httpResponce, id);
-        }
-
-
-        private void SendResponce(IZSocket handler, IHttpResponse httpResponce, Guid id)
-        {
-            handler.Send("HTTP/1.1 " + httpResponce.HttpStatusCode + "\r\n");
-            handler.Send("Cache-Control: " + httpResponce.CacheControl + "\r\n");
-            handler.Send("Content-Type: " + httpResponce.ContentType + "\r\n");
-            if (httpResponce.ContentDisposition != null)
-            {
-                handler.Send("Content-Disposition: " + httpResponce.ContentDisposition + "; filename = "
-                             + httpResponce.Filename +
-                             "\r\n");
-                handler.Send("Content-Length: " + _properties.FileReader.FileSize(httpResponce.FilePath) +
-                             "\r\n\r\n");
-                handler.SendFile(httpResponce.FilePath);
-            }
-            else
-            {
-                handler.Send("Content-Length: " + Encoding.ASCII.GetBytes(httpResponce.Body).Length +
-                             "\r\n\r\n");
-                handler.Send(httpResponce.Body);
-            }
-            _properties.Io.Print("[" + _properties.Time.GetTime() + "] [<" + id + ">] " + httpResponce.HttpStatusCode);
         }
     }
 }
