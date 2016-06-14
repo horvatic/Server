@@ -10,8 +10,6 @@ namespace Server.Test
         public MockHttpService()
         {
             _mock = new Mock<IHttpServiceProcessor>();
-            _mock.Setup(m => m.CanProcessRequest(It.IsAny<string>(),
-                It.IsAny<ServerProperties>())).Returns(true);
         }
 
         public bool CanProcessRequest(string request, ServerProperties serverProperties)

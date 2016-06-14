@@ -78,7 +78,7 @@ namespace Server.Core
 
                 returnCode
                     = _requestProcessor.HandleRequest(request,
-                        handler, _sender, processor);
+                        handler, _sender, processor, _properties);
             }
             catch (Exception)
             {

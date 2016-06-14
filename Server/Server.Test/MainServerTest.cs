@@ -113,6 +113,7 @@ namespace Server.Test
                 new Thread(() => server.RunningProcess(new PoolDataForRequest(zSocket,
                     Guid.NewGuid())));
             runningServer.Start();
+            Thread.Sleep(1000);
             server.StopNewConnAndCleanUp();
             runningServer.Join();
             zSocket.VerifyReceive();

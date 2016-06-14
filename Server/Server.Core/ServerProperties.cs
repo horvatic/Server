@@ -7,7 +7,7 @@
             IHttpResponse defaultResponse, 
             IServerTime time,
             IPrinter io,
-            object persistentData = null)
+            object serviceSpecificObjectsWrapper = null)
         {
             if (currentDir == null)
                 CurrentDir = null;
@@ -17,7 +17,8 @@
             DefaultResponse = defaultResponse;
             Time = time;
             Io = io;
-            PersistentData = persistentData;
+            ServiceSpecificObjectsWrapper 
+                = serviceSpecificObjectsWrapper;
         }
 
         public string CurrentDir { get; }
@@ -28,6 +29,6 @@
 
         public IPrinter Io { get; }
 
-        public object PersistentData { get; set; }
+        public object ServiceSpecificObjectsWrapper { get; set; }
     }
 }

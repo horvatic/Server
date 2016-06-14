@@ -4,6 +4,7 @@
     {
         string HandleRequest(string request, IZSocket handler,
             ISend sender, 
-            IHttpServiceProcessor service);
+            IHttpServiceProcessor service,
+            ServerProperties properties);
     }
 }

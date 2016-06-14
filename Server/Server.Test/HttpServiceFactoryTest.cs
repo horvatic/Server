@@ -18,7 +18,7 @@ namespace Server.Test
         [Fact]
         public void Make_Mock_Http_Processor_Factory()
         {
-            var serverProperties = new ServerProperties(null, 5555, 
+            var serverProperties = new ServerProperties("c:/", 5555, 
                 new HttpResponse(), new ServerTime(),
                 new MockPrinter());
             var httpFactory = new HttpServiceFactory(new MockHttpService());

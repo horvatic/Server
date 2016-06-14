@@ -63,7 +63,7 @@ namespace Server.Test
             var properties = new ServerProperties(currentDir, 
                 port, new HttpResponse(),
                 new MockServerTime(), new MockPrinter(), testObject);
-            Assert.Equal(testObject, properties.PersistentData);
+            Assert.Equal(testObject, properties.ServiceSpecificObjectsWrapper);
         }
     }
 }

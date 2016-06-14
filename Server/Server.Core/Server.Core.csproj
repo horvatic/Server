@@ -58,6 +58,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClosingServerHandler.cs" />
+    <Compile Include="DefaultPrinter.cs" />
+    <Compile Include="DefaultRequestProcessor.cs" />
+    <Compile Include="DefaultSender.cs" />
+    <Compile Include="DefaultZSocket.cs" />
     <Compile Include="HttpResponse.cs" />
     <Compile Include="HttpServiceFactory.cs" />
     <Compile Include="IHttpResponse.cs" />
