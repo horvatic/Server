@@ -32,7 +32,7 @@
         public string Filename { get; set; }
         public string FilePath { get; set; }
         public string Body { get; set; } = "";
-        public int ContentLength { get; set; }
+        public long ContentLength { get; set; }
 
         public IHttpResponse Clone()
         {

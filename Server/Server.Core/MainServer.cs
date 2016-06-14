@@ -89,9 +89,10 @@ namespace Server.Core
                 if (handler.Connected())
                     handler.Close();
                 Interlocked.Decrement(ref _numberOfThreads);
-                _properties.Io.Print("[" + _properties.Time.GetTime()
-                                     + "] [<" + id + ">] "
-                                     + returnCode);
+                if(returnCode != "")
+                    _properties.Io.Print("[" + _properties.Time.GetTime()
+                                         + "] [<" + id + ">] "
+                                         + returnCode);
             }
         }
 
