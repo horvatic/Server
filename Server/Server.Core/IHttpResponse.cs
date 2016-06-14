@@ -9,6 +9,7 @@
         string Filename { get; set; }
         string FilePath { get; set; }
         string Body { get; set; }
+        long ContentLength { get; set; }
 
         IHttpResponse Clone();
     }

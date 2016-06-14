@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Server.Core
 {
-    public class Printer : IPrinter
+    public class DefaultPrinter : IPrinter
     {
         public string Log { get; set; } = null;
 

@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{CC5D26B6-C3EA-4E21-B7D6-A3AE2EDDC7F4}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Server.Core</RootNamespace>
     <AssemblyName>Server.Core</AssemblyName>
@@ -42,6 +42,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -55,35 +58,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClosingServerHandler.cs" />
-    <Compile Include="DirectoryService.cs" />
-    <Compile Include="FileSendService.cs" />
-    <Compile Include="FormService.cs" />
-    <Compile Include="Ftpservice.cs" />
-    <Compile Include="HelloWorldService.cs" />
+    <Compile Include="DefaultPrinter.cs" />
+    <Compile Include="DefaultRequestProcessor.cs" />
+    <Compile Include="DefaultSender.cs" />
+    <Compile Include="DefaultZSocket.cs" />
     <Compile Include="HttpResponse.cs" />
     <Compile Include="HttpServiceFactory.cs" />
     <Compile Include="IHttpResponse.cs" />
     <Compile Include="IHttpServiceProcessor.cs" />
-    <Compile Include="InlinePdfService.cs" />
-    <Compile Include="InlinePngService.cs" />
-    <Compile Include="InlineTextDocService.cs" />
     <Compile Include="IPrinter.cs" />
+    <Compile Include="IRequestProcessor.cs" />
+    <Compile Include="ISend.cs" />
     <Compile Include="IServerTime.cs" />
     <Compile Include="PoolDataForRequest.cs" />
-    <Compile Include="Printer.cs" />
     <Compile Include="ServerProperties.cs" />
     <Compile Include="ServerTime.cs" />
-    <Compile Include="Service404.cs" />
-    <Compile Include="VideoStreamingService.cs" />
-    <Compile Include="ZSocket.cs" />
-    <Compile Include="DirectoryProcessor.cs" />
     <Compile Include="MainServer.cs" />
-    <Compile Include="FileProcessor.cs" />
     <Compile Include="IZSocket.cs" />
-    <Compile Include="IDirectoryProcessor.cs" />
-    <Compile Include="IFileProcessor.cs" />
     <Compile Include="IMainServer.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

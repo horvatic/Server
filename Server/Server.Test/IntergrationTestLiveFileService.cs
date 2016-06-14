@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Server.Core;
 
-namespace Server.Core
+namespace Server.Test
 {
-    public class FileSendService : IHttpServiceProcessor
+    internal class IntergrationTestLiveFileService : IHttpServiceProcessor
     {
-        public bool CanProcessRequest(string request, ServerProperties serverProperties)
+        public bool CanProcessRequest(string request,
+            ServerProperties serverProperties)
         {
             var requestItem = CleanRequest(request);
             var configManager = ConfigurationManager.AppSettings;
@@ -17,24 +20,27 @@ namespace Server.Core
             }
 
             return serverProperties.CurrentDir != null &&
-                   serverProperties.FileReader
-                   .Exists(serverProperties.CurrentDir + requestItem.Substring(1))
+                   File
+                       .Exists(serverProperties.CurrentDir
+                               + requestItem.Substring(1))
                    && request.Contains("GET /");
         }
 
-        public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
+        public IHttpResponse ProcessRequest(string request,
+            IHttpResponse httpResponse,
             ServerProperties serverProperties)
         {
             var requestItem = CleanRequest(request).Substring(1);
             try
             {
-                serverProperties.FileReader.FileSize(serverProperties.CurrentDir + requestItem);
                 httpResponse.HttpStatusCode = "200 OK";
                 httpResponse.CacheControl = "no-cache";
                 httpResponse.FilePath = serverProperties.CurrentDir + requestItem;
                 httpResponse.Filename = requestItem.Remove(0, requestItem.LastIndexOf('/') + 1);
                 httpResponse.ContentType = "application/octet-stream";
                 httpResponse.ContentDisposition = "attachment";
+                httpResponse.ContentLength
+                    = Encoding.ASCII.GetBytes(httpResponse.Body).Length;
                 return httpResponse;
             }
             catch (Exception)

@@ -15,7 +15,6 @@ namespace Server.Core
 
         public void ShutdownProcess(object sender, ConsoleCancelEventArgs e)
         {
-            //Console.WriteLine("Server Shuting Down...");
             _runningServer.StopNewConnAndCleanUp();
         }
     }

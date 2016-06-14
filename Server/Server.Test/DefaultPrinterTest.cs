@@ -5,12 +5,12 @@ using Xunit;
 
 namespace Server.Test
 {
-    public class PrinterTest
+    public class DefaultPrinterTest
     {
         [Fact]
         public void Make_Not_Null_Class()
         {
-            Assert.NotNull(new Printer());
+            Assert.NotNull(new DefaultPrinter());
         }
 
         [Fact]
@@ -19,7 +19,7 @@ namespace Server.Test
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
 
-            var io = new Printer();
+            var io = new DefaultPrinter();
             io.Print("Hello");
             Assert.Equal("Hello\r\n", consoleOutput.ToString());
         }
@@ -30,7 +30,8 @@ namespace Server.Test
             var gid = Guid.NewGuid();
             var consoleOutput = new StringWriter();
             Console.SetOut(consoleOutput);
-            var io = new Printer {Log = "c:/" + gid + ".txt"};
+            var io = new DefaultPrinter
+                { Log = "c:/" + gid + ".txt"};
             io.Print("Hello");
             Assert.True(File.Exists("c:/" + gid + ".txt"));
             File.Delete("c:/" + gid + ".txt");
@@ -40,7 +41,7 @@ namespace Server.Test
         public void Print_To_File()
         {
             var gid = Guid.NewGuid();
-            var io = new Printer();
+            var io = new DefaultPrinter();
             io.PrintToFile("Hello", "c:/" + gid + ".txt");
             Assert.True(File.Exists("c:/" + gid + ".txt"));
             File.Delete("c:/" + gid + ".txt");

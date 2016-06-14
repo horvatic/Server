@@ -21,6 +21,8 @@
             FilePath = copy.FilePath;
 
             Body = copy.Body;
+
+            ContentLength = copy.ContentLength;
         }
 
         public string HttpStatusCode { get; set; } = "200 OK";
@@ -30,6 +32,7 @@
         public string Filename { get; set; }
         public string FilePath { get; set; }
         public string Body { get; set; } = "";
+        public long ContentLength { get; set; }
 
         public IHttpResponse Clone()
         {

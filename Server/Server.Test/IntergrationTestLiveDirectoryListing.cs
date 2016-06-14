@@ -1,26 +1,32 @@
 ﻿using System;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Server.Core;
 
-namespace Server.Core
+namespace Server.Test
 {
-    public class DirectoryService : IHttpServiceProcessor
+    internal class IntergrationTestLiveDirectoryListing : IHttpServiceProcessor
     {
         public bool CanProcessRequest(string request, ServerProperties serverProperties)
         {
             var requestItem = CleanRequest(request);
             var configManager = ConfigurationManager.AppSettings;
-            if (configManager.AllKeys.Any(key => requestItem.EndsWith(configManager[key]))
+            if (configManager.AllKeys.Any(key =>
+                requestItem.EndsWith(configManager[key]))
                 || request.Contains("POST /"))
             {
                 return false;
             }
             return serverProperties.CurrentDir != null &&
-                   serverProperties.DirReader.Exists(serverProperties.CurrentDir + requestItem.Substring(1));
+                   Directory
+                       .Exists(serverProperties.CurrentDir
+                               + requestItem.Substring(1));
         }
 
-        public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
+        public IHttpResponse ProcessRequest(string request,
+            IHttpResponse httpResponse,
             ServerProperties serverProperties)
         {
             var requestItem = CleanRequest(request);
@@ -28,8 +34,11 @@ namespace Server.Core
             httpResponse.HttpStatusCode = "200 OK";
             httpResponse.CacheControl = "no-cache";
             httpResponse.ContentType = "text/html";
-            httpResponse.Body = DirectoryContents(requestItem, serverProperties.DirReader, serverProperties.CurrentDir,
+            httpResponse.Body = DirectoryContents(requestItem,
+                serverProperties.CurrentDir,
                 serverProperties.Port);
+            httpResponse.ContentLength
+                = Encoding.ASCII.GetBytes(httpResponse.Body).Length;
             return httpResponse;
         }
 
@@ -62,10 +71,11 @@ namespace Server.Core
             return tail.ToString();
         }
 
-        private string DirectoryContents(string dir, IDirectoryProcessor reader, string root, int port)
+        private string DirectoryContents(string dir,
+            string root, int port)
         {
             var directoryContents = new StringBuilder();
-            var files = reader.GetFiles(root + dir);
+            var files = Directory.GetFiles(root + dir);
             foreach (var replacedBackSlash in files.Select(file => file.Replace('\\', '/')))
             {
                 directoryContents.Append(@"<br><a href=""http://localhost:" + port + "/" +
@@ -76,7 +86,7 @@ namespace Server.Core
                                          replacedBackSlash.Remove(0, replacedBackSlash.LastIndexOf('/') + 1)
                                          + "</a>");
             }
-            var subDirs = reader.GetDirectories(root + dir);
+            var subDirs = Directory.GetDirectories(root + dir);
             foreach (var replacedBackSlash in subDirs.Select(subDir => subDir.Replace('\\', '/')))
             {
                 directoryContents.Append(@"<br><a href=""http://localhost:" + port + "/" +
