@@ -1,4 +1,6 @@
-﻿namespace Server.Core
+﻿using System.Collections.Generic;
+
+namespace Server.Core
 {
     public interface IHttpResponse
     {
@@ -10,6 +12,8 @@
         string FilePath { get; set; }
         string Body { get; set; }
         long ContentLength { get; set; }
+
+        List<string> OtherHeaders { get; set; }
 
         IHttpResponse Clone();
     }
