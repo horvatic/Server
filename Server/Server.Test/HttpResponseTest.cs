@@ -1,4 +1,5 @@
-﻿using Server.Core;
+﻿using System.Collections.Generic;
+using Server.Core;
 using Xunit;
 
 namespace Server.Test
@@ -99,6 +100,31 @@ namespace Server.Test
             Assert.Equal("C:/Hello", copy.FilePath);
             Assert.Equal("<p>Hello</p>", copy.Body);
             Assert.Equal(100, copy.ContentLength);
+        }
+
+        [Fact]
+        public void Http_Clone_Other_Headers()
+        {
+            var respone = new HttpResponse
+            {
+                HttpStatusCode = "404 Not Found",
+                CacheControl = "no-store",
+                ContentType = "application/octet-stream",
+                Filename = "Hello",
+                FilePath = "C:/Hello",
+                ContentDisposition = "inline",
+                Body = "<p>Hello</p>",
+                ContentLength = 100,
+                OtherHeaders = new List<string>()
+                {
+                    "Accpet : Yes"
+                }
+            };
+
+            var copy = respone.Clone();
+
+            Assert.Equal("Accpet : Yes",
+                respone.OtherHeaders[0]);
         }
     }
 }

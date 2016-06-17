@@ -1,4 +1,7 @@
-﻿namespace Server.Core
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters;
+
+namespace Server.Core
 {
     public class HttpResponse : IHttpResponse
     {
@@ -23,6 +26,11 @@
             Body = copy.Body;
 
             ContentLength = copy.ContentLength;
+
+            if (copy.OtherHeaders == null) return;
+            OtherHeaders = new List<string>();
+            foreach(var header in copy.OtherHeaders)
+                OtherHeaders.Add(header);
         }
 
         public string HttpStatusCode { get; set; } = "200 OK";
@@ -33,6 +41,7 @@
         public string FilePath { get; set; }
         public string Body { get; set; } = "";
         public long ContentLength { get; set; }
+        public List<string> OtherHeaders { get; set; }
 
         public IHttpResponse Clone()
         {
