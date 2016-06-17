@@ -1,4 +1,5 @@
-﻿using Server.Core;
+﻿using System.Collections.Generic;
+using Server.Core;
 using Xunit;
 namespace Server.Test
 {
@@ -26,6 +27,24 @@ namespace Server.Test
             zSocket.VerifySend("Content-Type: text/html\r\n");
             zSocket.VerifySend("Content-Length: 20\r\n\r\n");
             zSocket.VerifySend("Hello");
+        }
+
+        [Fact]
+        public void Send_Other_Headers()
+        {
+            var zSocket = new MockZSocket();
+            var response = new HttpResponse()
+            {
+                OtherHeaders = new List<string>()
+                {
+                    "Hello : Yes"
+                }
+            };
+
+            var sender = new DefaultSender();
+            var returnCode = sender.SendResponce(zSocket, response);
+            
+            zSocket.VerifySend("Hello : Yes");
         }
 
         [Fact]

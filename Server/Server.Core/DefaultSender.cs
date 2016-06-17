@@ -11,6 +11,11 @@ namespace Server.Core
                          + httpResponce.HttpStatusCode + "\r\n");
             handler.Send("Cache-Control: "
                          + httpResponce.CacheControl + "\r\n");
+
+            if (httpResponce.OtherHeaders != null)
+                foreach (var header in httpResponce.OtherHeaders)
+                    handler.Send(header);
+
             handler.Send("Content-Type: "
                          + httpResponce.ContentType + "\r\n");
             if (httpResponce.ContentDisposition != null)
@@ -31,6 +36,7 @@ namespace Server.Core
                              "\r\n\r\n");
                 handler.Send(httpResponce.Body);
             }
+            
             return httpResponce.HttpStatusCode;
         }
     }
