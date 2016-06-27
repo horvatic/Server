@@ -12,7 +12,6 @@ namespace Server.Test
         [Fact]
         public void Get_Empty_Request()
         {
-            var sender = new MockSender();
             var requestProcessor = new MockRequestProcessor();
             var zSocket = new MockZSocket()
                 .StubSentToReturn(10)
@@ -20,15 +19,13 @@ namespace Server.Test
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
             var properties = new ServerProperties("",
-                5555, new HttpResponse(),
-                new ServerTime(),
+                5555, new ServerTime(),
                 new MockPrinter());
             var dirServer = new MainServer(zSocket,
                 properties,
                 new HttpServiceFactory(new MockHttpService()),
                 requestProcessor,
-                sender,
-                new List<string> {"Server.Test"},
+                new List<string> { "Server.Test" },
                 new List<Assembly>
                 {Assembly.GetAssembly(typeof (MockHttpService))});
             dirServer.Run();
@@ -37,7 +34,6 @@ namespace Server.Test
         [Fact]
         public void Web_Server_No_Longer_Taking_Request()
         {
-            var sender = new MockSender();
             var requestProcessor = new MockRequestProcessor();
             var zSocket = new MockZSocket()
                 .StubSentToReturn(10)
@@ -45,13 +41,12 @@ namespace Server.Test
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
             var properties = new ServerProperties("",
-                5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                5555, new ServerTime(), new MockPrinter());
             var dirServer = new MainServer(zSocket,
                 properties,
                 new HttpServiceFactory(new MockHttpService()),
                 requestProcessor,
-                sender,
-                new List<string> {"Server.Test"},
+                new List<string> { "Server.Test" },
                 new List<Assembly>
                 {Assembly.GetAssembly(typeof (MockHttpService))});
             dirServer.StopNewConnAndCleanUp();
@@ -63,7 +58,7 @@ namespace Server.Test
         public void Active_Catch_When_Server_Is_Shuting_Down()
 
         {
-            var server = new MainServer(null, null, null, null, null,
+            var server = new MainServer(null, null, null, null,
                 null, null);
             server.Run();
         }
@@ -71,17 +66,15 @@ namespace Server.Test
         [Fact]
         public void Make_Sure_Sever_Is_Still_Alive()
         {
-            var sender = new MockSender();
             var requestProcessor = new MockRequestProcessor();
             var mockZSocket = new MockZSocket();
             var properties = new ServerProperties("",
-                5555, new HttpResponse(), new ServerTime(), new MockPrinter());
+                5555, new ServerTime(), new MockPrinter());
             var dirServer = new MainServer(mockZSocket,
                 properties,
                 new HttpServiceFactory(new MockHttpService()),
                 requestProcessor,
-                sender,
-                new List<string> {"Server.Test"},
+                new List<string> { "Server.Test" },
                 new List<Assembly>
                 {Assembly.GetAssembly(typeof (MockHttpService))});
             Assert.Equal(true, dirServer.AcceptingNewConn);
@@ -90,11 +83,9 @@ namespace Server.Test
         [Fact]
         public void Server_Processing_Request_When_End_Is_Made()
         {
-            var sender = new MockSender();
             var requestProcessor = new MockRequestProcessor();
             var serverProperties = new ServerProperties(null,
                 5555,
-                new HttpResponse(),
                 new ServerTime(), new MockPrinter());
 
             var zSocket = new MockZSocket()
@@ -105,12 +96,13 @@ namespace Server.Test
             var server = new MainServer(zSocket, serverProperties,
                 new HttpServiceFactory(new MockHttpService()),
                 requestProcessor,
-                sender,
-                new List<string> {"Server.Test"},
+                new List<string> { "Server.Test" },
                 new List<Assembly>
                 {Assembly.GetAssembly(typeof (MockHttpService))});
             var runningServer =
-                new Thread(() => server.RunningProcess(new PoolDataForRequest(zSocket,
+                new Thread(() => server.RunningProcess(
+                    new PoolDataForRequest(new HttpResponse(zSocket), 
+                    zSocket,
                     Guid.NewGuid())));
             runningServer.Start();
             Thread.Sleep(1000);
@@ -123,11 +115,9 @@ namespace Server.Test
         [Fact]
         public void Make_Web_Server_Get_Request()
         {
-            var sender = new MockSender();
             var requestProcessor = new MockRequestProcessor();
             var serverProperties = new ServerProperties(null,
                 5555,
-                new HttpResponse(),
                 new ServerTime(), new MockPrinter());
 
             var zSocket = new MockZSocket()
@@ -138,11 +128,12 @@ namespace Server.Test
             var server = new MainServer(zSocket, serverProperties,
                 new HttpServiceFactory(new MockHttpService()),
                 requestProcessor,
-                sender,
-                new List<string> {"Server.Test"},
+                new List<string> { "Server.Test" },
                 new List<Assembly>
                 {Assembly.GetAssembly(typeof (MockHttpService))});
-            server.RunningProcess(new PoolDataForRequest(zSocket,
+            server.RunningProcess(
+                new PoolDataForRequest(new HttpResponse(zSocket), 
+                zSocket,
                 Guid.NewGuid()));
             zSocket.VerifyReceive();
 
@@ -152,11 +143,9 @@ namespace Server.Test
         [Fact]
         public void Mock_Socket_Error()
         {
-            var sender = new MockSender();
             var requestProcessor = new MockRequestProcessor();
             var serverProperties = new ServerProperties(null,
                 5555,
-                new HttpResponse(),
                 new ServerTime(), new MockPrinter());
 
             var zSocket = new MockZSocket()
@@ -167,11 +156,12 @@ namespace Server.Test
             var server = new MainServer(zSocket, serverProperties,
                 new HttpServiceFactory(new MockHttpService()),
                 requestProcessor,
-                sender,
-                new List<string> {"Server.Test"},
+                new List<string> { "Server.Test" },
                 new List<Assembly>
                 {Assembly.GetAssembly(typeof (MockHttpService))});
-            server.RunningProcess(new PoolDataForRequest(zSocket,
+            server.RunningProcess(
+                new PoolDataForRequest(new HttpResponse(zSocket),
+                zSocket,
                 Guid.NewGuid()));
             zSocket.VerifyReceive();
 

@@ -60,7 +60,6 @@
     <Compile Include="ClosingServerHandler.cs" />
     <Compile Include="DefaultPrinter.cs" />
     <Compile Include="DefaultRequestProcessor.cs" />
-    <Compile Include="DefaultSender.cs" />
     <Compile Include="DefaultZSocket.cs" />
     <Compile Include="HttpResponse.cs" />
     <Compile Include="HttpServiceFactory.cs" />
@@ -68,7 +67,6 @@
     <Compile Include="IHttpServiceProcessor.cs" />
     <Compile Include="IPrinter.cs" />
     <Compile Include="IRequestProcessor.cs" />
-    <Compile Include="ISend.cs" />
     <Compile Include="IServerTime.cs" />
     <Compile Include="PoolDataForRequest.cs" />
     <Compile Include="ServerProperties.cs" />

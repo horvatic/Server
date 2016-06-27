@@ -16,16 +16,16 @@ namespace Server.Test
             var endPoint = new IPEndPoint((IPAddress.Loopback), 4321);
             var zSocket = new DefaultZSocket(endPoint);
             var properties = new ServerProperties("c:/",
-                4321, new HttpResponse(), 
-                new ServerTime(), 
+                4321,
+                new ServerTime(),
                 new MockPrinter());
             var testingServer = new MainServer(zSocket,
-                properties, 
+                properties,
                 new HttpServiceFactory(new IntergrationTestLiveDirectoryListing()),
-                new DefaultRequestProcessor(), new DefaultSender(),
+                new DefaultRequestProcessor(),
                 new List<string>() { "Server.Test" },
                 new List<Assembly>() { Assembly.GetExecutingAssembly() });
-            new Thread(() => 
+            new Thread(() =>
                 RunServerNoUntilEndRequest(testingServer)).Start();
 
 
@@ -39,16 +39,16 @@ namespace Server.Test
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 50321);
             var zSocket = new DefaultZSocket(endPoint);
-            var properties = new ServerProperties("c:/", 
-                50321, new HttpResponse(), new ServerTime(), 
+            var properties = new ServerProperties("c:/",
+                50321, new ServerTime(),
                 new MockPrinter());
-            var testingServer = 
-                new MainServer(zSocket, properties, 
+            var testingServer =
+                new MainServer(zSocket, properties,
                 new HttpServiceFactory(new IntergrationTestLiveFileService()),
-                new DefaultRequestProcessor(), new DefaultSender(),
+                new DefaultRequestProcessor(),
                 new List<string>() { "Server.Test" },
                 new List<Assembly>() { Assembly.GetExecutingAssembly() });
-            new Thread(() => 
+            new Thread(() =>
                 RunServerNoUntilEndRequest(testingServer)).Start();
 
             var wrGeturl =
@@ -63,13 +63,13 @@ namespace Server.Test
         {
             var endPoint = new IPEndPoint((IPAddress.Loopback), 45418);
             var zSocket = new DefaultZSocket(endPoint);
-            var properties = new ServerProperties("c:/", 
-                45418, new HttpResponse(), new ServerTime(), 
+            var properties = new ServerProperties("c:/",
+                45418, new ServerTime(),
                 new MockPrinter());
-            var testingServer = 
-                new MainServer(zSocket, properties, 
+            var testingServer =
+                new MainServer(zSocket, properties,
                 new HttpServiceFactory(new IntergrationTestLiveDirectoryListing()),
-                new DefaultRequestProcessor(), new DefaultSender(),
+                new DefaultRequestProcessor(),
                 new List<string>() { "Server.Test" },
                 new List<Assembly>() { Assembly.GetExecutingAssembly() });
             var testServerThread = new Thread(() => RunServerUntilEndRequest(testingServer));

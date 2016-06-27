@@ -19,18 +19,18 @@ namespace Server.Core
             ServerProperties serverProperties)
         {
             foreach (var processingService in assemblies.SelectMany(currentAssembly => (from currentNameSpace in nameSpaces
-                let typelist = GetTypesInNamespace(currentAssembly, currentNameSpace)
-                select typelist.Where(t => t.GetInterface("IHttpServiceProcessor", true) 
-                                           != null)
-                    .Select(
-                        t =>
-                            (IHttpServiceProcessor)
-                                Activator.CreateInstance(currentAssembly.ToString(),
-                                    currentNameSpace + "." + t.Name).Unwrap())
-                    .FirstOrDefault(service => service.CanProcessRequest(canProcess, serverProperties))
+                                                                                        let typelist = GetTypesInNamespace(currentAssembly, currentNameSpace)
+                                                                                        select typelist.Where(t => t.GetInterface("IHttpServiceProcessor", true)
+                                                                                                                   != null)
+                                                                                            .Select(
+                                                                                                t =>
+                                                                                                    (IHttpServiceProcessor)
+                                                                                                        Activator.CreateInstance(currentAssembly.ToString(),
+                                                                                                            currentNameSpace + "." + t.Name).Unwrap())
+                                                                                            .FirstOrDefault(service => service.CanProcessRequest(canProcess, serverProperties))
                 into processingService
-                where processingService != null
-                select processingService)))
+                                                                                        where processingService != null
+                                                                                        select processingService)))
             {
                 return processingService;
             }

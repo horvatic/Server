@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using Server.Core;
 using Xunit;
 
@@ -37,22 +35,20 @@ namespace Server.Test
             message.Enqueue("A");
             message.Enqueue("------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n");
 
-            var zSocket = new MockZSocket().StubReceiveWithQueue(message)
+            var zSocket = new MockZSocket()
+                .StubReceiveWithQueue(message)
                 .StubSentToReturn(10)
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
-            var properties = new ServerProperties(@"Home",
-                8080, new HttpResponse(), 
-                new ServerTime(), new MockPrinter());
-            var server = new MainServer(zSocket, properties,
-                new HttpServiceFactory(new MockHttpService()
-                    .StubProcessRequest(new HttpResponse())),
-                new DefaultRequestProcessor(), new MockSender(),
-                 new List<string>() { "Server.Test" },
-                new List<Assembly>() { Assembly.GetExecutingAssembly() });
-            server.RunningProcess(new PoolDataForRequest(zSocket, 
-                Guid.NewGuid()));
 
+            var properties = new ServerProperties(@"Home",
+                8080, new ServerTime(), new MockPrinter());
+            var process = new DefaultRequestProcessor();
+            var status = process.HandleRequest(request, zSocket,
+                new MockHttpService()
+                    .StubProcessRequest("200 OK"),
+                properties, new HttpResponse(zSocket));
+            Assert.Equal("200 OK", status);
             zSocket.VerifyManyReceive(11);
         }
 
@@ -84,33 +80,27 @@ namespace Server.Test
             message.Enqueue("A");
             message.Enqueue("A");
             message.Enqueue("\r\n------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n");
-            
-            var zSocket = new MockZSocket().StubReceiveWithQueue(message)
+
+            var zSocket = new MockZSocket()
+                .StubReceiveWithQueue(message)
                 .StubSentToReturn(10)
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
-            var properties = new ServerProperties(@"Home", 8080, 
-                new HttpResponse(), new ServerTime(), 
-                new MockPrinter());
-            var server = new MainServer(zSocket, properties,
-                new HttpServiceFactory(
-                    new MockHttpService()
-                    .StubProcessRequest(new HttpResponse
-                    {
-                        HttpStatusCode = "404"
-                    })),
-                new DefaultRequestProcessor(), new MockSender(),
-                 new List<string>() { "Server.Test" },
-                new List<Assembly>() { Assembly.GetExecutingAssembly() });
-            server.RunningProcess(new PoolDataForRequest(zSocket, Guid.NewGuid()));
+            var properties = new ServerProperties(@"Home", 8080,
+                new ServerTime(), new MockPrinter());
+            var process = new DefaultRequestProcessor();
+            var status = process.HandleRequest(request, zSocket,
+                new MockHttpService()
+                    .StubProcessRequest("409 Conflict"),
+                properties, new HttpResponse(zSocket));
 
+            Assert.Equal("409 Conflict", status);
             zSocket.VerifyManyReceive(11);
         }
 
         [Fact]
         public void Handles_Request_Split_Half_InHeader()
         {
-            var gid = Guid.NewGuid();
             var message = new Queue<string>();
             var request = "POST /upload HTTP/1.1\r\n" +
                           "Host: localhost: 8080\r\n" +
@@ -129,29 +119,30 @@ namespace Server.Test
                           @"Content-Disposition: form-data; name=""saveLocation""" + "\r\n\r\n" +
                           "ZZZ\r\n" +
                           "------WebKitFormBoundaryGeqPPReAkwpcPO8e\r\n" +
-                          @"Content-Disposition: form-data; name=""fileToUpload""; filename=""" + gid + ".txt\"" +
+                          @"Content-Disposition: form-data; name=""fileToUpload""; filename=""" + "gid" + ".txt\"" +
                           "\r\n" +
                           "Content-Type: plan/txt\r\n\r\n";
             message.Enqueue(request);
             var packet = "Hello\r\n" + "------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n";
             message.Enqueue(packet);
-            
-            var zSocket = new MockZSocket().StubReceiveWithQueue(message)
+
+            var zSocket = new MockZSocket()
+                .StubReceiveWithQueue(message)
                 .StubSentToReturn(10)
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
             var printer = new MockPrinter();
-            var properties = new ServerProperties(@"Home", 
-                8080, new HttpResponse(), new ServerTime(), 
+            var properties = new ServerProperties(@"Home",
+                8080, new ServerTime(),
                 printer);
-            var server = new MainServer(zSocket, 
-                properties, 
-                new HttpServiceFactory(new MockHttpService()
-                    .StubProcessRequest(new HttpResponse())),
-                new DefaultRequestProcessor(), new MockSender(),
-                 new List<string>() { "Server.Test" },
-                new List<Assembly>() { Assembly.GetExecutingAssembly() });
-            server.RunningProcess(new PoolDataForRequest(zSocket, gid));
+            var processor = new DefaultRequestProcessor();
+
+            var status = processor.HandleRequest(request,
+                zSocket,
+                new MockHttpService()
+                    .StubProcessRequest("200 OK"),
+                properties, new HttpResponse(zSocket));
+            Assert.Equal("200 OK", status);
             zSocket.VerifyManyReceive(2);
         }
 
@@ -174,22 +165,21 @@ namespace Server.Test
                           "Accept-Language: en-US,en;q=0.8";
             message.Enqueue(request);
             message.Enqueue("------WebKitFormBoundaryGeqPPReAkwpcPO8e--\r\n");
-            
-            var zSocket = new MockZSocket().StubReceiveWithQueue(message)
+
+            var zSocket = new MockZSocket()
+                .StubReceiveWithQueue(message)
                 .StubSentToReturn(10)
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
             var properties = new ServerProperties(@"Home",
-                8080, new HttpResponse(), new ServerTime(), 
+                8080, new ServerTime(),
                 new MockPrinter());
-            var server = new MainServer(zSocket, 
-                properties, 
-                new HttpServiceFactory(new MockHttpService()
-                .StubProcessRequest(new HttpResponse())),
-                new DefaultRequestProcessor(), new MockSender(),
-                new List<string>() { "Server.Test" },
-                new List<Assembly>() { Assembly.GetExecutingAssembly() });
-            server.RunningProcess(new PoolDataForRequest(zSocket, Guid.NewGuid()));
+            var processor = new DefaultRequestProcessor();
+            processor.HandleRequest(request, zSocket,
+                new MockHttpService()
+                    .StubProcessRequest("200 OK"),
+                properties, new HttpResponse(zSocket));
+
 
             zSocket.VerifyManyReceive(2);
         }
@@ -198,21 +188,20 @@ namespace Server.Test
         public void Handles_Request_Less_Than_1024_Bytes_All_Given()
         {
             var request = GetRequest();
-            
+
             var zSocket = new MockZSocket().StubReceive(request)
                 .StubSentToReturn(10)
                 .StubConnect(true);
             zSocket = zSocket.StubAcceptObject(zSocket);
             var properties = new ServerProperties(@"Home",
-                8080, new HttpResponse(), new ServerTime(), new MockPrinter());
-            var server = new MainServer(zSocket, properties, 
-                new HttpServiceFactory(new MockHttpService()),
-                new DefaultRequestProcessor(), new MockSender(),
-                new List<string>() { "Server.Test" },
-                new List<Assembly>() { Assembly.GetExecutingAssembly() });
-            server.RunningProcess(new PoolDataForRequest(zSocket, Guid.NewGuid()));
+                8080, new ServerTime(), new MockPrinter());
+            var processor = new DefaultRequestProcessor();
+            processor.HandleRequest(request, zSocket,
+                new MockHttpService()
+                    .StubProcessRequest("200 OK"), properties,
+                new HttpResponse(zSocket));
 
-            zSocket.VerifyManyReceive(1);
+            zSocket.VerifyManyReceive(0);
         }
 
 

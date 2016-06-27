@@ -13,18 +13,23 @@ namespace Server.Test
             _mock = new Mock<IRequestProcessor>();
         }
 
-        public string HandleRequest(string request,
-            IZSocket handler, ISend sender,
-            IHttpServiceProcessor service,
-            ServerProperties serverProperties)
+
+        public string HandleRequest(string request, 
+            IZSocket handler, IHttpServiceProcessor service, 
+            ServerProperties properties,
+            IHttpResponse httpResponse)
         {
-            if (request == "GET /throw HTTP/1.1\r\n")
-                throw new System.Exception("Error");
-            if (request == "GET /Sleep HTTP/1.1\r\n")
-                Thread.Sleep(3000);
+            switch (request)
+            {
+                case "GET /throw HTTP/1.1\r\n":
+                    throw new System.Exception("Error");
+                case "GET /Sleep HTTP/1.1\r\n":
+                    Thread.Sleep(3000);
+                    break;
+            }
             return _mock.Object.HandleRequest(request,
-            handler, sender,
-            service, serverProperties);
+            handler, service, 
+            properties, httpResponse);
         }
     }
 }

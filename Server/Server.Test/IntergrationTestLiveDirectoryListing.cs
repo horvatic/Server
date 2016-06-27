@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -7,7 +8,7 @@ using Server.Core;
 
 namespace Server.Test
 {
-    internal class IntergrationTestLiveDirectoryListing : IHttpServiceProcessor
+    public class IntergrationTestLiveDirectoryListing : IHttpServiceProcessor
     {
         public bool CanProcessRequest(string request, ServerProperties serverProperties)
         {
@@ -25,21 +26,27 @@ namespace Server.Test
                                + requestItem.Substring(1));
         }
 
-        public IHttpResponse ProcessRequest(string request,
+        public string ProcessRequest(string request,
             IHttpResponse httpResponse,
             ServerProperties serverProperties)
         {
             var requestItem = CleanRequest(request);
             requestItem = requestItem.Substring(1);
-            httpResponse.HttpStatusCode = "200 OK";
-            httpResponse.CacheControl = "no-cache";
-            httpResponse.ContentType = "text/html";
-            httpResponse.Body = DirectoryContents(requestItem,
+            var dirPage = DirectoryContents(requestItem,
                 serverProperties.CurrentDir,
                 serverProperties.Port);
-            httpResponse.ContentLength
-                = Encoding.ASCII.GetBytes(httpResponse.Body).Length;
-            return httpResponse;
+            httpResponse.SendHeaders(new List<string>
+                {
+                    "HTTP/1.1 200 OK\r\n",
+                    "Cache-Control: no-cache\r\n",
+                    "Content-Type: text/html\r\n",
+                    "Content-Length: "
+                    + (Encoding.ASCII.GetByteCount(dirPage)) +
+                    "\r\n\r\n"
+                });
+            httpResponse.SendBody(Encoding.ASCII.GetBytes(dirPage),
+                                Encoding.ASCII.GetByteCount(dirPage));
+            return "200 OK";
         }
 
         private string CleanRequest(string request)

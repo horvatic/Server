@@ -14,18 +14,19 @@ namespace Server.Test
 
         public bool CanProcessRequest(string request, ServerProperties serverProperties)
         {
-            if(request == "GET /Default HTTP/1.1")
+            if (request == "GET /Default HTTP/1.1")
                 return false;
             return _mock.Object.CanProcessRequest(request, serverProperties);
         }
 
-        public IHttpResponse ProcessRequest(string request, IHttpResponse httpResponse,
+        public string ProcessRequest(string request, 
+            IHttpResponse httpResponse,
             ServerProperties serverProperties)
         {
             return _mock.Object.ProcessRequest(request, httpResponse, serverProperties);
         }
 
-        public MockHttpService StubProcessRequest(IHttpResponse response)
+        public MockHttpService StubProcessRequest(string response)
         {
             _mock.Setup(
                 m => m.ProcessRequest(It.IsAny<string>(), It.IsAny<IHttpResponse>(),
@@ -35,7 +36,7 @@ namespace Server.Test
 
         public MockHttpService StubCanProcessRequest(bool canProcess)
         {
-            _mock.Setup(m => m.CanProcessRequest(It.IsAny<string>(), 
+            _mock.Setup(m => m.CanProcessRequest(It.IsAny<string>(),
                 It.IsAny<ServerProperties>())).Returns(canProcess);
             return this;
         }

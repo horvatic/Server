@@ -4,8 +4,7 @@
     {
         bool Connected();
         string Receive();
-        int Send(string message);
-        void SendFile(string message);
+        int Send(byte[] packet, int size);
         IZSocket Accept();
         void Close();
     }
