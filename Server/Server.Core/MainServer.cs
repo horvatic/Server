@@ -12,7 +12,6 @@ namespace Server.Core
         private readonly List<string> _namespaces;
         private readonly ServerProperties _properties;
         private readonly IRequestProcessor _requestProcessor;
-        private readonly ISend _sender;
         private readonly HttpServiceFactory _serviceFactory;
         private readonly IZSocket _socket;
 
@@ -20,7 +19,6 @@ namespace Server.Core
             ServerProperties properties,
             HttpServiceFactory serviceFactory,
             IRequestProcessor requestProcessor,
-            ISend sender,
             List<string> namespaces,
             List<Assembly> assembly)
         {
@@ -33,7 +31,6 @@ namespace Server.Core
             _namespaces = namespaces;
             _assembly = assembly;
             _requestProcessor = requestProcessor;
-            _sender = sender;
         }
 
         public bool AcceptingNewConn { get; private set; }
@@ -45,7 +42,8 @@ namespace Server.Core
                 if (!AcceptingNewConn) return;
                 var handler = _socket.Accept();
                 ThreadPool.QueueUserWorkItem(RunningProcess,
-                    new PoolDataForRequest(handler, Guid.NewGuid()));
+                    new PoolDataForRequest(new HttpResponse(handler), 
+                    handler, Guid.NewGuid()));
             }
             catch (Exception)
             {
@@ -55,8 +53,9 @@ namespace Server.Core
 
         public void RunningProcess(object poolIdAndSocket)
         {
-            var handler = ((PoolDataForRequest) poolIdAndSocket).Handler;
-            var id = ((PoolDataForRequest) poolIdAndSocket).Id;
+            var handler = ((PoolDataForRequest)poolIdAndSocket).Handler;
+            var id = ((PoolDataForRequest)poolIdAndSocket).Id;
+            var response = ((PoolDataForRequest) poolIdAndSocket).Response;
             Interlocked.Increment(ref _numberOfThreads);
             var returnCode = "";
             try
@@ -78,7 +77,8 @@ namespace Server.Core
 
                 returnCode
                     = _requestProcessor.HandleRequest(request,
-                        handler, _sender, processor, _properties);
+                        handler, processor, _properties,
+                        response);
             }
             catch (Exception)
             {
@@ -89,7 +89,7 @@ namespace Server.Core
                 if (handler.Connected())
                     handler.Close();
                 Interlocked.Decrement(ref _numberOfThreads);
-                if(returnCode != "")
+                if (returnCode != "")
                     _properties.Io.Print("[" + _properties.Time.GetTime()
                                          + "] [<" + id + ">] "
                                          + returnCode);

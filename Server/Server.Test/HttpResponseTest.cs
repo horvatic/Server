@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using Server.Core;
 using Xunit;
 
@@ -9,122 +10,45 @@ namespace Server.Test
         [Fact]
         public void Make_Http_Response_Not_Null()
         {
-            var respone = new HttpResponse();
+            var respone = new HttpResponse(new MockZSocket());
             Assert.NotNull(respone);
         }
 
         [Fact]
-        public void Http_Default_Values_Correct()
+        public void Send_HTTP_Header()
         {
-            var respone = new HttpResponse();
-            Assert.Equal("200 OK", respone.HttpStatusCode);
-            Assert.Equal("no-cache", respone.CacheControl);
-            Assert.Equal("text/html", respone.ContentType);
-            Assert.Equal(null, respone.ContentDisposition);
-            Assert.Equal(null, respone.Filename);
-            Assert.Equal(null, respone.FilePath);
-            Assert.Equal("", respone.Body);
-        }
-
-        [Fact]
-        public void Http_Change_Values_Correct()
-        {
-            var respone = new HttpResponse
+            var mockSocket = new MockZSocket();
+            var responeList = new List<string>
             {
-                HttpStatusCode = "404 Not Found",
-                CacheControl = "no-store",
-                ContentType = "application/octet-stream",
-                Filename = "Hello",
-                FilePath = "C:/Hello",
-                ContentDisposition = "inline",
-                Body = "<p>Hello</p>"
-            };
-            Assert.Equal("404 Not Found", respone.HttpStatusCode);
-            Assert.Equal("no-store", respone.CacheControl);
-            Assert.Equal("application/octet-stream", respone.ContentType);
-            Assert.Equal("inline", respone.ContentDisposition);
-            Assert.Equal("Hello", respone.Filename);
-            Assert.Equal("C:/Hello", respone.FilePath);
-            Assert.Equal("<p>Hello</p>", respone.Body);
-        }
-
-        [Fact]
-        public void Http_Copy()
-        {
-            var respone = new HttpResponse
-            {
-                HttpStatusCode = "404 Not Found",
-                CacheControl = "no-store",
-                ContentType = "application/octet-stream",
-                Filename = "Hello",
-                FilePath = "C:/Hello",
-                ContentDisposition = "inline",
-                Body = "<p>Hello</p>",
-                ContentLength = 100
-           };
-
-            var copy = new HttpResponse(respone);
-
-            Assert.Equal("404 Not Found", copy.HttpStatusCode);
-            Assert.Equal("no-store", copy.CacheControl);
-            Assert.Equal("application/octet-stream", copy.ContentType);
-            Assert.Equal("inline", copy.ContentDisposition);
-            Assert.Equal("Hello", copy.Filename);
-            Assert.Equal("C:/Hello", copy.FilePath);
-            Assert.Equal("<p>Hello</p>", copy.Body);
-            Assert.Equal(100, copy.ContentLength);
-        }
-
-        [Fact]
-        public void Http_Clone()
-        {
-            var respone = new HttpResponse
-            {
-                HttpStatusCode = "404 Not Found",
-                CacheControl = "no-store",
-                ContentType = "application/octet-stream",
-                Filename = "Hello",
-                FilePath = "C:/Hello",
-                ContentDisposition = "inline",
-                Body = "<p>Hello</p>",
-                ContentLength = 100
+                "Status : 200 OK\r\n",
+                "Transfer-Encoding: chunked\r\n\r\n"
             };
 
-            var copy = respone.Clone();
+            var respone = new HttpResponse(mockSocket);
+            respone.SendHeaders(responeList);
 
-            Assert.Equal("404 Not Found", copy.HttpStatusCode);
-            Assert.Equal("no-store", copy.CacheControl);
-            Assert.Equal("application/octet-stream", copy.ContentType);
-            Assert.Equal("inline", copy.ContentDisposition);
-            Assert.Equal("Hello", copy.Filename);
-            Assert.Equal("C:/Hello", copy.FilePath);
-            Assert.Equal("<p>Hello</p>", copy.Body);
-            Assert.Equal(100, copy.ContentLength);
+            mockSocket
+                .VerifySend(Encoding.ASCII
+                    .GetBytes("Status : 200 OK\r\n"),
+                    Encoding.ASCII
+                        .GetByteCount("Status : 200 OK\r\n"));
+
+            mockSocket
+                .VerifySend(Encoding.ASCII
+                    .GetBytes("Transfer-Encoding: chunked\r\n\r\n"),
+                    Encoding.ASCII
+                        .GetByteCount("Transfer-Encoding: chunked\r\n\r\n"));
         }
 
         [Fact]
-        public void Http_Clone_Other_Headers()
+        public void Send_HTTP_Body()
         {
-            var respone = new HttpResponse
-            {
-                HttpStatusCode = "404 Not Found",
-                CacheControl = "no-store",
-                ContentType = "application/octet-stream",
-                Filename = "Hello",
-                FilePath = "C:/Hello",
-                ContentDisposition = "inline",
-                Body = "<p>Hello</p>",
-                ContentLength = 100,
-                OtherHeaders = new List<string>()
-                {
-                    "Accpet : Yes"
-                }
-            };
+            var data = new byte[200];
+            var mockSocket = new MockZSocket();
 
-            var copy = respone.Clone();
-
-            Assert.Equal("Accpet : Yes",
-                respone.OtherHeaders[0]);
+            var respone = new HttpResponse(mockSocket);
+            respone.SendBody(data, data.Length);
+            mockSocket.Send(data, data.Length);
         }
     }
 }

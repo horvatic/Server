@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Server.Core
 {
@@ -42,32 +37,20 @@ namespace Server.Core
             return _tcpSocket.Connected;
         }
 
-        public int Send(string message)
+        public int Send(byte[] packet, int size)
         {
-            return _tcpSocket.Send(Encoding.ASCII.GetBytes(message));
-        }
-
-        public void SendFile(string message)
-        {
-            using (var fileStream = File.Open(message,
-                FileMode.Open,
-                FileAccess.Read,
-                FileShare.Read))
-            {
-                var buffer = new byte[BufferSize];
-                int bytesRead;
-                while ((bytesRead = fileStream.Read(buffer, 0, BufferSize)) > 0)
-                {
-                    _tcpSocket.Send(buffer, bytesRead, SocketFlags.None);
-                }
-            }
+            return
+                _tcpSocket.Send(packet, size,
+                    SocketFlags.None);
         }
 
         public string Receive()
         {
             var readData = new byte[BufferSize];
             var lengthRead = _tcpSocket.Receive(readData);
-            return (Encoding.Default.GetString(readData).Substring(0, lengthRead));
+            return (Encoding.Default
+                .GetString(readData)
+                .Substring(0, lengthRead));
         }
     }
 }

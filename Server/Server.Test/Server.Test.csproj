@@ -75,14 +75,12 @@
   <ItemGroup>
     <Compile Include="DefaultPrinterTest.cs" />
     <Compile Include="DefaultRequestProcessorTest.cs" />
-    <Compile Include="DefaultSenderTest.cs" />
     <Compile Include="IntergrationTestLiveDirectoryListing.cs" />
     <Compile Include="IntergrationTestLiveFileService.cs" />
     <Compile Include="IntergrationTests.cs" />
     <Compile Include="MockDefaultService.cs" />
     <Compile Include="MockPrinter.cs" />
     <Compile Include="MockRequestProcessor.cs" />
-    <Compile Include="MockSender.cs" />
     <Compile Include="MockServerTime.cs" />
     <Compile Include="PoolDataForRequestTest.cs" />
     <Compile Include="ServerTimeTest.cs" />

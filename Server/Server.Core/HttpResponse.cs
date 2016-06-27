@@ -1,51 +1,30 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Serialization.Formatters;
+using System.Linq;
+using System.Text;
 
 namespace Server.Core
 {
     public class HttpResponse : IHttpResponse
     {
-        public HttpResponse()
+        private readonly IZSocket _socket;
+
+        public HttpResponse(IZSocket socket)
         {
+            _socket = socket;
         }
 
-        public HttpResponse(IHttpResponse copy)
+        public bool SendHeaders(List<string> headers)
         {
-            HttpStatusCode = copy.HttpStatusCode;
-
-            CacheControl = copy.CacheControl;
-
-            ContentType = copy.ContentType;
-
-            ContentDisposition = copy.ContentDisposition;
-
-            Filename = copy.Filename;
-
-            FilePath = copy.FilePath;
-
-            Body = copy.Body;
-
-            ContentLength = copy.ContentLength;
-
-            if (copy.OtherHeaders == null) return;
-            OtherHeaders = new List<string>();
-            foreach(var header in copy.OtherHeaders)
-                OtherHeaders.Add(header);
+            var sendSize =
+                headers.Sum(header =>
+                    _socket.Send(Encoding.ASCII.GetBytes(header),
+                        Encoding.ASCII.GetByteCount(header)));
+            return sendSize > 0 ? true : false;
         }
 
-        public string HttpStatusCode { get; set; } = "200 OK";
-        public string CacheControl { get; set; } = "no-cache";
-        public string ContentType { get; set; } = "text/html";
-        public string ContentDisposition { get; set; }
-        public string Filename { get; set; }
-        public string FilePath { get; set; }
-        public string Body { get; set; } = "";
-        public long ContentLength { get; set; }
-        public List<string> OtherHeaders { get; set; }
-
-        public IHttpResponse Clone()
+        public int SendBody(byte[] packet, int size)
         {
-            return new HttpResponse(this);
+            return _socket.Send(packet, size);
         }
     }
 }

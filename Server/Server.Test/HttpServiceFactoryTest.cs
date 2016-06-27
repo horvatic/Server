@@ -19,28 +19,30 @@ namespace Server.Test
         public void Make_Mock_Http_Processor_Factory()
         {
             var serverProperties = new ServerProperties("c:/", 5555, 
-                new HttpResponse(), new ServerTime(),
+                new ServerTime(),
                 new MockPrinter());
             var httpFactory = new HttpServiceFactory(new MockHttpService());
             var gotMockedHttpService = httpFactory.GetService("GET / HTTP/1.1",
-                new List<string>() {"Server.Test"}, 
+                new List<string>() { "Server.Test" },
                 new List<Assembly>() { Assembly.GetExecutingAssembly() },
                 serverProperties);
             Assert.NotNull(gotMockedHttpService);
         }
 
-        [Fact] public void Http_Processor_Factory_Default()
+        [Fact]
+        public void Http_Processor_Factory_Default()
         {
-            var serverProperties = new ServerProperties(null, 
-                5555, new HttpResponse(), new ServerTime(),
+            var serverProperties = new ServerProperties(null,
+                5555, new ServerTime(),
                 new MockPrinter());
             var httpFactory = new HttpServiceFactory(new MockDefaultService());
             var gotMockedHttpService = httpFactory.GetService("GET /Default HTTP/1.1",
-                new List<string>() { "Server.Core", "Server.Test" }, 
+                new List<string>() { "Server.Core", "Server.Test" },
                 new List<Assembly>() { Assembly.GetAssembly(typeof(MockDefaultService)),
-                    Assembly.GetExecutingAssembly()}, 
+                    Assembly.GetExecutingAssembly()},
                 serverProperties);
-            Assert.IsType(typeof(MockDefaultService), gotMockedHttpService);
+            Assert.IsType(typeof(MockDefaultService), 
+                gotMockedHttpService);
         }
     }
 }

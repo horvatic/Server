@@ -4,13 +4,16 @@ namespace Server.Core
 {
     public class PoolDataForRequest
     {
-        public PoolDataForRequest(IZSocket handler, Guid id)
+        public PoolDataForRequest(HttpResponse response,
+            IZSocket handler, Guid id)
         {
             Handler = handler;
             Id = id;
+            Response = response;
         }
 
         public IZSocket Handler { get; }
         public Guid Id { get; }
+        public HttpResponse Response { get; }
     }
 }

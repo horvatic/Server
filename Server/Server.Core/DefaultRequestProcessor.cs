@@ -5,17 +5,18 @@ namespace Server.Core
     public class DefaultRequestProcessor : IRequestProcessor
     {
         public string HandleRequest(string request,
-            IZSocket handler, ISend sender,
+            IZSocket handler,
             IHttpServiceProcessor service,
-            ServerProperties serverProperties)
+            ServerProperties serverProperties,
+            IHttpResponse httpResponse)
         {
             if (request.Contains("Content-Type: multipart/form-data;"))
                 return MultiPart(request,
                     handler, service, serverProperties,
-                    sender);
+                    httpResponse);
             return NoMultiPart(request,
                 handler, service, serverProperties,
-                sender);
+                httpResponse);
         }
 
         private string GetPacketSplit(string request)
@@ -32,36 +33,37 @@ namespace Server.Core
             IZSocket handler,
             IHttpServiceProcessor service,
             ServerProperties serverProperties,
-            ISend sender)
+            IHttpResponse httpResponse)
         {
             var requestPacket = request;
             var packetSplit = GetPacketSplit(request);
-            var httpResponce = serverProperties.DefaultResponse.Clone();
+            
 
-            httpResponce = service.ProcessRequest(requestPacket,
-                httpResponce, serverProperties);
+            var status = service.ProcessRequest(requestPacket,
+                httpResponse, serverProperties);
 
             while (!requestPacket.EndsWith($"------{packetSplit}--\r\n"))
             {
                 requestPacket = handler.Receive();
-                if (httpResponce.HttpStatusCode != "409 Conflict")
-                    httpResponce = service
-                        .ProcessRequest(requestPacket, httpResponce,
+                if (status != "409 Conflict")
+                    status = service
+                        .ProcessRequest(requestPacket,
+                        httpResponse,
                             serverProperties);
             }
-            return sender.SendResponce(handler, httpResponce);
+            return status;
         }
 
         private string NoMultiPart(string request,
             IZSocket handler,
             IHttpServiceProcessor service,
             ServerProperties serverProperties,
-            ISend sender)
+            IHttpResponse httpResponse)
         {
-            var httpResponce = service.ProcessRequest(request,
-                serverProperties.DefaultResponse.Clone(),
+            var status = service.ProcessRequest(request,
+                httpResponse,
                 serverProperties);
-            return sender.SendResponce(handler, httpResponce);
+            return status;
         }
     }
 }

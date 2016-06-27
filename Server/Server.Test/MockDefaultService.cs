@@ -11,13 +11,14 @@ namespace Server.Test
         {
             _mock = new Mock<IHttpServiceProcessor>();
         }
-        public bool CanProcessRequest(string request, ServerProperties serverProperties)
+        public bool CanProcessRequest(string request,
+            ServerProperties serverProperties)
         {
             return false;
         }
 
-        public IHttpResponse ProcessRequest(string request, 
-            IHttpResponse httpResponse, 
+        public string ProcessRequest(string request,
+            IHttpResponse httpResponse,
             ServerProperties serverProperties)
         {
             return _mock.Object.ProcessRequest(request,

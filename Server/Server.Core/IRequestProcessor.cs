@@ -3,8 +3,8 @@
     public interface IRequestProcessor
     {
         string HandleRequest(string request, IZSocket handler,
-            ISend sender, 
             IHttpServiceProcessor service,
-            ServerProperties properties);
+            ServerProperties properties,
+            IHttpResponse httpResponse);
     }
 }
